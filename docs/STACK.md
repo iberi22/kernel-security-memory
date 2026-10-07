@@ -48,3 +48,11 @@ Acceptance requires actual ranks/qrels/citations, negative queries, temporal lea
 - https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
 - https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases
 - https://github.com/asg017/sqlite-vec
+
+## Xavier implementation boundary verified locally
+
+`src/storage/multi_db.rs` creates/migrates Xavier-owned databases; deletion removes SQLite/WAL/SHM and is not external-pack unmount. `/v1/workspaces/db` is not a generic reader for this corpus. `/v1/memories/search` can serve native memories for a future external federator.
+
+`code-graph/src/parser/c.rs` parses C symbols, but `code-graph/src/types.rs` Symbol has no commit identity; `src/codebase/repo_identity.rs` tracks one indexed commit. Our corpus needs repo+commit+blob+symbol identity. `src/memory/graph_store.rs` and context timeline do not by themselves reconstruct Linux patch causality.
+
+`src/embedding/mod.rs` and sqlite_vec_store/schema_impl.rs track active model/dimensions and invalidate embeddings on model-name change; an imported embedding still needs its full effective-model contract. Generic external read-only pack mounting, non-destructive unmount and pack/native federated search were not found in productive code. These are implementation gaps, not existing Xavier capabilities.
