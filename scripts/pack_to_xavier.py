@@ -76,7 +76,13 @@ def verify_pack(source, manifest_sha256=None):
         if not (path_str.endswith(".json") and path_str.startswith("records/")):
             continue
         file_path = source_dir / path_str
-        if not is_safe_path(str(source_dir), file_path):
+        # Validate the relative record path itself: file_path already
+        # contains source_dir, so passing it would join the base twice.
+        if not is_safe_path(str(source_dir), path_str):
+            raise ValueError(f"Path traversal detected: {path_str}")
+        resolved = (source_dir / path_str).resolve()
+        if resolved != file_path.resolve() or \
+                source_dir.resolve() not in resolved.parents:
             raise ValueError(f"Path traversal detected: {path_str}")
         data = file_path.read_bytes()
         if len(data) != file_info.get("bytes"):
@@ -91,6 +97,16 @@ def verify_pack(source, manifest_sha256=None):
     return manifest, records
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise urllib.error.HTTPError(req.full_url, code,
+                                     "Redirects not allowed", headers, fp)
+
+
+def _opener():
+    return urllib.request.build_opener(_NoRedirect)
+
+
 def _request(url, token, method="POST", body=None):
     data = json.dumps(body).encode("utf-8") if body is not None else None
     req = urllib.request.Request(
@@ -103,7 +119,7 @@ def _request(url, token, method="POST", body=None):
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+        with _opener().open(req, timeout=TIMEOUT) as resp:
             return resp.status, resp.read()
     except urllib.error.HTTPError as exc:
         try:
@@ -113,6 +129,20 @@ def _request(url, token, method="POST", body=None):
         raise RuntimeError(f"HTTP {exc.code} {method} {url} :: {detail}")
     except urllib.error.URLError as exc:
         raise RuntimeError(f"Network error {method} {url} :: {exc.reason}")
+
+
+def _url_allowed(base_url):
+    """Bearer tokens travel only over TLS, or plain HTTP to loopback."""
+    try:
+        parts = urllib.parse.urlparse(base_url)
+    except Exception:
+        return False
+    if parts.scheme == "https" and parts.hostname:
+        return True
+    if parts.scheme == "http" and parts.hostname in (
+            "localhost", "127.0.0.1", "::1"):
+        return True
+    return False
 
 
 def mem_path(prefix, record_id):
@@ -129,17 +159,41 @@ def mem_body(prefix, record):
     }
 
 
+def _load_inventory(path):
+    if not path:
+        return []
+    try:
+        items = json.loads(Path(path).read_bytes().decode("utf-8"))
+    except FileNotFoundError:
+        return []
+    return [p for p in items if isinstance(p, str) and "/" in p]
+
+
+def _save_inventory(path, paths):
+    if not path:
+        return
+    Path(path).write_text(json.dumps(sorted(set(paths)), indent=2) + "\n")
+
+
 def publish(records, base_url, token, endpoint=DEFAULT_ENDPOINT,
-            prefix="ksm-pack", dry_run=False, disconnect=False):
+            prefix="ksm-pack", dry_run=False, disconnect=False,
+            inventory=None):
     """Send one request per record. Returns a summary dict. No secrets in it."""
     url = base_url.rstrip("/") + endpoint
     action = "DELETE" if disconnect else "POST"
-    plan = []
-    for record in records:
-        path = mem_path(prefix, record["id"])
-        target = url + "/" + urllib.parse.quote(path, safe="")
-        body = None if disconnect else mem_body(prefix, record)
-        plan.append((path, target, body))
+    if disconnect:
+        paths = [mem_path(prefix, r["id"]) for r in records]
+        for known in _load_inventory(inventory):
+            if known not in paths:
+                paths.append(known)
+        plan = [(p, url + "/" + urllib.parse.quote(p, safe=""), None)
+                for p in paths]
+    else:
+        plan = []
+        for record in records:
+            path = mem_path(prefix, record["id"])
+            target = url + "/" + urllib.parse.quote(path, safe="")
+            plan.append((path, target, mem_body(prefix, record)))
     if dry_run:
         for path, target, body in plan:
             nbytes = len(json.dumps(body).encode()) if body else 0
@@ -160,6 +214,8 @@ def publish(records, base_url, token, endpoint=DEFAULT_ENDPOINT,
     print(json.dumps(summary, indent=2))
     if failed:
         raise SystemExit(f"Error: {len(failed)}/{len(plan)} requests failed")
+    if not disconnect:
+        _save_inventory(inventory, [p for p, _, _ in plan])
     return summary
 
 
@@ -177,6 +233,9 @@ def main(argv=None):
                         help="Verify and show what would be sent; no network")
     parser.add_argument("--disconnect", action="store_true",
                         help="DELETE every path with the prefix instead of publishing")
+    parser.add_argument("--inventory", default=None,
+                        help="Optional JSON file recording published paths; "
+                             "disconnect also deletes paths listed here")
     args = parser.parse_args(argv)
 
     if args.source.startswith(("http://", "https://")):
@@ -188,16 +247,18 @@ def main(argv=None):
 
     if args.dry_run:
         return publish(records, "<dry-run>", "<dry-run>",
-                       args.endpoint, args.path_prefix, dry_run=True)
+                       args.endpoint, args.path_prefix, dry_run=True,
+                       disconnect=args.disconnect, inventory=args.inventory)
 
     base_url = _environ("XAVIER_URL")
     token = _environ("XAVIER_TOKEN")
-    if base_url.startswith(("http://localhost", "https://")) is False and \
-            not base_url.startswith("http"):
-        raise SystemExit("Error: XAVIER_URL must be an http(s) URL")
+    if not _url_allowed(base_url):
+        raise SystemExit("Error: XAVIER_URL must be https, or http loopback "
+                         "(localhost/127.0.0.1/::1)")
     try:
         return publish(records, base_url, token, args.endpoint,
-                       args.path_prefix, disconnect=args.disconnect)
+                       args.path_prefix, disconnect=args.disconnect,
+                       inventory=args.inventory)
     except SystemExit:
         raise
     except Exception as exc:  # noqa: BLE001 - never leak the token

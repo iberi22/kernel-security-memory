@@ -6,6 +6,7 @@ import io
 import json
 import os
 import sys
+import tempfile
 import threading
 from contextlib import redirect_stderr, redirect_stdout
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -85,10 +86,8 @@ class BridgeTest(TestCase):
         cls.thread = threading.Thread(target=cls.server.serve_forever,
                                       daemon=True)
         cls.thread.start()
-        cls.tmp = Path(os.environ.get("TMPDIR", "/tmp/opencode")) / "packbridge"
-        if cls.tmp.exists():
-            import shutil
-            shutil.rmtree(cls.tmp)
+        cls._tmpdir = tempfile.TemporaryDirectory(prefix="packbridge-")
+        cls.tmp = Path(cls._tmpdir.name)
         pack = cls.tmp / "pack"
         pack.mkdir(parents=True)
         for name, body in artifacts([make_record("r1"), make_record("r2")]).items():
@@ -103,6 +102,7 @@ class BridgeTest(TestCase):
     def tearDownClass(cls):
         cls.server.shutdown()
         cls.thread.join()
+        cls._tmpdir.cleanup()
 
     def setUp(self):
         CaptureHandler.store = {"POST": [], "DELETE": [], "fail": False}
@@ -172,6 +172,94 @@ class BridgeTest(TestCase):
         out, err, code = self.run_main(
             "--source", "https://example.com/pack", "--dry-run")
         self.assertNotEqual(code, 0)
+
+    def test_dry_run_disconnect_previews_deletes(self):
+        out, err, code = self.run_main("--source", self.pack, "--dry-run",
+                                       "--disconnect", "--path-prefix",
+                                       "ksm-test")
+        self.assertEqual(code, 0)
+        self.assertIn("DRY-RUN DELETE", out)
+        self.assertNotIn("DRY-RUN POST", out)
+        self.assertEqual(CaptureHandler.store["POST"], [])
+        self.assertEqual(CaptureHandler.store["DELETE"], [])
+
+    def test_rejects_cleartext_remote_url(self):
+        os.environ["XAVIER_URL"] = "http://example.com:9999"
+        try:
+            out, err, code = self.run_main("--source", self.pack)
+            self.assertNotEqual(code, 0)
+            self.assertEqual(CaptureHandler.store["POST"], [])
+        finally:
+            os.environ["XAVIER_URL"] = f"http://127.0.0.1:{self.port}"
+
+    def test_redirects_not_followed(self):
+        from http.server import BaseHTTPRequestHandler, HTTPServer
+        from pack_to_xavier import _request
+
+        class Redirector(BaseHTTPRequestHandler):
+            def do_POST(self):
+                length = int(self.headers.get("Content-Length", 0))
+                self.rfile.read(length)
+                self.send_response(302)
+                self.send_header("Location",
+                                 "http://127.0.0.1:9/stolen")
+                self.end_headers()
+
+            def log_message(self, *args):
+                pass
+
+        srv = HTTPServer(("127.0.0.1", 0), Redirector)
+        port = srv.server_address[1]
+        thread = threading.Thread(target=srv.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with self.assertRaises(RuntimeError) as ctx:
+                _request(f"http://127.0.0.1:{port}/v1/memories",
+                         SECRET, body={"a": 1})
+            # redirect refused instead of followed: 302 surfaces as error
+            self.assertIn("302", str(ctx.exception))
+        finally:
+            srv.shutdown()
+            thread.join()
+
+    def test_inventory_covers_older_paths_on_disconnect(self):
+        inv = Path(self.tmp) / "inv.json"
+        inv.write_text(json.dumps(["ksm-test/old-gone"]) + "\n")
+        out, err, code = self.run_main(
+            "--source", self.pack, "--disconnect", "--path-prefix",
+            "ksm-test", "--inventory", str(inv))
+        self.assertEqual(code, 0)
+        deleted = [d["path"] for d in CaptureHandler.store["DELETE"]]
+        self.assertTrue(any("old-gone" in p for p in deleted))
+        self.assertEqual(len(deleted), 3)
+
+    def test_publish_writes_inventory(self):
+        inv = Path(self.tmp) / "inv2.json"
+        out, err, code = self.run_main(
+            "--source", self.pack, "--path-prefix", "ksm-test",
+            "--inventory", str(inv))
+        self.assertEqual(code, 0)
+        saved = json.loads(inv.read_text())
+        self.assertEqual(sorted(saved), ["ksm-test/r1", "ksm-test/r2"])
+
+    def test_traversal_path_in_manifest_rejected(self):
+        import hashlib
+        evil = Path(self.tmp) / "evilpack"
+        (evil / "records").mkdir(parents=True)
+        body = b'{"schema_version": "0.1.0"}'
+        (evil / "records" / "ok.json").write_bytes(body)
+        manifest = {
+            "schema_version": "0.1.0",
+            "files": [
+                {"path": "records/../evil.json",
+                 "bytes": len(body),
+                 "sha256": hashlib.sha256(body).hexdigest()},
+            ],
+        }
+        (evil / "manifest.json").write_text(json.dumps(manifest))
+        from pack_to_xavier import verify_pack
+        with self.assertRaises(ValueError):
+            verify_pack(str(evil))
 
     def test_missing_env_fails_closed(self):
         del os.environ["XAVIER_TOKEN"]
