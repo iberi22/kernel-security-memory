@@ -11,3 +11,5 @@ Not yet implemented: full history scan, security candidate classifier, C AST min
 ## Remote operation checkpoint — 2026-10-07
 
 Public verification Actions runs completed successfully and Pages is built. Recommended provisional stack and operating limits are in STACK.md. Simulation PR https://github.com/iberi22/swal-sim/pull/4 is under review: five tests pass, but retrieval metrics include unsupported proxies and an unrelated path change, so it is not accepted evidence. Corrections requested in the same Jules session; ADR-001 remains PROPOSED.
+
+Wave 1 dispatched through the official Jules API against public main (delivery pending): source candidates [#6](https://github.com/iberi22/kernel-security-memory/issues/6), bounded graph retrieval [#7](https://github.com/iberi22/kernel-security-memory/issues/7), verified portable reader [#8](https://github.com/iberi22/kernel-security-memory/issues/8). These are independent prototypes with disjoint file ownership; publication does not assert they are implemented.
