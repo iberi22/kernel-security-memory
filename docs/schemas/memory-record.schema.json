@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iberi22.github.io/kernel-security-memory/schemas/memory-record.schema.json",
+  "title": "Kernel evidence memory record v0.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "project",
+    "title",
+    "status",
+    "nodes",
+    "edges",
+    "evidence",
+    "claims",
+    "evolution",
+    "validation",
+    "license"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+$"
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "observed",
+        "hypothesis",
+        "validated",
+        "unknown"
+      ]
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "repository",
+              "advisory",
+              "commit",
+              "code_version",
+              "pattern",
+              "test_observation",
+              "review_observation"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attributes": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "label",
+          "attributes"
+        ]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "parent_of",
+              "fixes",
+              "fixed_by",
+              "changes",
+              "before",
+              "after",
+              "backport_of",
+              "reverts",
+              "supersedes",
+              "affects",
+              "supports",
+              "refutes"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "observed",
+              "hypothesis",
+              "validated",
+              "unknown"
+            ]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "known_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "target",
+          "relation",
+          "status",
+          "evidence_ids",
+          "known_at"
+        ]
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "observed_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "hash_scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_license": {
+            "type": "string",
+            "minLength": 1
+          },
+          "extractor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "observed_at",
+          "sha256",
+          "hash_scope",
+          "source_license",
+          "extractor"
+        ]
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "observed",
+              "hypothesis",
+              "validated",
+              "unknown"
+            ]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "status",
+          "evidence_ids"
+        ]
+      }
+    },
+    "evolution": {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "enum": [
+            "UNKNOWN",
+            "REFINED",
+            "REVERTED",
+            "TEST_SUPPORTED",
+            "DISPUTED"
+          ]
+        },
+        "horizon_end": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "coverage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "followups": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "outcome",
+        "horizon_end",
+        "coverage",
+        "followups"
+      ]
+    },
+    "validation": {
+      "type": "object"
+    },
+    "license": {
+      "type": "object"
+    }
+  }
+}

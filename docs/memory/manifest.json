@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "kernel-security-memory-bootstrap-v0",
+  "project": "linux",
+  "record_count": 1,
+  "source_scope": "source-linked seed; not full history",
+  "vectors": "NOT_BUILT",
+  "files": [
+    {
+      "path": "kernel-security-memory.sql",
+      "sha256": "67c4572662d9850781dbe415b238448270647022c2fd2011a804161e151458ff",
+      "bytes": 14055
+    },
+    {
+      "path": "records/linux-CVE-2024-26581-mainline.json",
+      "sha256": "80d7aa9051ac9e1ef7499c17bf91e50871b3dbdf4713a4b05c0b0968eadbfc29",
+      "bytes": 7544
+    }
+  ]
+}

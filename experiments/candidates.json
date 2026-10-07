@@ -1,0 +1,49 @@
+{
+  "schema_version": "0.1.0",
+  "selection": "requirement-based, not global ranking",
+  "measured": false,
+  "candidates": [
+    {
+      "id": "xavier",
+      "name": "Xavier",
+      "source": "https://github.com/iberi22/xavier",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "id": "vul-rag",
+      "name": "Vul-RAG",
+      "source": "https://github.com/KnowledgeRAG4LLMVulD/KnowledgeRAG4LLMVulD",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "id": "microsoft-graphrag",
+      "name": "Microsoft GraphRAG",
+      "source": "https://github.com/microsoft/graphrag",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "id": "lightrag",
+      "name": "LightRAG",
+      "source": "https://github.com/HKUDS/LightRAG",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "id": "llamaindex",
+      "name": "LlamaIndex",
+      "source": "https://developers.llamaindex.ai/python/framework/module_guides/indexing/lpg_index_guide/",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "id": "langgraph",
+      "name": "LangGraph",
+      "source": "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "id": "pageindex",
+      "name": "PageIndex",
+      "source": "https://github.com/VectifyAI/PageIndex",
+      "execution_status": "NOT_RUN"
+    }
+  ]
+}
