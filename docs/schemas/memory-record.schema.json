@@ -181,6 +181,14 @@
           "extractor": {
             "type": "string",
             "minLength": 1
+          },
+          "fetch_url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "canonicalization": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
@@ -190,7 +198,9 @@
           "sha256",
           "hash_scope",
           "source_license",
-          "extractor"
+          "extractor",
+          "fetch_url",
+          "canonicalization"
         ]
       }
     },
@@ -257,7 +267,38 @@
           "minLength": 1
         },
         "followups": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "node_id",
+              "evidence_ids"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "test_result",
+                  "revert",
+                  "fix_followup",
+                  "dispute"
+                ]
+              },
+              "node_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_ids": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
         }
       },
       "required": [
