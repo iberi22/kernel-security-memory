@@ -53,6 +53,31 @@ class PackTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate(r)
 
+    def test_reject_fabricated_evolution_support(self):
+        for outcome in ('TEST_SUPPORTED', 'REVERTED', 'REFINED'):
+            r = copy.deepcopy(self.records[0])
+            r['evolution']['outcome'] = outcome
+            r['evolution']['followups'] = ['invented']
+            with self.assertRaises(ValueError):
+                validate(r)
+
+    def test_reject_contract_type_and_missing_fields(self):
+        changes = [('validation', []), ('license', ''), ('id', 4)]
+        for key, value in changes:
+            r = copy.deepcopy(self.records[0])
+            r[key] = value
+            with self.assertRaises(ValueError):
+                validate(r)
+        for key in ('coverage', 'horizon_end', 'followups'):
+            r = copy.deepcopy(self.records[0])
+            del r['evolution'][key]
+            with self.assertRaises(ValueError):
+                validate(r)
+        r = copy.deepcopy(self.records[0])
+        r['claims'][0]['evidence_ids'] *= 2
+        with self.assertRaises(ValueError):
+            validate(r)
+
     def test_reject_duplicate_evidence_and_bad_hash(self):
         r = copy.deepcopy(self.records[0])
         r['evidence'].append(copy.deepcopy(r['evidence'][0]))

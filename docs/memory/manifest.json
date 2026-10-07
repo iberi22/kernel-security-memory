@@ -8,13 +8,13 @@
   "files": [
     {
       "path": "kernel-security-memory.sql",
-      "sha256": "67c4572662d9850781dbe415b238448270647022c2fd2011a804161e151458ff",
-      "bytes": 14055
+      "sha256": "a66268f1f8c5f3ca4ede7f2d0093249924ab3a96b5727a3b3380264a4a450491",
+      "bytes": 15757
     },
     {
       "path": "records/linux-CVE-2024-26581-mainline.json",
-      "sha256": "80d7aa9051ac9e1ef7499c17bf91e50871b3dbdf4713a4b05c0b0968eadbfc29",
-      "bytes": 7544
+      "sha256": "8bf48427a43ddc3452da20c6a087e9bbc884b38104f0f315d08d9f6ca5c5ce52",
+      "bytes": 8459
     }
   ]
 }

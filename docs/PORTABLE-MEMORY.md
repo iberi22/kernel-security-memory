@@ -11,7 +11,7 @@ https://iberi22.github.io/kernel-security-memory/memory/manifest.json
 
 Manifest: schema version, pack ID, project, record count, source scope, and `{path, sha256, bytes}` entries. Download a manifest from a trusted/pinned revision and verify each object before parsing. Hashes give integrity, not publisher authentication if both manifest and data come from an untrusted mutable source. Paths must remain inside the memory pack.
 
-Records follow `schemas/memory-record.schema.json`. Edges and claims reference evidence within the record. UNKNOWN is a valid outcome. Pack-level splits and snapshot metadata are added with the miner. HTTP provides GET data; dynamic `/search` is not promised.
+Records follow `schemas/memory-record.schema.json`. Evidence includes a human-facing URL and a fetch URL plus explicit digest canonicalization. Capture-time API digests may change when API metadata changes; immutable blob hashes can be reproduced from raw bytes. Evolution conclusions require typed, source-linked observations; a passing test requires its command, revision and environment. Edges and claims reference evidence within the record. UNKNOWN is a valid outcome. Pack-level splits and snapshot metadata are added with the miner. HTTP provides GET data; dynamic `/search` is not promised.
 
 ## SQL text snapshot
 

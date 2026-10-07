@@ -28,48 +28,97 @@ def canonical(value):
     return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':'))
 
 
+def fields(value, required, label):
+    if not isinstance(value, dict) or not set(required) <= value.keys():
+        raise ValueError(f'Missing/invalid {label} fields')
+
+
+def text(value):
+    return isinstance(value, str) and bool(value.strip())
+
+
+def references(value, known):
+    return (isinstance(value, list) and bool(value) and all(text(x) for x in value)
+            and len(value) == len(set(value)) and set(value) <= known)
+
+
 def validate(record):
     required = {'schema_version', 'id', 'project', 'title', 'status', 'nodes', 'edges', 'evidence', 'claims', 'evolution', 'validation', 'license'}
-    if not isinstance(record, dict) or not required <= record.keys():
-        raise ValueError('Missing required record fields')
-    if record['schema_version'] != '0.1.0' or not re.fullmatch(r'[A-Za-z0-9_.-]+', record['id']):
+    fields(record, required, 'record')
+    if record['schema_version'] != '0.1.0' or not text(record['id']) or not re.fullmatch(r'[A-Za-z0-9_.-]+', record['id']):
         raise ValueError('Invalid version or record id')
-    if record['status'] not in STATES:
-        raise ValueError('Invalid record status')
+    if not text(record['project']) or not text(record['title']) or record['status'] not in STATES:
+        raise ValueError('Invalid record text/status')
     for key in ('nodes', 'edges', 'evidence', 'claims'):
         if not isinstance(record[key], list):
             raise ValueError(f'{key} must be an array')
+        for item in record[key]:
+            fields(item, ['id'], key)
+            if not text(item['id']):
+                raise ValueError(f'Invalid {key} id')
         ids = [x['id'] for x in record[key]]
         if len(ids) != len(set(ids)):
             raise ValueError(f'Duplicate {key} ids')
     if not record['nodes'] or not record['evidence']:
         raise ValueError('A record needs nodes and source evidence')
-    node_ids = {n['id'] for n in record['nodes']}
+    nodes = {n['id']: n for n in record['nodes']}
     evidence_ids = {e['id'] for e in record['evidence']}
     for node in record['nodes']:
-        if node['type'] not in KINDS or not isinstance(node['label'], str) or not isinstance(node['attributes'], dict):
+        fields(node, ['type', 'label', 'attributes'], 'node')
+        if node['type'] not in KINDS or not text(node['label']) or not isinstance(node['attributes'], dict):
             raise ValueError('Invalid node')
     for item in record['evidence']:
-        if not re.fullmatch(r'[0-9a-f]{64}', item['sha256']) or not item['url'].startswith('https://'):
-            raise ValueError('Invalid source hash or URL')
-        for field in ('observed_at', 'hash_scope', 'source_license', 'extractor'):
-            if not isinstance(item.get(field), str) or not item[field]:
+        fields(item, ['sha256', 'url', 'fetch_url', 'observed_at', 'hash_scope', 'source_license', 'extractor', 'canonicalization'], 'evidence')
+        if not isinstance(item['sha256'], str) or not re.fullmatch(r'[0-9a-f]{64}', item['sha256']):
+            raise ValueError('Invalid source hash')
+        for field in ('url', 'fetch_url'):
+            if not text(item[field]) or not item[field].startswith('https://'):
+                raise ValueError('Invalid source URL')
+        for field in ('observed_at', 'hash_scope', 'source_license', 'extractor', 'canonicalization'):
+            if not text(item[field]):
                 raise ValueError(f'Missing evidence {field}')
     for item in record['claims'] + record['edges']:
-        if item['status'] not in STATES or not item['evidence_ids'] or not set(item['evidence_ids']) <= evidence_ids:
+        fields(item, ['status', 'evidence_ids'], 'claim/edge')
+        if item['status'] not in STATES or not references(item['evidence_ids'], evidence_ids):
             raise ValueError('Unsupported claim/edge or dangling evidence')
     for claim in record['claims']:
-        if not isinstance(claim.get('text'), str) or not claim['text']:
+        if not text(claim.get('text')):
             raise ValueError('Missing claim text')
     for edge in record['edges']:
-        if edge['source'] not in node_ids or edge['target'] not in node_ids:
+        fields(edge, ['source', 'target', 'relation', 'known_at'], 'edge')
+        if not text(edge['source']) or not text(edge['target']) or edge['source'] not in nodes or edge['target'] not in nodes:
             raise ValueError('Dangling edge endpoint')
-        if edge['relation'] not in RELATIONS or not edge.get('known_at'):
+        if edge['relation'] not in RELATIONS or not text(edge['known_at']):
             raise ValueError('Invalid relation or missing known time')
-    if record['evolution'].get('outcome') not in {'UNKNOWN', 'REFINED', 'REVERTED', 'TEST_SUPPORTED', 'DISPUTED'}:
+    evolution = record['evolution']
+    fields(evolution, ['outcome', 'coverage', 'horizon_end', 'followups'], 'evolution')
+    if not text(evolution['coverage']) or (evolution['horizon_end'] is not None and not text(evolution['horizon_end'])) or not isinstance(evolution['followups'], list):
+        raise ValueError('Invalid evolution coverage/horizon/observations')
+    outcome = evolution['outcome']
+    if outcome not in {'UNKNOWN', 'REFINED', 'REVERTED', 'TEST_SUPPORTED', 'DISPUTED'}:
         raise ValueError('Invalid evolution outcome')
-    if record['evolution']['outcome'] != 'UNKNOWN' and not record['evolution'].get('followups'):
-        raise ValueError('Evolution conclusion requires observations')
+    kinds = set()
+    for obs in evolution['followups']:
+        fields(obs, ['kind', 'node_id', 'evidence_ids'], 'follow-up observation')
+        if obs['kind'] not in {'test_result', 'revert', 'fix_followup', 'dispute'} or not text(obs['node_id']) or obs['node_id'] not in nodes or not references(obs['evidence_ids'], evidence_ids):
+            raise ValueError('Unsubstantiated follow-up observation')
+        node = nodes[obs['node_id']]
+        if obs['kind'] == 'test_result':
+            attrs = node['attributes']
+            if node['type'] != 'test_observation' or attrs.get('outcome') != 'PASS' or not all(text(attrs.get(k)) for k in ['command', 'revision', 'environment']):
+                raise ValueError('Test support needs a sourced passing test observation')
+        elif obs['kind'] in {'revert', 'fix_followup'}:
+            relations = {'reverts'} if obs['kind'] == 'revert' else {'fixes', 'supersedes'}
+            if node['type'] != 'commit' or not any(e['source'] == obs['node_id'] and e['relation'] in relations and e['status'] in {'observed', 'validated'} and set(e['evidence_ids']) & set(obs['evidence_ids']) for e in record['edges']):
+                raise ValueError('Patch evolution needs a source-supported typed edge')
+        elif node['type'] != 'review_observation':
+            raise ValueError('Dispute needs a review observation')
+        kinds.add(obs['kind'])
+    needs = {'TEST_SUPPORTED': 'test_result', 'REVERTED': 'revert', 'REFINED': 'fix_followup', 'DISPUTED': 'dispute'}
+    if outcome in needs and needs[outcome] not in kinds:
+        raise ValueError('Evolution conclusion requires the corresponding observation')
+    if not isinstance(record['validation'], dict) or not isinstance(record['license'], dict):
+        raise ValueError('Validation and license must be objects')
 
 
 def load_records(directory=ROOT / 'docs/memory/records'):
