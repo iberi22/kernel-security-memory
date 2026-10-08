@@ -1,0 +1,31 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "openssl",
+    "repo": "https://github.com/openssl/openssl",
+    "github": "openssl/openssl"
+  },
+  "coverage": "WINDOW_SAMPLED",
+  "method": {
+    "used_query": "GET https://api.github.com/repos/openssl/openssl/security-advisories?state=published&per_page=20",
+    "http_status": 403,
+    "examined": 0,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {},
+  "recorded": 0,
+  "records": [],
+  "skipped": [],
+  "errors": [
+    "http_error_403"
+  ],
+  "notes": "No matching advisories were recorded for this observation window."
+}
