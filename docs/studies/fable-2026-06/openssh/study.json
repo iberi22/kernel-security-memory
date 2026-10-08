@@ -1,0 +1,154 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "openssh",
+    "repo": "https://github.com/openssh/openssh-portable",
+    "github": "openssh/openssh-portable"
+  },
+  "coverage": "WINDOW_SAMPLED",
+  "method": {
+    "used_query": "https://api.osv.dev/v1/query",
+    "http_status": 200,
+    "examined": 36,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {
+    "injection": 1,
+    "logic": 2,
+    "memory-lifetime": 2,
+    "authz": 1,
+    "path-resolution": 1,
+    "integer": 1
+  },
+  "recorded": 8,
+  "records": [
+    "records/openssh-CVE-2023-51384.json",
+    "records/openssh-CVE-2025-32728.json",
+    "records/openssh-CVE-2023-51385.json",
+    "records/openssh-CVE-2023-25136.json",
+    "records/openssh-CVE-2023-51767.json",
+    "records/openssh-CVE-2021-28041.json",
+    "records/openssh-CVE-2018-20685.json",
+    "records/openssh-CVE-2020-12062.json"
+  ],
+  "skipped": [
+    {
+      "id": "CVE-2026-73282",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-73281",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-73283",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-60000",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-59998",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-59997",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-59999",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-59995",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-60001",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-35387",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-35385",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-35388",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-35386",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-35414",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-55653",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-55655",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-59996",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-60002",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-55654",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2023-38408",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2026-3497",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2025-26465",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2025-26466",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2021-41617",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2018-15473",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2018-15919",
+      "reason": "subsystem_not_in_this_slice"
+    },
+    {
+      "id": "CVE-2017-15906",
+      "reason": "subsystem_not_in_this_slice"
+    }
+  ],
+  "errors": [],
+  "notes": "Analyzed 36 OpenSSH advisories and recorded 8 security fixes."
+}
