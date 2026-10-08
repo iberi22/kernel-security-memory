@@ -1,0 +1,89 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "git",
+    "repo": "https://github.com/git/git",
+    "github": "git/git"
+  },
+  "coverage": "WINDOW_SAMPLED",
+  "method": {
+    "used_query": "POST https://api.osv.dev/v1/query",
+    "http_status": 200,
+    "examined": 20,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {
+    "logic": 8
+  },
+  "recorded": 8,
+  "records": [
+    "records/cve-2016-2315.json",
+    "records/cve-2016-2324.json",
+    "records/cve-2018-17456.json",
+    "records/cve-2020-11008.json",
+    "records/cve-2020-5260.json",
+    "records/cve-2021-21300.json",
+    "records/cve-2021-40330.json",
+    "records/cve-2024-32002.json"
+  ],
+  "skipped": [
+    {
+      "id": "CVE-2017-1000117",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2017-14867",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2017-15298",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-1000021",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-11233",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-11235",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-19486",
+      "reason": "outside_window"
+    },
+    {
+      "id": "CVE-2019-1348",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-1353",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-1387",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-19604",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2022-24975",
+      "reason": "subsystem_not_evidenced"
+    }
+  ],
+  "errors": [],
+  "notes": "Recorded 8 Git security fix advisories."
+}
