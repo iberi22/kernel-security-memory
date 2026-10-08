@@ -1,0 +1,38 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "postgresql",
+    "repo": "https://github.com/postgres/postgres",
+    "github": "postgres/postgres"
+  },
+  "coverage": "INCOMPLETE",
+  "method": {
+    "used_query": "https://api.osv.dev/v1/query",
+    "http_status": 200,
+    "examined": 2,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {},
+  "recorded": 0,
+  "records": [],
+  "skipped": [
+    {
+      "id": "CVE-2021-23214",
+      "reason": "outside_window"
+    },
+    {
+      "id": "CVE-2021-23222",
+      "reason": "outside_window"
+    }
+  ],
+  "errors": [],
+  "notes": "Zero PostgreSQL security advisories with full 40-hex commit SHAs were observed in this window; this empty result is the observation."
+}
