@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kernel Security Memory &mdash; candidate review</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:1100px;margin:2em auto;padding:0 1em;color:#111}
+table{border-collapse:collapse;width:100%}
+th,td{border:1px solid #999;padding:.4em .6em;vertical-align:top;text-align:left}
+th{background:#eee}
+code{font-size:.85em}
+.muted{color:#666}
+#decisions{width:100%;height:10em;font-family:monospace}
+button{padding:.5em 1em;font-size:1em}
+</style>
+</head>
+<body>
+<h1>Candidate fix review</h1>
+<p>Seed record: <code>linux-CVE-2024-26581-mainline</code> &mdash; Interval garbage-collection generation-state fix (status: observed).</p>
+<p>Batch coverage: <strong id="batch-coverage">INCOMPLETE</strong> &middot; candidates: <span id="cand-count">10</span></p>
+<h2>Fetch/mining errors</h2>
+<ul><li>CVE-2022-0185: OSV FIX ref has abbreviated SHA only (722d94847de2), no full 40-hex; not attempted</li><li>CVE-2023-31248: OSV refs are lore/patchwork links with no commit SHA; not attempted</li><li>CVE-2023-35001: OSV refs are lore/debian links with no commit SHA; not attempted</li><li>CVE-2022-0847: OSV FIX ref is a bugzilla link with no commit SHA; not attempted</li><li>CVE-2023-4569: OSV FIX refs are bugzilla/patchwork links with no commit SHA; not attempted</li><li>CVE-2023-2008: OSV FIX ref SHA is truncated (39 hex), invalid 40-hex; not attempted</li><li>CVE-2017-16995/CVE-2022-0995/CVE-2022-1015/CVE-2023-0179/CVE-2023-1829/CVE-2017-1000253: no FIX commit SHA in OSV refs; not attempted</li></ul>
+<table>
+<thead><tr><th>CVE</th><th>Commit</th><th>Message</th><th>Files</th><th>Fixes signals</th><th>Parents</th><th>Decision</th></tr></thead>
+<tbody>
+<tr id="cand-60c0c230c6f0"><td>CVE-2024-26581</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/60c0c230c6f046da536d3df8b39a20b9a9fd6af0"><code>60c0c230c6f0</code></a></td><td>netfilter: nft_set_rbtree: skip end interval element from gc</td><td><ul><li><code>net/netfilter/nft_set_rbtree.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>f718863aca46</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-60c0c230c6f046da536d3df8b39a20b9a9fd6af0" class="dec-approve" data-sha="60c0c230c6f046da536d3df8b39a20b9a9fd6af0"> approve</label><br><label><input type="checkbox" id="reject-60c0c230c6f046da536d3df8b39a20b9a9fd6af0" class="dec-reject" data-sha="60c0c230c6f046da536d3df8b39a20b9a9fd6af0"> reject</label></td></tr>
+<tr id="cand-f342de4e2f33"><td>CVE-2024-1086</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/f342de4e2f33e0e39165d8639387aa6c19dff660"><code>f342de4e2f33</code></a></td><td>netfilter: nf_tables: reject QUEUE/DROP verdict parameters</td><td><ul><li><code>net/netfilter/nf_tables_api.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>e0abdadcc6e1</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-f342de4e2f33e0e39165d8639387aa6c19dff660" class="dec-approve" data-sha="f342de4e2f33e0e39165d8639387aa6c19dff660"> approve</label><br><label><input type="checkbox" id="reject-f342de4e2f33e0e39165d8639387aa6c19dff660" class="dec-reject" data-sha="f342de4e2f33e0e39165d8639387aa6c19dff660"> reject</label></td></tr>
+<tr id="cand-9fa492cdc160"><td>CVE-2021-22555</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/9fa492cdc160cd27ce1046cb36f47d3b2b1efa21"><code>9fa492cdc160</code></a></td><td>[NETFILTER]: x_tables: simplify compat API</td><td><ul><li><code>include/linux/netfilter/x_tables.h</code></li><li><code>net/ipv4/netfilter/ip_tables.c</code></li><li><code>net/netfilter/x_tables.c</code></li></ul></td><td><span class=muted>none</span></td><td>sole</td><td><label><input type="checkbox" id="approve-9fa492cdc160cd27ce1046cb36f47d3b2b1efa21" class="dec-approve" data-sha="9fa492cdc160cd27ce1046cb36f47d3b2b1efa21"> approve</label><br><label><input type="checkbox" id="reject-9fa492cdc160cd27ce1046cb36f47d3b2b1efa21" class="dec-reject" data-sha="9fa492cdc160cd27ce1046cb36f47d3b2b1efa21"> reject</label></td></tr>
+<tr id="cand-acf69c946233"><td>CVE-2020-14386</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/acf69c946233259ab4d64f8869d4037a198c7f06"><code>acf69c946233</code></a></td><td>net/packet: fix overflow in tpacket_rcv</td><td><ul><li><code>net/packet/af_packet.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>8913336a7e8d</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-acf69c946233259ab4d64f8869d4037a198c7f06" class="dec-approve" data-sha="acf69c946233259ab4d64f8869d4037a198c7f06"> approve</label><br><label><input type="checkbox" id="reject-acf69c946233259ab4d64f8869d4037a198c7f06" class="dec-reject" data-sha="acf69c946233259ab4d64f8869d4037a198c7f06"> reject</label></td></tr>
+<tr id="cand-cb66ddd15620"><td>CVE-2019-11815</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/cb66ddd156203daefb8d71158036b27b0e2caf63"><code>cb66ddd15620</code></a></td><td>net: rds: force to destroy connection if t_sock is NULL in rds_tcp_kill_sock().</td><td><ul><li><code>net/rds/tcp.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>467fa15356ac</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-cb66ddd156203daefb8d71158036b27b0e2caf63" class="dec-approve" data-sha="cb66ddd156203daefb8d71158036b27b0e2caf63"> approve</label><br><label><input type="checkbox" id="reject-cb66ddd156203daefb8d71158036b27b0e2caf63" class="dec-reject" data-sha="cb66ddd156203daefb8d71158036b27b0e2caf63"> reject</label></td></tr>
+<tr id="cand-19be0eaffa3a"><td>CVE-2016-5195</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619"><code>19be0eaffa3a</code></a></td><td>mm: remove gup_flags FOLL_WRITE games from __get_user_pages()</td><td><ul><li><code>include/linux/mm.h</code></li><li><code>mm/gup.c</code></li></ul></td><td><span class=muted>none</span></td><td>sole</td><td><label><input type="checkbox" id="approve-19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619" class="dec-approve" data-sha="19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619"> approve</label><br><label><input type="checkbox" id="reject-19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619" class="dec-reject" data-sha="19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619"> reject</label></td></tr>
+<tr id="cand-7e6bc1f6cabc"><td>CVE-2022-34918</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6"><code>7e6bc1f6cabc</code></a></td><td>netfilter: nf_tables: stricter validation of element data</td><td><ul><li><code>net/netfilter/nf_tables_api.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>7d7402642eaf</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6" class="dec-approve" data-sha="7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6"> approve</label><br><label><input type="checkbox" id="reject-7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6" class="dec-reject" data-sha="7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6"> reject</label></td></tr>
+<tr id="cand-29b0589a865b"><td>CVE-2023-1118</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/29b0589a865b6f66d141d79b2dd1373e4e50fe17"><code>29b0589a865b</code></a></td><td>media: rc: Fix use-after-free bugs caused by ene_tx_irqsim()</td><td><ul><li><code>drivers/media/rc/ene_ir.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>9ea53b74df9c</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-29b0589a865b6f66d141d79b2dd1373e4e50fe17" class="dec-approve" data-sha="29b0589a865b6f66d141d79b2dd1373e4e50fe17"> approve</label><br><label><input type="checkbox" id="reject-29b0589a865b6f66d141d79b2dd1373e4e50fe17" class="dec-reject" data-sha="29b0589a865b6f66d141d79b2dd1373e4e50fe17"> reject</label></td></tr>
+<tr id="cand-b1a5983f56e3"><td>CVE-2022-25636</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/b1a5983f56e371046dcf164f90bfaf704d2b89f6"><code>b1a5983f56e3</code></a></td><td>netfilter: nf_tables_offload: incorrect flow offload action array size</td><td><ul><li><code>include/net/netfilter/nf_tables.h</code></li><li><code>include/net/netfilter/nf_tables_offload.h</code></li><li><code>net/netfilter/nf_tables_offload.c</code></li><li><code>net/netfilter/nft_dup_netdev.c</code></li><li><code>net/netfilter/nft_fwd_netdev.c</code></li><li><code>net/netfilter/nft_immediate.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>be2861dc36d7</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-b1a5983f56e371046dcf164f90bfaf704d2b89f6" class="dec-approve" data-sha="b1a5983f56e371046dcf164f90bfaf704d2b89f6"> approve</label><br><label><input type="checkbox" id="reject-b1a5983f56e371046dcf164f90bfaf704d2b89f6" class="dec-reject" data-sha="b1a5983f56e371046dcf164f90bfaf704d2b89f6"> reject</label></td></tr>
+<tr id="cand-458e279f861d"><td>CVE-2023-1074</td><td><a href="https://api.github.com/repos/torvalds/linux/commits/458e279f861d3f61796894cd158b780765a1569f"><code>458e279f861d</code></a></td><td>sctp: fail if no bound addresses can be used for a given scope</td><td><ul><li><code>net/sctp/bind_addr.c</code></li></ul></td><td><ul><li>fixes_trailer: <code>1da177e4c3f4</code> (NOT_CONFIRMED)</li></ul></td><td>sole</td><td><label><input type="checkbox" id="approve-458e279f861d3f61796894cd158b780765a1569f" class="dec-approve" data-sha="458e279f861d3f61796894cd158b780765a1569f"> approve</label><br><label><input type="checkbox" id="reject-458e279f861d3f61796894cd158b780765a1569f" class="dec-reject" data-sha="458e279f861d3f61796894cd158b780765a1569f"> reject</label></td></tr>
+</tbody>
+</table>
+<p><button id="export-btn" type="button">Export decisions to JSON</button></p>
+<textarea id="decisions" readonly placeholder="Decisions JSON will appear here for copy-paste."></textarea>
+<script>
+(function(){
+function onlyOne(box){
+  var sha=box.getAttribute("data-sha");
+  var cls=box.classList.contains("dec-approve")?"dec-reject":"dec-approve";
+  var others=document.querySelectorAll("input."+cls+'[data-sha="'+sha+'"]');
+  for(var i=0;i<others.length;i++){others[i].checked=false;}
+}
+var boxes=document.querySelectorAll("input.dec-approve,input.dec-reject");
+for(var i=0;i<boxes.length;i++){boxes[i].addEventListener("change",function(){onlyOne(this);});}
+document.getElementById("export-btn").addEventListener("click",function(){
+  var out=[];
+  var rows=document.querySelectorAll("tbody tr[id^='cand-']");
+  for(var i=0;i<rows.length;i++){
+    var tds=rows[i].getElementsByTagName("td");
+    var shaCell=rows[i].querySelector("input.dec-approve");
+    var sha=shaCell?shaCell.getAttribute("data-sha"):"";
+    var ap=rows[i].querySelector("input.dec-approve").checked;
+    var rj=rows[i].querySelector("input.dec-reject").checked;
+    out.push({sha:sha,cve:tds[0].textContent,decision:ap?"approve":(rj?"reject":"pending")});
+  }
+  document.getElementById("decisions").value=JSON.stringify({decisions:out},null,2);
+});
+})();
+</script>
+</body>
+</html>

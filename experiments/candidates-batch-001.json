@@ -1,0 +1,316 @@
+{
+  "schema_version": "0.1.0",
+  "tool": "mine_candidates-reuse-v1 (import, no copy)",
+  "osv_source": "api.osv.dev /v1/vulns per-CVE, 2026-10-08",
+  "github_source": "api.github.com repos/torvalds/linux/commits",
+  "coverage": "INCOMPLETE",
+  "attempts": 10,
+  "count": 10,
+  "cves_mined": [
+    "CVE-2016-5195",
+    "CVE-2019-11815",
+    "CVE-2020-14386",
+    "CVE-2021-22555",
+    "CVE-2022-25636",
+    "CVE-2022-34918",
+    "CVE-2023-1074",
+    "CVE-2023-1118",
+    "CVE-2024-1086",
+    "CVE-2024-26581"
+  ],
+  "errors": [
+    "CVE-2022-0185: OSV FIX ref has abbreviated SHA only (722d94847de2), no full 40-hex; not attempted",
+    "CVE-2023-31248: OSV refs are lore/patchwork links with no commit SHA; not attempted",
+    "CVE-2023-35001: OSV refs are lore/debian links with no commit SHA; not attempted",
+    "CVE-2022-0847: OSV FIX ref is a bugzilla link with no commit SHA; not attempted",
+    "CVE-2023-4569: OSV FIX refs are bugzilla/patchwork links with no commit SHA; not attempted",
+    "CVE-2023-2008: OSV FIX ref SHA is truncated (39 hex), invalid 40-hex; not attempted",
+    "CVE-2017-16995/CVE-2022-0995/CVE-2022-1015/CVE-2023-0179/CVE-2023-1829/CVE-2017-1000253: no FIX commit SHA in OSV refs; not attempted"
+  ],
+  "commits": [
+    {
+      "sha": "60c0c230c6f046da536d3df8b39a20b9a9fd6af0",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/60c0c230c6f046da536d3df8b39a20b9a9fd6af0",
+      "raw_response_sha256": "994adc91eb9a9038388d04fee146e93a2d7717d0bd6321000f1d2afc8ed5caf6",
+      "observed_at": "2026-10-08T06:13:27.636122+00:00",
+      "parents": [
+        "f82777e8ce6c039cdcacbcf1eb8619b99a20c06d"
+      ],
+      "sole_parent": true,
+      "message": "netfilter: nft_set_rbtree: skip end interval element from gc\n\nrbtree lazy gc on insert might collect an end interval element that has\nbeen just added in this transactions, skip end interval elements that\nare not yet active.\n\nFixes: f718863aca46 (\"netfilter: nft_set_rbtree: fix overlap expiration walk\")\nCc: stable@vger.kernel.org\nReported-by: lonial con <kongln9170@gmail.com>\nSigned-off-by: Pablo Neira Ayuso <pablo@netfilter.org>",
+      "changed_files": [
+        "net/netfilter/nft_set_rbtree.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "f718863aca46",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2024-26581",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://git.kernel.org/stable/c/60c0c230c6f046da536d3df8b39a20b9a9fd6af0",
+        "type": "WEB",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "f342de4e2f33e0e39165d8639387aa6c19dff660",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/f342de4e2f33e0e39165d8639387aa6c19dff660",
+      "raw_response_sha256": "9c01494bcc628f75326c3458ada3e8af69d33b40d4b1c6c2592542bbb7eb2a08",
+      "observed_at": "2026-10-08T06:13:28.152325+00:00",
+      "parents": [
+        "b462579b2b86a8f5230543cadd3a4836be27baf7"
+      ],
+      "sole_parent": true,
+      "message": "netfilter: nf_tables: reject QUEUE/DROP verdict parameters\n\nThis reverts commit e0abdadcc6e1.\n\ncore.c:nf_hook_slow assumes that the upper 16 bits of NF_DROP\nverdicts contain a valid errno, i.e. -EPERM, -EHOSTUNREACH or similar,\nor 0.\n\nDue to the reverted commit, its possible to provide a positive\nvalue, e.g. NF_ACCEPT (1), which results in use-after-free.\n\nIts not clear to me why this commit was made.\n\nNF_QUEUE is not used by nftables; \"queue\" rules in nftables\nwill result in use of \"nft_queue\" expression.\n\nIf we later need to allow specifiying errno values from userspace\n(do not know why), this has to call NF_DROP_GETERR and check that\n\"err <= 0\" holds true.\n\nFixes: e0abdadcc6e1 (\"netfilter: nf_tables: accept QUEUE/DROP verdict parameters\")\nCc: stable@vger.kernel.org\nReported-by: Notselwyn <notselwyn@pwning.tech>\nSigned-off-by: Florian Westphal <fw@strlen.de>\nSigned-off-by: Pablo Neira Ayuso <pablo@netfilter.org>",
+      "changed_files": [
+        "net/netfilter/nf_tables_api.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "e0abdadcc6e1",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2024-1086",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f342de4e2f33e0e39165d8639387aa6c19dff660",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "9fa492cdc160cd27ce1046cb36f47d3b2b1efa21",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/9fa492cdc160cd27ce1046cb36f47d3b2b1efa21",
+      "raw_response_sha256": "d7bcce28316a4538457c39a737c01e12a847d6956abf3fed2625ab830654fdbe",
+      "observed_at": "2026-10-08T06:13:28.919678+00:00",
+      "parents": [
+        "79030ed07de673e8451a03aecb9ada9f4d75d491"
+      ],
+      "sole_parent": true,
+      "message": "[NETFILTER]: x_tables: simplify compat API\n\nSplit the xt_compat_match/xt_compat_target into smaller type-safe functions\nperforming just one operation. Handle all alignment and size-related\nconversions centrally in these function instead of requiring each module to\nimplement a full-blown conversion function. Replace ->compat callback by\n->compat_from_user and ->compat_to_user callbacks, responsible for\nconverting just a single private structure.\n\nSigned-off-by: Patrick McHardy <kaber@trash.net>\nSigned-off-by: David S. Miller <davem@davemloft.net>",
+      "changed_files": [
+        "include/linux/netfilter/x_tables.h",
+        "net/ipv4/netfilter/ip_tables.c",
+        "net/netfilter/x_tables.c"
+      ],
+      "candidate_signals": [],
+      "cve_id": "CVE-2021-22555",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/net/netfilter/x_tables.c?id=9fa492cdc160cd27ce1046cb36f47d3b2b1efa21",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "acf69c946233259ab4d64f8869d4037a198c7f06",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/acf69c946233259ab4d64f8869d4037a198c7f06",
+      "raw_response_sha256": "1f1c6246b05baf6a3f21ed11295e140a787b6e377923646cc24bc6cc55172b3c",
+      "observed_at": "2026-10-08T06:13:29.618267+00:00",
+      "parents": [
+        "b25d1dc9474e1f0cefca994885e82beea271acfe"
+      ],
+      "sole_parent": true,
+      "message": "net/packet: fix overflow in tpacket_rcv\n\nUsing tp_reserve to calculate netoff can overflow as\ntp_reserve is unsigned int and netoff is unsigned short.\n\nThis may lead to macoff receving a smaller value then\nsizeof(struct virtio_net_hdr), and if po->has_vnet_hdr\nis set, an out-of-bounds write will occur when\ncalling virtio_net_hdr_from_skb.\n\nThe bug is fixed by converting netoff to unsigned int\nand checking if it exceeds USHRT_MAX.\n\nThis addresses CVE-2020-14386\n\nFixes: 8913336a7e8d (\"packet: add PACKET_RESERVE sockopt\")\nSigned-off-by: Or Cohen <orcohen@paloaltonetworks.com>\nSigned-off-by: Eric Dumazet <edumazet@google.com>\nSigned-off-by: Linus Torvalds <torvalds@linux-foundation.org>",
+      "changed_files": [
+        "net/packet/af_packet.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "8913336a7e8d",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2020-14386",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=acf69c946233259ab4d64f8869d4037a198c7f06",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "cb66ddd156203daefb8d71158036b27b0e2caf63",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/cb66ddd156203daefb8d71158036b27b0e2caf63",
+      "raw_response_sha256": "67eb164ea5375bba2dffc7facdb1a2fac3760c0397aab73bb8a2eb1c03565d45",
+      "observed_at": "2026-10-08T06:13:30.089140+00:00",
+      "parents": [
+        "f28cd2af22a0c134e4aa1c64a70f70d815d473fb"
+      ],
+      "sole_parent": true,
+      "message": "net: rds: force to destroy connection if t_sock is NULL in rds_tcp_kill_sock().\n\nWhen it is to cleanup net namespace, rds_tcp_exit_net() will call\nrds_tcp_kill_sock(), if t_sock is NULL, it will not call\nrds_conn_destroy(), rds_conn_path_destroy() and rds_tcp_conn_free() to free\nconnection, and the worker cp_conn_w is not stopped, afterwards the net is freed in\nnet_drop_ns(); While cp_conn_w rds_connect_worker() will call rds_tcp_conn_path_connect()\nand reference 'net' which has already been freed.\n\nIn rds_tcp_conn_path_connect(), rds_tcp_set_callbacks() will set t_sock = sock before\nsock->ops->connect, but if connect() is failed, it will call\nrds_tcp_restore_callbacks() and set t_sock = NULL, if connect is always\nfailed, rds_connect_worker() will try to reconnect all the time, so\nrds_tcp_kill_sock() will never to cancel worker cp_conn_w and free the\nconnections.\n\nTherefore, the condition !tc->t_sock is not needed if it is going to do\ncleanup_net->rds_tcp_exit_net->rds_tcp_kill_sock, because tc->t_sock is always\nNULL, and there is on other path to cancel cp_conn_w and free\nconnection. So this patch is to fix this.\n\nrds_tcp_kill_sock():\n...\nif (net != c_net || !tc->t_sock)\n...\nAcked-by: Santosh Shilimkar <santosh.shilimkar@oracle.com>\n\n==================================================================\nBUG: KASAN: use-after-free in inet_create+0xbcc/0xd28\nnet/ipv4/af_inet.c:340\nRead of size 4 at addr ffff8003496a4684 by task kworker/u8:4/3721\n\nCPU: 3 PID: 3721 Comm: kworker/u8:4 Not tainted 5.1.0 #11\nHardware name: linux,dummy-virt (DT)\nWorkqueue: krdsd rds_connect_worker\nCall trace:\n dump_backtrace+0x0/0x3c0 arch/arm64/kernel/time.c:53\n show_stack+0x28/0x38 arch/arm64/kernel/traps.c:152\n __dump_stack lib/dump_stack.c:77 [inline]\n dump_stack+0x120/0x188 lib/dump_stack.c:113\n print_address_description+0x68/0x278 mm/kasan/report.c:253\n kasan_report_error mm/kasan/report.c:351 [inline]\n kasan_report+0x21c/0x348 mm/kasan/report.c:409\n __asan_report_load4_noabort+0x30/0x40 mm/kasan/report.c:429\n inet_create+0xbcc/0xd28 net/ipv4/af_inet.c:340\n __sock_create+0x4f8/0x770 net/socket.c:1276\n sock_create_kern+0x50/0x68 net/socket.c:1322\n rds_tcp_conn_path_connect+0x2b4/0x690 net/rds/tcp_connect.c:114\n rds_connect_worker+0x108/0x1d0 net/rds/threads.c:175\n process_one_work+0x6e8/0x1700 kernel/workqueue.c:2153\n worker_thread+0x3b0/0xdd0 kernel/workqueue.c:2296\n kthread+0x2f0/0x378 kernel/kthread.c:255\n ret_from_fork+0x10/0x18 arch/arm64/kernel/entry.S:1117\n\nAllocated by task 687:\n save_stack mm/kasan/kasan.c:448 [inline]\n set_track mm/kasan/kasan.c:460 [inline]\n kasan_kmalloc+0xd4/0x180 mm/kasan/kasan.c:553\n kasan_slab_alloc+0x14/0x20 mm/kasan/kasan.c:490\n slab_post_alloc_hook mm/slab.h:444 [inline]\n slab_alloc_node mm/slub.c:2705 [inline]\n slab_alloc mm/slub.c:2713 [inline]\n kmem_cache_alloc+0x14c/0x388 mm/slub.c:2718\n kmem_cache_zalloc include/linux/slab.h:697 [inline]\n net_alloc net/core/net_namespace.c:384 [inline]\n copy_net_ns+0xc4/0x2d0 net/core/net_namespace.c:424\n create_new_namespaces+0x300/0x658 kernel/nsproxy.c:107\n unshare_nsproxy_namespaces+0xa0/0x198 kernel/nsproxy.c:206\n ksys_unshare+0x340/0x628 kernel/fork.c:2577\n __do_sys_unshare kernel/fork.c:2645 [inline]\n __se_sys_unshare kernel/fork.c:2643 [inline]\n __arm64_sys_unshare+0x38/0x58 kernel/fork.c:2643\n __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]\n invoke_syscall arch/arm64/kernel/syscall.c:47 [inline]\n el0_svc_common+0x168/0x390 arch/arm64/kernel/syscall.c:83\n el0_svc_handler+0x60/0xd0 arch/arm64/kernel/syscall.c:129\n el0_svc+0x8/0xc arch/arm64/kernel/entry.S:960\n\nFreed by task 264:\n save_stack mm/kasan/kasan.c:448 [inline]\n set_track mm/kasan/kasan.c:460 [inline]\n __kasan_slab_free+0x114/0x220 mm/kasan/kasan.c:521\n kasan_slab_free+0x10/0x18 mm/kasan/kasan.c:528\n slab_free_hook mm/slub.c:1370 [inline]\n slab_free_freelist_hook mm/slub.c:1397 [inline]\n slab_free mm/slub.c:2952 [inline]\n kmem_cache_free+0xb8/0x3a8 mm/slub.c:2968\n net_free net/core/net_namespace.c:400 [inline]\n net_drop_ns.part.6+0x78/0x90 net/core/net_namespace.c:407\n net_drop_ns net/core/net_namespace.c:406 [inline]\n cleanup_net+0x53c/0x6d8 net/core/net_namespace.c:569\n process_one_work+0x6e8/0x1700 kernel/workqueue.c:2153\n worker_thread+0x3b0/0xdd0 kernel/workqueue.c:2296\n kthread+0x2f0/0x378 kernel/kthread.c:255\n ret_from_fork+0x10/0x18 arch/arm64/kernel/entry.S:1117\n\nThe buggy address belongs to the object at ffff8003496a3f80\n which belongs to the cache net_namespace of size 7872\nThe buggy address is located 1796 bytes inside of\n 7872-byte region [ffff8003496a3f80, ffff8003496a5e40)\nThe buggy address belongs to the page:\npage:ffff7e000d25a800 count:1 mapcount:0 mapping:ffff80036ce4b000\nindex:0x0 compound_mapcount: 0\nflags: 0xffffe0000008100(slab|head)\nraw: 0ffffe0000008100 dead000000000100 dead000000000200 ffff80036ce4b000\nraw: 0000000000000000 0000000080040004 00000001ffffffff 0000000000000000\npage dumped because: kasan: bad access detected\n\nMemory state around the buggy address:\n ffff8003496a4580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb\n ffff8003496a4600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb\n>ffff8003496a4680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb\n                   ^\n ffff8003496a4700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb\n ffff8003496a4780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb\n==================================================================\n\nFixes: 467fa15356ac(\"RDS-TCP: Support multiple RDS-TCP listen endpoints, one per netns.\")\nReported-by: Hulk Robot <hulkci@huawei.com>\nSigned-off-by: Mao Wenan <maowenan@huawei.com>\nSigned-off-by: David S. Miller <davem@davemloft.net>",
+      "changed_files": [
+        "net/rds/tcp.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "467fa15356ac",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2019-11815",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://github.com/torvalds/linux/commit/cb66ddd156203daefb8d71158036b27b0e2caf63",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619",
+      "raw_response_sha256": "e7312744d09b3612e79e4f1c2237eda529c97f07a6f4fd320acab63a9ce52dc4",
+      "observed_at": "2026-10-08T06:13:35.730985+00:00",
+      "parents": [
+        "6b25e21fa6f26d0f0d45f161d169029411c84286"
+      ],
+      "sole_parent": true,
+      "message": "mm: remove gup_flags FOLL_WRITE games from __get_user_pages()\n\nThis is an ancient bug that was actually attempted to be fixed once\n(badly) by me eleven years ago in commit 4ceb5db9757a (\"Fix\nget_user_pages() race for write access\") but that was then undone due to\nproblems on s390 by commit f33ea7f404e5 (\"fix get_user_pages bug\").\n\nIn the meantime, the s390 situation has long been fixed, and we can now\nfix it by checking the pte_dirty() bit properly (and do it better).  The\ns390 dirty bit was implemented in abf09bed3cce (\"s390/mm: implement\nsoftware dirty bits\") which made it into v3.9.  Earlier kernels will\nhave to look at the page state itself.\n\nAlso, the VM has become more scalable, and what used a purely\ntheoretical race back then has become easier to trigger.\n\nTo fix it, we introduce a new internal FOLL_COW flag to mark the \"yes,\nwe already did a COW\" rather than play racy games with FOLL_WRITE that\nis very fundamental, and then use the pte dirty flag to validate that\nthe FOLL_COW flag is still valid.\n\nReported-and-tested-by: Phil \"not Paul\" Oester <kernel@linuxace.com>\nAcked-by: Hugh Dickins <hughd@google.com>\nReviewed-by: Michal Hocko <mhocko@suse.com>\nCc: Andy Lutomirski <luto@kernel.org>\nCc: Kees Cook <keescook@chromium.org>\nCc: Oleg Nesterov <oleg@redhat.com>\nCc: Willy Tarreau <w@1wt.eu>\nCc: Nick Piggin <npiggin@gmail.com>\nCc: Greg Thelen <gthelen@google.com>\nCc: stable@vger.kernel.org\nSigned-off-by: Linus Torvalds <torvalds@linux-foundation.org>",
+      "changed_files": [
+        "include/linux/mm.h",
+        "mm/gup.c"
+      ],
+      "candidate_signals": [],
+      "cve_id": "CVE-2016-5195",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://github.com/torvalds/linux/commit/19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6",
+      "raw_response_sha256": "18e5097c77ae70fb8f407546cb2424bbf394419d64afe7b3c7f55ca5349f6b74",
+      "observed_at": "2026-10-08T06:13:36.150095+00:00",
+      "parents": [
+        "f8ebb3ac881b17712e1d5967c97ab1806b16d3d6"
+      ],
+      "sole_parent": true,
+      "message": "netfilter: nf_tables: stricter validation of element data\n\nMake sure element data type and length do not mismatch the one specified\nby the set declaration.\n\nFixes: 7d7402642eaf (\"netfilter: nf_tables: variable sized set element keys / data\")\nReported-by: Hugues ANGUELKOV <hanguelkov@randorisec.fr>\nSigned-off-by: Pablo Neira Ayuso <pablo@netfilter.org>",
+      "changed_files": [
+        "net/netfilter/nf_tables_api.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "7d7402642eaf",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2022-34918",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=7e6bc1f6cabcd30aba0b11219d8e01b952eacbb6",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "29b0589a865b6f66d141d79b2dd1373e4e50fe17",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/29b0589a865b6f66d141d79b2dd1373e4e50fe17",
+      "raw_response_sha256": "ca1be3be666096025cc587b9d223c3e6a7a494599bf7f440f6ef50805d87db49",
+      "observed_at": "2026-10-08T06:13:36.623468+00:00",
+      "parents": [
+        "30040818b338b8ebc956ce0ebd198f8d593586a6"
+      ],
+      "sole_parent": true,
+      "message": "media: rc: Fix use-after-free bugs caused by ene_tx_irqsim()\n\nWhen the ene device is detaching, function ene_remove() will\nbe called. But there is no function to cancel tx_sim_timer\nin ene_remove(), the timer handler ene_tx_irqsim() could race\nwith ene_remove(). As a result, the UAF bugs could happen,\nthe process is shown below.\n\n    (cleanup routine)          |        (timer routine)\n                               | mod_timer(&dev->tx_sim_timer, ..)\nene_remove()                   | (wait a time)\n                               | ene_tx_irqsim()\n                               |   dev->hw_lock //USE\n                               |   ene_tx_sample(dev) //USE\n\nFix by adding del_timer_sync(&dev->tx_sim_timer) in ene_remove(),\nThe tx_sim_timer could stop before ene device is deallocated.\n\nWhat's more, The rc_unregister_device() and del_timer_sync()\nshould be called first in ene_remove() and the deallocated\nfunctions such as free_irq(), release_region() and so on\nshould be called behind them. Because the rc_unregister_device()\nis well synchronized. Otherwise, race conditions may happen. The\nsituations that may lead to race conditions are shown below.\n\nFirstly, the rx receiver is disabled with ene_rx_disable()\nbefore rc_unregister_device() in ene_remove(), which means it\ncan be enabled again if a process opens /dev/lirc0 between\nene_rx_disable() and rc_unregister_device().\n\nSecondly, the irqaction descriptor is freed by free_irq()\nbefore the rc device is unregistered, which means irqaction\ndescriptor may be accessed again after it is deallocated.\n\nThirdly, the timer can call ene_tx_sample() that can write\nto the io ports, which means the io ports could be accessed\nagain after they are deallocated by release_region().\n\nTherefore, the rc_unregister_device() and del_timer_sync()\nshould be called first in ene_remove().\n\nSuggested by: Sean Young <sean@mess.org>\n\nFixes: 9ea53b74df9c (\"V4L/DVB: STAGING: remove lirc_ene0100 driver\")\nSigned-off-by: Duoming Zhou <duoming@zju.edu.cn>\nSigned-off-by: Sean Young <sean@mess.org>\nSigned-off-by: Mauro Carvalho Chehab <mchehab@kernel.org>",
+      "changed_files": [
+        "drivers/media/rc/ene_ir.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "9ea53b74df9c",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2023-1118",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://github.com/torvalds/linux/commit/29b0589a865b6f66d141d79b2dd1373e4e50fe17",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "b1a5983f56e371046dcf164f90bfaf704d2b89f6",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/b1a5983f56e371046dcf164f90bfaf704d2b89f6",
+      "raw_response_sha256": "de7c2d2cadcd5ee32dcfbac00274882249cee7e8af1de33c6f8ee2293f237477",
+      "observed_at": "2026-10-08T06:13:37.225286+00:00",
+      "parents": [
+        "2874b7911132f6975e668f6849c8ac93bc4e1f35"
+      ],
+      "sole_parent": true,
+      "message": "netfilter: nf_tables_offload: incorrect flow offload action array size\n\nimmediate verdict expression needs to allocate one slot in the flow offload\naction array, however, immediate data expression does not need to do so.\n\nfwd and dup expression need to allocate one slot, this is missing.\n\nAdd a new offload_action interface to report if this expression needs to\nallocate one slot in the flow offload action array.\n\nFixes: be2861dc36d7 (\"netfilter: nft_{fwd,dup}_netdev: add offload support\")\nReported-and-tested-by: Nick Gregory <Nick.Gregory@Sophos.com>\nSigned-off-by: Pablo Neira Ayuso <pablo@netfilter.org>",
+      "changed_files": [
+        "include/net/netfilter/nf_tables.h",
+        "include/net/netfilter/nf_tables_offload.h",
+        "net/netfilter/nf_tables_offload.c",
+        "net/netfilter/nft_dup_netdev.c",
+        "net/netfilter/nft_fwd_netdev.c",
+        "net/netfilter/nft_immediate.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "be2861dc36d7",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2022-25636",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git/commit/?id=b1a5983f56e371046dcf164f90bfaf704d2b89f6",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    },
+    {
+      "sha": "458e279f861d3f61796894cd158b780765a1569f",
+      "source_url": "https://api.github.com/repos/torvalds/linux/commits/458e279f861d3f61796894cd158b780765a1569f",
+      "raw_response_sha256": "9392c454c6cc7ec67b914fd4703817ebbdf2dfcfbcb966b9576f7d53360a676d",
+      "observed_at": "2026-10-08T06:13:37.804719+00:00",
+      "parents": [
+        "ea4fdbaa2f7798cb25adbe4fd52ffc6356f097bb"
+      ],
+      "sole_parent": true,
+      "message": "sctp: fail if no bound addresses can be used for a given scope\n\nCurrently, if you bind the socket to something like:\n        servaddr.sin6_family = AF_INET6;\n        servaddr.sin6_port = htons(0);\n        servaddr.sin6_scope_id = 0;\n        inet_pton(AF_INET6, \"::1\", &servaddr.sin6_addr);\n\nAnd then request a connect to:\n        connaddr.sin6_family = AF_INET6;\n        connaddr.sin6_port = htons(20000);\n        connaddr.sin6_scope_id = if_nametoindex(\"lo\");\n        inet_pton(AF_INET6, \"fe88::1\", &connaddr.sin6_addr);\n\nWhat the stack does is:\n - bind the socket\n - create a new asoc\n - to handle the connect\n   - copy the addresses that can be used for the given scope\n   - try to connect\n\nBut the copy returns 0 addresses, and the effect is that it ends up\ntrying to connect as if the socket wasn't bound, which is not the\ndesired behavior. This unexpected behavior also allows KASLR leaks\nthrough SCTP diag interface.\n\nThe fix here then is, if when trying to copy the addresses that can\nbe used for the scope used in connect() it returns 0 addresses, bail\nout. This is what TCP does with a similar reproducer.\n\nReported-by: Pietro Borrello <borrello@diag.uniroma1.it>\nFixes: 1da177e4c3f4 (\"Linux-2.6.12-rc2\")\nSigned-off-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>\nReviewed-by: Xin Long <lucien.xin@gmail.com>\nLink: https://lore.kernel.org/r/9fcd182f1099f86c6661f3717f63712ddd1c676c.1674496737.git.marcelo.leitner@gmail.com\nSigned-off-by: Jakub Kicinski <kuba@kernel.org>",
+      "changed_files": [
+        "net/sctp/bind_addr.c"
+      ],
+      "candidate_signals": [
+        {
+          "type": "fixes_trailer",
+          "target": "1da177e4c3f4",
+          "status": "NOT_CONFIRMED",
+          "reason": "explicit fixes trailer found, not causal proof"
+        }
+      ],
+      "cve_id": "CVE-2023-1074",
+      "cve_binding_status": "HYPOTHESIS_NOT_CONFIRMED",
+      "osv_reference": {
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=458e279f861d3f61796894cd158b780765a1569f",
+        "type": "FIX",
+        "queried": "api.osv.dev /v1/vulns 2026-10-08"
+      }
+    }
+  ]
+}
