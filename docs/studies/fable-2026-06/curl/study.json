@@ -1,0 +1,29 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "curl",
+    "repo": "https://github.com/curl/curl",
+    "github": "curl/curl"
+  },
+  "coverage": "INCOMPLETE",
+  "method": {
+    "used_query": "https://api.github.com/repos/curl/curl/security-advisories?state=published&per_page=20",
+    "http_status": 200,
+    "examined": 0,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {},
+  "recorded": 0,
+  "records": [],
+  "skipped": [],
+  "errors": [],
+  "notes": "The empty result is the observation for this slice."
+}
