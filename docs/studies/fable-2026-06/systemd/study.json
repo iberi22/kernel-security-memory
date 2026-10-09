@@ -1,0 +1,180 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "systemd",
+    "repo": "https://github.com/systemd/systemd",
+    "github": "systemd/systemd"
+  },
+  "coverage": "INCOMPLETE",
+  "method": {
+    "used_query": "https://api.osv.dev/v1/query",
+    "http_status": 200,
+    "examined": 40,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {
+    "memory-lifetime": 2,
+    "bounds": 0,
+    "integer": 0,
+    "concurrency": 1,
+    "authz": 1,
+    "injection": 0,
+    "crypto": 0,
+    "path-resolution": 0,
+    "parser": 0,
+    "resource-accounting": 2,
+    "logic": 0,
+    "unknown": 2
+  },
+  "recorded": 8,
+  "records": [
+    "records/systemd-CVE-2026-29111.json",
+    "records/systemd-CVE-2022-3821.json",
+    "records/systemd-CVE-2022-45873.json",
+    "records/systemd-CVE-2022-2526.json",
+    "records/systemd-CVE-2022-4415.json",
+    "records/systemd-CVE-2021-3997.json",
+    "records/systemd-CVE-2021-33910.json",
+    "records/systemd-CVE-2020-1712.json"
+  ],
+  "skipped": [
+    {
+      "id": "CVE-2026-40226",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2025-4598",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2023-26604",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2023-31437",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2023-31439",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-40225",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-40228",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-40223",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2023-31438",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-40227",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2023-7008",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-40224",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-20386",
+      "reason": "max_records_reached"
+    },
+    {
+      "id": "CVE-2017-9445",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-1049",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2017-9217",
+      "reason": "max_records_reached"
+    },
+    {
+      "id": "CVE-2018-20839",
+      "reason": "max_records_reached"
+    },
+    {
+      "id": "CVE-2017-1000082",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2016-10156",
+      "reason": "max_records_reached"
+    },
+    {
+      "id": "CVE-2020-13529",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-6454",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-3844",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-3842",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-3843",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-16888",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2017-15908",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-15686",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-15688",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-15687",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2020-13776",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-15718",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-6954",
+      "reason": "subsystem_not_evidenced"
+    }
+  ],
+  "errors": [],
+  "notes": "Fetched 8 qualifying security records for systemd in the window 2026-06-09 through 2026-10-08."
+}
