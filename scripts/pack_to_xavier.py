@@ -11,9 +11,10 @@ environment at runtime. They are never committed, never written to files,
 and never printed to stdout/stderr (errors are redacted).
 
 Disconnect: re-run with ``--disconnect`` and the same ``--path-prefix``;
-the script issues one DELETE per published path, then the procedure in
-docs/XAVIER-BRIDGE.md applies. This bridge never mounts a foreign DB and
-never restores SQL anywhere: only verified JSON records cross the boundary.
+the script issues one DELETE per published path (or POST to /memory/delete
+if using /memory/add), then the procedure in docs/XAVIER-BRIDGE.md applies.
+This bridge never mounts a foreign DB and never restores SQL anywhere:
+only verified JSON records cross the boundary.
 
 Stdlib only.
 """
@@ -150,11 +151,24 @@ def mem_path(prefix, record_id):
 
 
 def mem_body(prefix, record):
+    formatted_content = (
+        f"# {record['title']}\n"
+        f"Project: {record['project']}\n"
+        f"Status: {record['status']}\n\n"
+        f"```json\n{json.dumps(record, indent=2)}\n```"
+    )
     return {
         "path": mem_path(prefix, record["id"]),
         "title": record["title"],
         "project": record["project"],
         "status": record["status"],
+        "content": formatted_content,
+        "metadata": {
+            "project": record["project"],
+            "status": record["status"],
+            "schema_version": record.get("schema_version", "0.1.0"),
+            "id": record["id"],
+        },
         "payload": record,
     }
 
@@ -180,42 +194,49 @@ def publish(records, base_url, token, endpoint=DEFAULT_ENDPOINT,
             inventory=None):
     """Send one request per record. Returns a summary dict. No secrets in it."""
     url = base_url.rstrip("/") + endpoint
-    action = "DELETE" if disconnect else "POST"
+    is_xavier_native = endpoint in ("/v1/memories", "/memory/add")
+
     if disconnect:
         paths = [mem_path(prefix, r["id"]) for r in records]
         for known in _load_inventory(inventory):
             if known not in paths:
                 paths.append(known)
-        plan = [(p, url + "/" + urllib.parse.quote(p, safe=""), None)
-                for p in paths]
+        if endpoint == "/memory/add":
+            del_url = base_url.rstrip("/") + "/memory/delete"
+            plan = [(p, del_url, "POST", {"path": p}) for p in paths]
+        else:
+            plan = [(p, url + "/" + urllib.parse.quote(p, safe=""), "DELETE", None)
+                    for p in paths]
+        action = "DELETE" if endpoint != "/memory/add" else "POST"
     else:
         plan = []
+        action = "POST"
         for record in records:
             path = mem_path(prefix, record["id"])
-            target = url + "/" + urllib.parse.quote(path, safe="")
-            plan.append((path, target, mem_body(prefix, record)))
+            target = url if is_xavier_native else url + "/" + urllib.parse.quote(path, safe="")
+            plan.append((path, target, "POST", mem_body(prefix, record)))
+
     if dry_run:
-        for path, target, body in plan:
+        for path, target, act, body in plan:
             nbytes = len(json.dumps(body).encode()) if body else 0
-            print(f"DRY-RUN {action} {target} path={path} bytes={nbytes}")
+            print(f"DRY-RUN {act} {target} path={path} bytes={nbytes}")
         return {"action": action, "dry_run": True, "count": len(plan)}
+
     sent, failed = 0, []
-    for path, target, body in plan:
+    for path, target, act, body in plan:
         try:
-            if disconnect:
-                _request(target, token, method="DELETE")
-            else:
-                _request(target, token, method="POST", body=body)
+            _request(target, token, method=act, body=body)
             sent += 1
         except Exception as exc:  # noqa: BLE001 - report per-record, redacted
             failed.append({"path": path, "error": _redact(exc)})
+
     summary = {"action": action, "dry_run": False, "sent": sent,
                "failed": failed, "count": len(plan)}
     print(json.dumps(summary, indent=2))
     if failed:
         raise SystemExit(f"Error: {len(failed)}/{len(plan)} requests failed")
     if not disconnect:
-        _save_inventory(inventory, [p for p, _, _ in plan])
+        _save_inventory(inventory, [p for p, _, _, _ in plan])
     return summary
 
 
@@ -233,36 +254,30 @@ def main(argv=None):
                         help="Verify and show what would be sent; no network")
     parser.add_argument("--disconnect", action="store_true",
                         help="DELETE every path with the prefix instead of publishing")
-    parser.add_argument("--inventory", default=None,
-                        help="Optional JSON file recording published paths; "
-                             "disconnect also deletes paths listed here")
+    parser.add_argument("--inventory",
+                        help="Optional JSON file recording published paths; disconnect also deletes paths listed here")
     args = parser.parse_args(argv)
 
-    if args.source.startswith(("http://", "https://")):
-        raise SystemExit("Error: only local pack directories are accepted")
-
     manifest, records = verify_pack(args.source, args.manifest_sha256)
-    print(f"Verified pack: {manifest.get('pack_id')} "
-          f"({len(records)} records, manifest schema {manifest.get('schema_version')})")
+    prefix_manifest = manifest.get("pack_id", "bootstrap")
+    print(f"Verified pack: {prefix_manifest} ({len(records)} records, "
+          f"manifest schema {manifest.get('schema_version')})")
 
     if args.dry_run:
-        return publish(records, "<dry-run>", "<dry-run>",
-                       args.endpoint, args.path_prefix, dry_run=True,
-                       disconnect=args.disconnect, inventory=args.inventory)
+        publish(records, "<dry-run>", "tok_dry_run", endpoint=args.endpoint,
+                prefix=args.path_prefix, dry_run=True, disconnect=args.disconnect,
+                inventory=args.inventory)
+        return
 
     base_url = _environ("XAVIER_URL")
-    token = _environ("XAVIER_TOKEN")
     if not _url_allowed(base_url):
-        raise SystemExit("Error: XAVIER_URL must be https, or http loopback "
-                         "(localhost/127.0.0.1/::1)")
-    try:
-        return publish(records, base_url, token, args.endpoint,
-                       args.path_prefix, disconnect=args.disconnect,
-                       inventory=args.inventory)
-    except SystemExit:
-        raise
-    except Exception as exc:  # noqa: BLE001 - never leak the token
-        raise SystemExit(f"Error: {_redact(exc)}")
+        raise SystemExit(
+            "Error: XAVIER_URL must use https:// (plain http allowed only "
+            "for localhost/127.0.0.1/::1)")
+    token = _environ("XAVIER_TOKEN")
+    publish(records, base_url, token, endpoint=args.endpoint,
+            prefix=args.path_prefix, dry_run=False, disconnect=args.disconnect,
+            inventory=args.inventory)
 
 
 if __name__ == "__main__":
