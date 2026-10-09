@@ -1,0 +1,105 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "sqlite",
+    "repo": "https://github.com/sqlite/sqlite",
+    "github": "sqlite/sqlite"
+  },
+  "coverage": "WINDOW_SAMPLED",
+  "method": {
+    "used_query": "https://api.osv.dev/v1/query",
+    "http_status": 200,
+    "examined": 23,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {
+    "bounds": 1,
+    "logic": 1,
+    "parser": 1,
+    "resource-accounting": 2,
+    "unknown": 3
+  },
+  "recorded": 8,
+  "records": [
+    "records/sqlite-CVE-2026-39113.json",
+    "records/sqlite-CVE-2026-50813.json",
+    "records/sqlite-CVE-2026-50812.json",
+    "records/sqlite-CVE-2025-29088.json",
+    "records/sqlite-CVE-2019-19603.json",
+    "records/sqlite-CVE-2019-20218.json",
+    "records/sqlite-CVE-2019-19244.json",
+    "records/sqlite-CVE-2019-19317.json"
+  ],
+  "skipped": [
+    {
+      "id": "CVE-2026-11822",
+      "reason": "abbreviated_sha"
+    },
+    {
+      "id": "CVE-2025-6965",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2025-29087",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-11824",
+      "reason": "abbreviated_sha"
+    },
+    {
+      "id": "CVE-2025-7458",
+      "reason": "abbreviated_sha"
+    },
+    {
+      "id": "CVE-2022-46908",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2022-35737",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2025-3277",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2025-70873",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-0232",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2023-7104",
+      "reason": "abbreviated_sha"
+    },
+    {
+      "id": "CVE-2021-45346",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2021-31239",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2019-9936",
+      "reason": "abbreviated_sha"
+    },
+    {
+      "id": "CVE-2019-9937",
+      "reason": "abbreviated_sha"
+    }
+  ],
+  "errors": [],
+  "notes": "Recorded 8 SQLite security fix advisories published or modified in window 2026-06-09..2026-10-08."
+}
