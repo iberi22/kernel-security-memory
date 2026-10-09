@@ -1,0 +1,31 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "linux",
+    "repo": "https://github.com/torvalds/linux",
+    "github": "torvalds/linux"
+  },
+  "coverage": "INCOMPLETE",
+  "method": {
+    "used_query": "https://api.github.com/repos/torvalds/linux/security-advisories?state=published&per_page=20",
+    "http_status": 200,
+    "examined": 0,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {},
+  "recorded": 0,
+  "records": [],
+  "skipped": [],
+  "errors": [
+    "response_cap"
+  ],
+  "notes": "Empty result observed because the query source produced no usable records under limits."
+}
