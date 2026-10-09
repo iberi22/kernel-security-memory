@@ -1,0 +1,187 @@
+{
+  "schema_version": "study-slice-v1",
+  "window": {
+    "start": "2026-06-09",
+    "end": "2026-10-08",
+    "anchor": "Claude Fable 5 public announcement 2026-06-09"
+  },
+  "project": {
+    "id": "nginx",
+    "repo": "https://github.com/nginx/nginx",
+    "github": "nginx/nginx"
+  },
+  "coverage": "WINDOW_SAMPLED",
+  "method": {
+    "used_query": "{\"package\": {\"ecosystem\": \"GIT\", \"name\": \"github.com/nginx/nginx\"}}",
+    "http_status": 200,
+    "examined": 40,
+    "limits": {
+      "max_examined": 40,
+      "max_records": 8
+    }
+  },
+  "counts_by_family": {
+    "logic": 2
+  },
+  "recorded": 2,
+  "records": [
+    "records/nginx-CVE-2019-20372.json",
+    "records/nginx-CVE-2017-20005.json"
+  ],
+  "skipped": [
+    {
+      "id": "CVE-2023-44487",
+      "reason": "not_this_project"
+    },
+    {
+      "id": "CVE-2026-42055",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-42945",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-60005",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-9256",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-42530",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-28755",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-40701",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-32647",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-27654",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-27784",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-42926",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-40460",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-42934",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-42946",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-27651",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-28753",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-48142",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2026-1642",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2022-41741",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2022-41742",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-7347",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2025-53859",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-32760",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-31079",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2025-23419",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-35200",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-34161",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-24990",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2024-24989",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2021-23017",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2021-3618",
+      "reason": "not_this_project"
+    },
+    {
+      "id": "CVE-2019-9516",
+      "reason": "not_this_project"
+    },
+    {
+      "id": "CVE-2019-9513",
+      "reason": "not_this_project"
+    },
+    {
+      "id": "CVE-2019-9511",
+      "reason": "not_this_project"
+    },
+    {
+      "id": "CVE-2018-16845",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-16844",
+      "reason": "subsystem_not_evidenced"
+    },
+    {
+      "id": "CVE-2018-16843",
+      "reason": "subsystem_not_evidenced"
+    }
+  ],
+  "errors": [],
+  "notes": "Recorded 2 security fix records for nginx in the 2026-06-09 to 2026-10-08 window."
+}
