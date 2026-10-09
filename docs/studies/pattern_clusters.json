@@ -1,0 +1,458 @@
+{
+  "schema_version": "pattern-clusters-v1",
+  "total_cves": 432,
+  "cluster_count": 26,
+  "clusters": [
+    {
+      "cwe_id": "UNKNOWN",
+      "title": "Unstated or Legacy Advisory Without CWE Classification",
+      "count": 299,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl": 2,
+        "glibc": 3,
+        "linux": 273,
+        "openssh": 2,
+        "openssl": 19
+      },
+      "sample_cves": [
+        "CVE-1999-0804",
+        "CVE-1999-1018",
+        "CVE-1999-1166",
+        "CVE-1999-1341",
+        "CVE-2000-0227",
+        "CVE-2000-0274",
+        "CVE-2000-0335",
+        "CVE-2000-0344",
+        "CVE-2000-0506",
+        "CVE-2000-0525"
+      ]
+    },
+    {
+      "cwe_id": "CWE-399",
+      "title": "Resource Management Errors",
+      "count": 38,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Resource exhaustion path without rate limit or quota"
+      ],
+      "projects_distribution": {
+        "linux": 24,
+        "openssl": 14
+      },
+      "sample_cves": [
+        "CVE-2005-0210",
+        "CVE-2005-0756",
+        "CVE-2005-2099",
+        "CVE-2005-2548",
+        "CVE-2005-2708",
+        "CVE-2005-2709",
+        "CVE-2005-2800",
+        "CVE-2005-3784",
+        "CVE-2005-3806",
+        "CVE-2005-3857"
+      ]
+    },
+    {
+      "cwe_id": "CWE-310",
+      "title": "Cryptographic Issues",
+      "count": 14,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 1,
+        "openssl": 13
+      },
+      "sample_cves": [
+        "CVE-2006-1056",
+        "CVE-2006-4339",
+        "CVE-2007-5502",
+        "CVE-2008-7270",
+        "CVE-2009-3765",
+        "CVE-2009-3766",
+        "CVE-2010-0742",
+        "CVE-2010-0928",
+        "CVE-2011-1945",
+        "CVE-2011-4108"
+      ]
+    },
+    {
+      "cwe_id": "CWE-20",
+      "title": "Improper Input Validation",
+      "count": 13,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Missing boundary / sanitize check on incoming payload"
+      ],
+      "projects_distribution": {
+        "linux": 9,
+        "openssl": 4
+      },
+      "sample_cves": [
+        "CVE-2005-0209",
+        "CVE-2005-1761",
+        "CVE-2005-3055",
+        "CVE-2006-0744",
+        "CVE-2006-1522",
+        "CVE-2006-1528",
+        "CVE-2006-1858",
+        "CVE-2007-2172",
+        "CVE-2007-2764",
+        "CVE-2008-5077"
+      ]
+    },
+    {
+      "cwe_id": "CWE-264",
+      "title": "Permissions, Privileges, and Access Controls",
+      "count": 11,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 8,
+        "openssl": 3
+      },
+      "sample_cves": [
+        "CVE-2002-2254",
+        "CVE-2005-2492",
+        "CVE-2005-2555",
+        "CVE-2005-3179",
+        "CVE-2005-3257",
+        "CVE-2005-3273",
+        "CVE-2006-1524",
+        "CVE-2006-4572",
+        "CVE-2010-1633",
+        "CVE-2011-1473"
+      ]
+    },
+    {
+      "cwe_id": "CWE-119",
+      "title": "Memory Corruption / Buffer Boundary Error",
+      "count": 11,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "projects_distribution": {
+        "curl": 1,
+        "linux": 6,
+        "openssl": 4
+      },
+      "sample_cves": [
+        "CVE-2005-3185",
+        "CVE-2006-1368",
+        "CVE-2006-1857",
+        "CVE-2006-3738",
+        "CVE-2006-6106",
+        "CVE-2007-0005",
+        "CVE-2007-1217",
+        "CVE-2007-1592",
+        "CVE-2009-0590",
+        "CVE-2009-1377"
+      ]
+    },
+    {
+      "cwe_id": "CWE-189",
+      "title": "CWE Family CWE-189",
+      "count": 10,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl": 1,
+        "linux": 3,
+        "openssl": 6
+      },
+      "sample_cves": [
+        "CVE-2004-2731",
+        "CVE-2005-4077",
+        "CVE-2006-6058",
+        "CVE-2007-2875",
+        "CVE-2007-4995",
+        "CVE-2007-5135",
+        "CVE-2008-0891",
+        "CVE-2009-0789",
+        "CVE-2012-2131",
+        "CVE-2012-2333"
+      ]
+    },
+    {
+      "cwe_id": "CWE-476",
+      "title": "NULL Pointer Dereference",
+      "count": 6,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Unchecked return value from allocator or lookup function"
+      ],
+      "projects_distribution": {
+        "linux": 1,
+        "openssl": 5
+      },
+      "sample_cves": [
+        "CVE-2004-0079",
+        "CVE-2005-2459",
+        "CVE-2006-4343",
+        "CVE-2008-1672",
+        "CVE-2009-1386",
+        "CVE-2009-1387"
+      ]
+    },
+    {
+      "cwe_id": "CWE-287",
+      "title": "Improper Authentication",
+      "count": 5,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl": 5
+      },
+      "sample_cves": [
+        "CVE-2009-0129",
+        "CVE-2009-0591",
+        "CVE-2009-0653",
+        "CVE-2009-1390",
+        "CVE-2010-4252"
+      ]
+    },
+    {
+      "cwe_id": "CWE-667",
+      "title": "CWE Family CWE-667",
+      "count": 4,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 4
+      },
+      "sample_cves": [
+        "CVE-2005-2456",
+        "CVE-2005-3847",
+        "CVE-2006-4342",
+        "CVE-2006-5158"
+      ]
+    },
+    {
+      "cwe_id": "CWE-401",
+      "title": "Missing Release of Memory after Effective Lifetime (Memory Leak)",
+      "count": 3,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Resource exhaustion path without rate limit or quota"
+      ],
+      "projects_distribution": {
+        "linux": 2,
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-2005-3119",
+        "CVE-2005-3181",
+        "CVE-2009-1378"
+      ]
+    },
+    {
+      "cwe_id": "CWE-295",
+      "title": "Improper Certificate Validation",
+      "count": 3,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl": 3
+      },
+      "sample_cves": [
+        "CVE-2009-2409",
+        "CVE-2009-3555",
+        "CVE-2009-3767"
+      ]
+    },
+    {
+      "cwe_id": "CWE-362",
+      "title": "Concurrent Execution using Shared Resource (Race Condition)",
+      "count": 2,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Multithreaded / interrupt context without adequate lock barrier"
+      ],
+      "projects_distribution": {
+        "linux": 1,
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-2006-0039",
+        "CVE-2010-3864"
+      ]
+    },
+    {
+      "cwe_id": "CWE-384",
+      "title": "CWE Family CWE-384",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-1999-0428"
+      ]
+    },
+    {
+      "cwe_id": "CWE-193",
+      "title": "CWE Family CWE-193",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 1
+      },
+      "sample_cves": [
+        "CVE-2001-1391"
+      ]
+    },
+    {
+      "cwe_id": "CWE-203",
+      "title": "CWE Family CWE-203",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-2003-0078"
+      ]
+    },
+    {
+      "cwe_id": "CWE-415",
+      "title": "CWE Family CWE-415",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-2003-0545"
+      ]
+    },
+    {
+      "cwe_id": "CWE-125",
+      "title": "Out-of-bounds Read",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "projects_distribution": {
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-2004-0112"
+      ]
+    },
+    {
+      "cwe_id": "CWE-190",
+      "title": "Integer Overflow or Wraparound",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 1
+      },
+      "sample_cves": [
+        "CVE-2004-2013"
+      ]
+    },
+    {
+      "cwe_id": "CWE-131",
+      "title": "CWE Family CWE-131",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl": 1
+      },
+      "sample_cves": [
+        "CVE-2005-0490"
+      ]
+    },
+    {
+      "cwe_id": "CWE-697",
+      "title": "CWE Family CWE-697",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 1
+      },
+      "sample_cves": [
+        "CVE-2005-2801"
+      ]
+    },
+    {
+      "cwe_id": "CWE-327",
+      "title": "CWE Family CWE-327",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-2005-2946"
+      ]
+    },
+    {
+      "cwe_id": "CWE-862",
+      "title": "CWE Family CWE-862",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 1
+      },
+      "sample_cves": [
+        "CVE-2005-3623"
+      ]
+    },
+    {
+      "cwe_id": "CWE-120",
+      "title": "Classic Buffer Overflow",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "projects_distribution": {
+        "linux": 1
+      },
+      "sample_cves": [
+        "CVE-2006-2935"
+      ]
+    },
+    {
+      "cwe_id": "CWE-416",
+      "title": "Use After Free",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Asynchronous lifecycle, double free, or aliased pointer reuse"
+      ],
+      "projects_distribution": {
+        "linux": 1
+      },
+      "sample_cves": [
+        "CVE-2006-4997"
+      ]
+    },
+    {
+      "cwe_id": "CWE-338",
+      "title": "CWE Family CWE-338",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl": 1
+      },
+      "sample_cves": [
+        "CVE-2008-0166"
+      ]
+    }
+  ]
+}
