@@ -26,10 +26,6 @@ jobs:
     # The fetch phase is capped at 35 minutes by refresh_all.py
     # --deadline-seconds; the rest covers validation and the pull request.
     timeout-minutes: 50
-    env:
-      # Shallow kernel security-vulns clone consumed by
-      # scripts/studies/fetch_kernel_cna_shas.py when that enricher exists.
-      KSM_VULNS_DIR: ${{ runner.temp }}/vulns
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -45,6 +41,13 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
+
+      # runner.temp is not an allowed context in a job-level env map (only
+      # github, inputs, matrix, needs, secrets, strategy and vars are), so the
+      # path is exported here and read by refresh_all.py and the clone step
+      # below through the KSM_VULNS_DIR environment variable.
+      - name: Set the kernel vulns directory
+        run: echo "KSM_VULNS_DIR=$RUNNER_TEMP/vulns" >> "$GITHUB_ENV"
 
       - name: Shallow clone kernel security vulns
         run: git clone --depth 1 https://git.kernel.org/pub/scm/linux/security/vulns.git "$KSM_VULNS_DIR"
@@ -133,9 +136,11 @@ jobs:
 
           Produced by `scripts/studies/refresh_all.py` (also runnable locally):
           every fetcher with `--fetch` under a per-project wall clock inside a
-          global deadline, the optional enrichers when present, the catalog
-          manifest and pattern-cluster rebuild, then every fetcher with
-          `--offline`, the unit tests and `build_pack.py --check`.
+          global deadline, the optional enrichers when present, the
+          authoritative snapshot catalogs (linux-cna, curl-upstream,
+          openssl-upstream), the catalog manifest and pattern-cluster rebuild,
+          then every fetcher with `--offline`, the unit tests and
+          `build_pack.py --check`.
 
           Per-project state from this run (PARTIAL = errors recorded but the
           cursor advanced; TIMED_OUT/REVERTED = a fetcher exceeded its wall

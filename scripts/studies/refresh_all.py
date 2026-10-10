@@ -32,9 +32,20 @@ This module is the only command humans and CI need in order to refresh
 2. the optional enrichers, but only when their script is already in the tree
    (``scripts/studies/enrich_from_osv.py`` and
    ``scripts/studies/fetch_kernel_cna_shas.py`` are written in parallel).
-   An enricher failure is recorded and never fatal.
-3. ``build_catalog_manifest.py`` and ``cluster_patterns.py`` (regeneration).
-4. validation: every fetcher with ``--offline``, the unit tests and
+   ``enrich_from_osv.py`` runs only on ``OSV_ENRICHABLE_PROJECTS``: it writes
+   provenance keys the other validators still reject. An enricher failure is
+   recorded and never fatal.
+3. the authoritative *snapshot* catalogs -- ``linux-cna`` (kernel CNA clone)
+   and ``curl-upstream`` / ``openssl-upstream`` (the projects' own advisory
+   feeds). No ``fetch_history_*.py`` fetcher builds them, so without these
+   steps a refresh never picked up a new CNA release or upstream advisory
+   while the manifest still counted the stale files. A rebuild failure is
+   network-kind (recorded, never fatal), like every other fetch; in
+   ``--offline-only`` mode their ``--check`` runs and IS fatal, but only when
+   the local cache exists (the raw snapshots are gitignored and the CNA clone
+   is made by the workflow).
+4. ``build_catalog_manifest.py`` and ``cluster_patterns.py`` (regeneration).
+5. validation: every fetcher with ``--offline``, the unit tests and
    ``build_pack.py --check``.
 
 Rules encoded here:
@@ -77,6 +88,17 @@ ENRICH_FROM_OSV = "enrich_from_osv.py"
 FETCH_KERNEL_CNA = "fetch_kernel_cna_shas.py"
 OPTIONAL_ENRICHERS: Tuple[str, ...] = (ENRICH_FROM_OSV, FETCH_KERNEL_CNA)
 
+# Snapshot catalog builders (also run only once the script is in the tree).
+FETCH_UPSTREAM = "fetch_upstream_advisories.py"
+
+# Projects whose fetch_history_*.py validator accepts the provenance keys
+# enrich_from_osv.py writes ("fix_sha_source", "cwe_source", "fix_repo") and
+# the cwe_state STATED_BY_ADVISORY it rewrites. The other six still require the
+# exact seven-key row, so enriching them would fail their own --offline step
+# and abort the refresh. Keep this list in sync with the validators:
+# tests/test_refresh_all.py derives the same set from their source.
+OSV_ENRICHABLE_PROJECTS: Tuple[str, ...] = ("curl", "glibc", "linux", "nginx", "openssh", "openssl")
+
 DEFAULT_BUDGET_SECONDS = 600
 # Global wall clock for the fetch phase. The workflow allows 50 minutes; 35
 # minutes of fetching leaves room for validation and the pull request.
@@ -99,8 +121,22 @@ EXIT_FETCH_OUTAGE = 3
 VULNS_DIR_ENV = "KSM_VULNS_DIR"
 DEFAULT_VULNS_DIR = Path(tempfile.gettempdir()) / "linux-security-vulns"
 CATALOGS_SUBDIR = Path("docs") / "studies" / "cve-history"
+CATALOG_NAME = "catalog.jsonl"
 HELP_TIMEOUT_SECONDS = 60
 OFFLINE_TIMEOUT_SECONDS = 120
+
+# Snapshot catalogs: no fetch_history_*.py fetcher builds them, so the refresh
+# rebuilds them explicitly before the manifest.
+KERNEL_CNA_CATALOG = CATALOGS_SUBDIR / "linux-cna"
+# (project, catalog directory) pairs built by fetch_upstream_advisories.py.
+UPSTREAM_CATALOGS: Tuple[Tuple[str, Path], ...] = (
+    ("curl", CATALOGS_SUBDIR / "curl-upstream"),
+    ("openssl", CATALOGS_SUBDIR / "openssl-upstream"),
+)
+# The fetcher's default snapshot name; the raw snapshots are gitignored.
+UPSTREAM_SNAPSHOT = "source.json"
+# Subdirectory of a kernel security-vulns clone that holds the CNA records.
+CNA_PUBLISHED_SUBDIR = Path("cve") / "published"
 
 NETWORK = "network"
 STEP = "step"
@@ -192,6 +228,64 @@ def budget_argv(script: Path, budget_seconds: int) -> List[str]:
     return []
 
 
+def osv_enrichable(projects: Sequence[str]) -> List[str]:
+    """The selected projects ``enrich_from_osv.py`` may safely write to.
+
+    The enricher adds the provenance keys "fix_sha_source"/"cwe_source"/
+    "fix_repo" and rewrites ``cwe_state`` as STATED_BY_ADVISORY. Only the
+    validators in OSV_ENRICHABLE_PROJECTS accept those keys; the rest still
+    require the exact seven-key row, so writing them would fail that project's
+    own ``--offline`` step afterwards.
+    """
+    accepted = set(OSV_ENRICHABLE_PROJECTS)
+    return [project for project in projects if project in accepted]
+
+
+def snapshot_steps(studies: Path, root: Path, offline_only: bool) -> List[Step]:
+    """Rebuild (or verify) the snapshot catalogs no fetcher builds.
+
+    ``linux-cna`` comes from the kernel CNA clone, ``curl-upstream`` and
+    ``openssl-upstream`` from the projects' own advisory feeds. Without these
+    steps the manifest would keep counting stale snapshot files forever.
+
+    Network mode rebuilds them from upstream, and a failure there is
+    network-kind: recorded, never fatal. ``--offline-only`` runs the ``--check``
+    variant instead, which IS fatal, but only when the local cache exists: the
+    raw advisory snapshots are gitignored and the CNA clone is made by the
+    workflow, so a plain checkout has neither.
+    """
+    py = sys.executable
+    steps: List[Step] = []
+    script = studies / FETCH_KERNEL_CNA
+    if script.is_file():
+        out_dir = root / KERNEL_CNA_CATALOG
+        base = [py, str(script), "--vulns-dir", str(vulns_dir()),
+                "--build-catalog", str(out_dir)]
+        if offline_only:
+            if (vulns_dir() / CNA_PUBLISHED_SUBDIR).is_dir():
+                steps.append(Step("snapshot:linux-cna", [*base, "--check"], STEP))
+            else:
+                print(f"skipping offline check of linux-cna "
+                      f"(no kernel CNA clone at {vulns_dir()})")
+        else:
+            steps.append(Step("snapshot:linux-cna", base, NETWORK))
+    script = studies / FETCH_UPSTREAM
+    if script.is_file():
+        for project, relative in UPSTREAM_CATALOGS:
+            out_dir = root / relative
+            base = [py, str(script), "--project", project, "--out-dir", str(out_dir)]
+            label = f"snapshot:{relative.name}"
+            if offline_only:
+                snapshot = out_dir / UPSTREAM_SNAPSHOT
+                if not snapshot.is_file():
+                    print(f"skipping offline check of {relative.name} (no snapshot at {snapshot})")
+                    continue
+                steps.append(Step(label, [*base, "--offline", "--check"], STEP))
+            else:
+                steps.append(Step(label, base, NETWORK))
+    return steps
+
+
 def build_plan(
     projects: Sequence[str],
     budget_seconds: int,
@@ -220,14 +314,26 @@ def build_plan(
                 print(f"skipping optional enricher (not present yet): {name}")
                 continue
             if name == ENRICH_FROM_OSV:
-                argv = [py, str(script), "--projects", ",".join(projects)]
+                enrichable = osv_enrichable(projects)
+                if not enrichable:
+                    print(f"skipping {name}: no selected project's validator accepts its "
+                          f"provenance keys (accepted: {', '.join(OSV_ENRICHABLE_PROJECTS)})")
+                    continue
+                argv = [py, str(script), "--projects", ",".join(enrichable)]
             else:
+                # fetch_kernel_cna_shas.py --catalog takes the catalog.jsonl file,
+                # not its directory: compute() requires catalog_path.is_file().
                 argv = [
                     py, str(script),
                     "--vulns-dir", str(vulns_dir()),
-                    "--catalog", str(root / CATALOGS_SUBDIR / "linux"),
+                    "--catalog", str(root / CATALOGS_SUBDIR / "linux" / CATALOG_NAME),
                 ]
             steps.append(Step(f"enrich:{name}", argv, NETWORK))
+
+        steps.extend(snapshot_steps(studies, root, offline_only=False))
+
+    if offline_only:
+        steps.extend(snapshot_steps(studies, root, offline_only=True))
 
     steps.append(Step(
         "manifest",

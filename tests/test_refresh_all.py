@@ -33,6 +33,8 @@ sys.path.insert(0, str(REPO / "scripts" / "studies"))
 
 import refresh_all  # noqa: E402
 
+WORKFLOW = REPO / ".github" / "workflows" / "refresh-catalogs.yml"
+
 # The stub's --help must advertise flags, like a real argparse program. The
 # header is read back by the stub itself when refresh_all parses --help.
 STUB = '''#!/usr/bin/env python3
@@ -75,6 +77,13 @@ sys.exit(int(exits.get(key, 0)))
 TIME_BUDGET_HEADER = "# flags: --fetch --offline --max-time\n"
 CALL_BUDGET_HEADER = "# flags: --fetch --offline --max-calls\n"
 
+# Names the snapshot rebuilders have on disk, and the CNA records subdirectory
+# of a kernel security-vulns clone. Kept literal (not read from refresh_all)
+# so the tests still run against an entrypoint without those steps.
+KERNEL_CNA_SCRIPT = "fetch_kernel_cna_shas.py"
+UPSTREAM_SCRIPT = "fetch_upstream_advisories.py"
+CNA_RECORDS_DIR = Path("cve") / "published"
+
 
 def index_payload(cursor=None, errors=(), entry_count=0, window_start="1999-01-01"):
     """A fetcher-style index.json: what refresh_all snapshots before/after."""
@@ -89,6 +98,44 @@ def index_payload(cursor=None, errors=(), entry_count=0, window_start="1999-01-0
     }
 
 
+def _validator_accepts_optional_keys(script: Path) -> bool:
+    """True when the fetcher's validator tolerates the enrichers' extra keys.
+
+    The relaxations are named ``optional_rec_keys`` / ``optional_keys`` in the
+    validators; a fetcher without one compares the whole key set, so the
+    enrichers' rows are rejected there.
+    """
+    text = script.read_text(encoding="utf-8")
+    return "optional_rec_keys" in text or "optional_keys" in text
+
+
+def _env_blocks(text: str):
+    """Every workflow/job-level ``env:`` map body in the workflow YAML.
+
+    Only these levels restrict the expression contexts (no ``runner`` there),
+    which is what made the refresh workflow invalid; a step-level ``env:`` is
+    indented deeper and is skipped on purpose.
+    """
+    lines = text.splitlines()
+    blocks = []
+    for index, line in enumerate(lines):
+        if line.strip() != "env:":
+            continue
+        indent = len(line) - len(line.lstrip())
+        if indent > 4:  # a step-level env: map
+            continue
+        end = index + 1
+        while end < len(lines):
+            candidate = lines[end]
+            if (candidate.strip()
+                    and not candidate.lstrip().startswith("#")
+                    and len(candidate) - len(candidate.lstrip()) <= indent):
+                break
+            end += 1
+        blocks.append("\n".join(lines[index + 1:end]))
+    return blocks
+
+
 def write_fetchers(studies: Path) -> None:
     """Fetcher stubs whose --help declares the budget flag each real script has."""
     studies.mkdir(parents=True, exist_ok=True)
@@ -97,13 +144,16 @@ def write_fetchers(studies: Path) -> None:
         (studies / f"fetch_history_{project}.py").write_text(STUB + header, encoding="utf-8")
 
 
-def write_stub_repo(root: Path, enrichers=()) -> Path:
+def write_stub_repo(root: Path, enrichers=(), snapshots=False) -> Path:
     studies = root / "scripts" / "studies"
     write_fetchers(studies)
     for name in ("build_catalog_manifest.py", "cluster_patterns.py"):
         (studies / name).write_text(STUB, encoding="utf-8")
     for name in enrichers:
         (studies / name).write_text(STUB, encoding="utf-8")
+    if snapshots:
+        for name in (KERNEL_CNA_SCRIPT, UPSTREAM_SCRIPT):
+            (studies / name).write_text(STUB, encoding="utf-8")
     (root / "scripts").mkdir(parents=True, exist_ok=True)
     (root / "scripts" / "build_pack.py").write_text(STUB, encoding="utf-8")
     tests = root / "tests"
@@ -118,15 +168,16 @@ def write_stub_repo(root: Path, enrichers=()) -> Path:
 class StubRepo:
     """Run refresh_all against a stub repo, capturing stdout and stub invocations."""
 
-    def __init__(self, exits=None, enrichers=(), sleeps=None, indexes=None):
+    def __init__(self, exits=None, enrichers=(), sleeps=None, indexes=None, snapshots=False):
         self.exits = dict(exits or {})
         self.enrichers = list(enrichers)
         self.sleeps = dict(sleeps or {})
         self.indexes = dict(indexes or {})
+        self.snapshots = snapshots
 
     def __enter__(self):
         self._tmp = tempfile.TemporaryDirectory()
-        self.root = write_stub_repo(Path(self._tmp.name), self.enrichers)
+        self.root = write_stub_repo(Path(self._tmp.name), self.enrichers, self.snapshots)
         self.log = self.root / "invocations.log"
         os.environ["KSM_TEST_STUB_LOG"] = str(self.log)
         os.environ["KSM_TEST_STUB_EXITS"] = json.dumps(self.exits)
@@ -245,15 +296,49 @@ class PlanBuildingTest(unittest.TestCase):
             cna = plan[labels.index(f"enrich:{refresh_all.FETCH_KERNEL_CNA}")]
             self.assertIn("--vulns-dir", cna.argv)
             self.assertIn("--catalog", cna.argv)
-            self.assertIn(str(root / "docs" / "studies" / "cve-history" / "linux"), cna.argv)
+            # compute() requires a catalog.jsonl file, never its directory.
+            self.assertIn(str(root / "docs" / "studies" / "cve-history" / "linux" / "catalog.jsonl"),
+                          cna.argv)
+            self.assertNotIn(str(root / "docs" / "studies" / "cve-history" / "linux"), cna.argv)
 
-    def test_osv_enricher_receives_selected_projects(self):
+    def test_osv_enricher_skips_projects_whose_validator_rejects_its_keys(self):
+        # The enricher writes fix_sha_source / cwe_source / fix_repo and
+        # rewrites cwe_state; git, postgresql, qemu, sqlite, systemd and
+        # unbound still require the exact seven-key row, so enriching them
+        # fails their own --offline step and would abort the refresh.
         with StubRepo([], enrichers=[refresh_all.ENRICH_FROM_OSV]) as repo:
             with contextlib.redirect_stdout(io.StringIO()):
-                plan = plan_of(repo.root, ["curl", "git"], 600, False)
+                plan = plan_of(repo.root, list(refresh_all.PROJECTS), 600, False)
             osv = plan[[s.label for s in plan].index(f"enrich:{refresh_all.ENRICH_FROM_OSV}")]
-            self.assertIn("--projects", osv.argv)
-            self.assertIn("curl,git", osv.argv)
+            received = osv.argv[osv.argv.index("--projects") + 1].split(",")
+            self.assertNotIn("git", received)
+            self.assertNotIn("postgresql", received)
+            self.assertNotIn("qemu", received)
+            self.assertNotIn("sqlite", received)
+            self.assertNotIn("systemd", received)
+            self.assertNotIn("unbound", received)
+            # ... and exactly the set the real validators accept, so the
+            # protection is neither narrower nor stale. This is the same set
+            # the allowlist must declare; tests/test_catalog_optional_keys.py
+            # checks one of the validators empirically, this covers all.
+            studies = REPO / "scripts" / "studies"
+            expected = [project for project in refresh_all.PROJECTS
+                        if _validator_accepts_optional_keys(studies / f"fetch_history_{project}.py")]
+            self.assertEqual(received, expected)
+            self.assertEqual(list(refresh_all.OSV_ENRICHABLE_PROJECTS), expected,
+                             "OSV_ENRICHABLE_PROJECTS drifted from the fetchers' validators")
+
+    def test_osv_enricher_is_skipped_when_no_selected_project_accepts_its_keys(self):
+        with StubRepo([], enrichers=[refresh_all.ENRICH_FROM_OSV]) as repo:
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                plan = refresh_all.build_plan(
+                    ["git"], 600, False, studies_dir=repo.root / "scripts" / "studies",
+                    root=repo.root,
+                )
+            labels = [step.label for step in plan]
+            self.assertNotIn(f"enrich:{refresh_all.ENRICH_FROM_OSV}", labels)
+            self.assertIn(f"skipping {refresh_all.ENRICH_FROM_OSV}", out.getvalue())
 
     def test_budget_argv_reads_the_scripts_help(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -427,6 +512,121 @@ class ExecutionTest(unittest.TestCase):
         for flag in ("--deadline-seconds", "--grace-seconds", "--budget-seconds"):
             with self.assertRaises(SystemExit):
                 refresh_all.main(["--projects", "curl", "--dry-run", flag, "0"])
+
+
+class WorkflowContextsTest(unittest.TestCase):
+    """The workflow must only use expression contexts GitHub allows there.
+
+    ``runner.temp`` is not available in a job-level ``env:`` map, so the
+    scheduled run failed before any step executed. actionlint reports it as
+    "context \"runner\" is not allowed here".
+    """
+
+    def test_no_expression_in_job_or_workflow_level_env(self):
+        blocks = _env_blocks(WORKFLOW.read_text(encoding="utf-8"))
+        self.assertTrue(blocks, "expected a workflow- or job-level env: map")
+        for block in blocks:
+            for line in block.splitlines():
+                if line.strip() and not line.strip().startswith("#"):
+                    self.assertNotIn(
+                        "${{", line,
+                        "job/workflow-level env allows only github, inputs, matrix, "
+                        "needs, secrets, strategy and vars; move runner.* into a step",
+                    )
+
+    def test_vulns_dir_is_exported_by_a_step(self):
+        text = WORKFLOW.read_text(encoding="utf-8")
+        self.assertRegex(text, r'echo\s+"KSM_VULNS_DIR=\$RUNNER_TEMP[^"]*"\s+>>\s+"\$GITHUB_ENV"')
+
+
+class SnapshotCatalogStepsTest(unittest.TestCase):
+    """The snapshot catalogs must be rebuilt before the manifest.
+
+    No ``fetch_history_*.py`` fetcher writes ``linux-cna``,
+    ``curl-upstream`` or ``openssl-upstream``, so without these steps the
+    refresh could never pick up a new CNA release or upstream advisory while
+    the manifest kept counting the stale files.
+    """
+
+    def _plan(self, root, offline_only):
+        return plan_of(root, list(refresh_all.PROJECTS), 600, offline_only)
+
+    def test_network_plan_rebuilds_the_snapshot_catalogs_before_the_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            studies = root / "scripts" / "studies"
+            write_fetchers(studies)
+            for name in (KERNEL_CNA_SCRIPT, UPSTREAM_SCRIPT):
+                (studies / name).write_text(STUB, encoding="utf-8")
+            plan = self._plan(root, False)
+
+        labels = [step.label for step in plan]
+        by_label = {step.label: step for step in plan}
+        cna = by_label.get("snapshot:linux-cna")
+        self.assertIsNotNone(cna, "the linux-cna snapshot catalog is never rebuilt")
+        self.assertEqual(cna.kind, refresh_all.NETWORK)
+        self.assertIn("--build-catalog", cna.argv)
+        self.assertIn(str(root / "docs" / "studies" / "cve-history" / "linux-cna"), cna.argv)
+        for label, project, subdir in (("snapshot:curl-upstream", "curl", "curl-upstream"),
+                                       ("snapshot:openssl-upstream", "openssl", "openssl-upstream")):
+            step = by_label.get(label)
+            self.assertIsNotNone(step, f"{label} is never rebuilt")
+            self.assertEqual(step.kind, refresh_all.NETWORK)
+            self.assertIn(project, step.argv)
+            self.assertIn(str(root / "docs" / "studies" / "cve-history" / subdir), step.argv)
+            self.assertNotIn("--offline", step.argv)
+        for label in ("snapshot:linux-cna", "snapshot:curl-upstream", "snapshot:openssl-upstream"):
+            self.assertIn(label, labels)
+            self.assertLess(labels.index(label), labels.index("manifest"))
+
+    def test_offline_only_skips_snapshot_checks_without_a_local_cache(self):
+        # The raw advisory snapshots are gitignored and the CNA clone is made
+        # by the workflow, so a plain checkout has neither: nothing to check.
+        with StubRepo([], snapshots=True) as repo:
+            code = refresh_all.main(["--offline-only"])
+            invocations = [inv[0] for inv in repo.invocations()]
+        self.assertEqual(code, 0)
+        self.assertNotIn(f"{KERNEL_CNA_SCRIPT} --check", invocations)
+        self.assertNotIn(f"{UPSTREAM_SCRIPT} --offline", invocations)
+
+    def test_offline_only_checks_snapshots_when_the_cache_exists(self):
+        with StubRepo([], snapshots=True) as repo:
+            (repo.root / "vulns" / CNA_RECORDS_DIR).mkdir(parents=True)
+            for subdir in ("curl-upstream", "openssl-upstream"):
+                snapshot = repo.root / "docs" / "studies" / "cve-history" / subdir / "source.json"
+                snapshot.parent.mkdir(parents=True, exist_ok=True)
+                snapshot.write_text("{}\n", encoding="utf-8")
+            code = refresh_all.main(["--offline-only"])
+            invocations = repo.invocations()
+        self.assertEqual(code, 0)
+        keys = [inv[0] for inv in invocations]
+        self.assertIn(f"{KERNEL_CNA_SCRIPT} --check", keys)
+        self.assertIn(f"{UPSTREAM_SCRIPT} --offline", keys)
+        self.assertEqual(keys.count(f"{UPSTREAM_SCRIPT} --offline"), 2)
+        cna = [args for args in invocations if args[0] == f"{KERNEL_CNA_SCRIPT} --check"][0]
+        self.assertIn("--build-catalog", cna)
+        self.assertIn(str(repo.root / "docs" / "studies" / "cve-history" / "linux-cna"), cna)
+        self.assertIn("--vulns-dir", cna)
+        for args in invocations:
+            if args[0] == f"{UPSTREAM_SCRIPT} --offline":
+                self.assertIn("--check", args)
+
+    def test_offline_snapshot_check_failure_is_fatal(self):
+        # A network failure of a rebuild is non-fatal, but its offline check is
+        # not: the committed catalog no longer matches its source.
+        with StubRepo({f"{KERNEL_CNA_SCRIPT} --check": 1}, snapshots=True) as repo:
+            (repo.root / "vulns" / CNA_RECORDS_DIR).mkdir(parents=True)
+            code = refresh_all.main(["--offline-only"])
+        self.assertEqual(code, 1)
+        self.assertIn("snapshot:linux-cna", repo.stdout)
+        self.assertIn("RESULT: FAILED (1 validation step(s) failed)", repo.stdout)
+
+    def test_network_snapshot_rebuild_failure_is_not_fatal(self):
+        with StubRepo({UPSTREAM_SCRIPT: 1}, snapshots=True) as repo:
+            code = refresh_all.main(["--budget-seconds", "600"])
+        self.assertEqual(code, 0)
+        self.assertIn("snapshot:curl-upstream", repo.stdout)
+        self.assertIn("optional enricher failures", repo.stdout)
 
 
 if __name__ == "__main__":
