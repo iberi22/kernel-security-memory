@@ -1,10 +1,14 @@
 """Offline unit tests for Linux CVE patch catalog fetching and offline validation."""
 
+import io
 import json
 import os
 import shutil
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from pathlib import Path
+from unittest import mock
 
 from scripts.studies.fetch_history_linux import (
     extract_cwe,
@@ -13,6 +17,7 @@ from scripts.studies.fetch_history_linux import (
     parse_nvd_item,
     validate_offline,
 )
+from scripts.studies.fetcher_io import CorruptStateError
 
 
 class TestHistoryLinux(unittest.TestCase):
@@ -145,3 +150,108 @@ class TestHistoryLinux(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class _FakeResponse:
+    """Context-manager response for a Linux fetch with a faked NVD."""
+
+    def __init__(self, payload):
+        self._payload = payload
+        self.status = 200
+
+    def read(self, _size=-1):
+        chunk, self._payload = self._payload, b""
+        return chunk
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_exc):
+        return False
+
+
+class TestLinuxFetchHardening(unittest.TestCase):
+    """fetch_history_linux.py owns its loop instead of using BaseHistoryFetcher."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.out_dir = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        self.index_path = self.out_dir / "index.json"
+        self.catalog_path = self.out_dir / "catalog.jsonl"
+
+    def _write_index(self, **overrides):
+        payload = {
+            "schema_version": "cve-history-v1",
+            "project": "linux",
+            "window": {"start": "1999-01-01", "end": "2026-10-08"},
+            "coverage": "INCOMPLETE",
+            "status": "CURSOR_PAUSED",
+            "cursor_date": "2007-06-22",
+            "window_closed": False,
+            "entry_count": 0,
+            "with_fix_sha": 0,
+            "requests": 19,
+            "resume": {"next_start_date": "2007-06-22"},
+            "errors": [],
+            "notes": "stub",
+        }
+        payload.update(overrides)
+        self.index_path.write_text(json.dumps(payload), encoding="utf-8")
+        return payload
+
+    def test_carried_error_no_longer_blocks_completion(self):
+        """The unbound-style state: a cursor parked by one recorded timeout."""
+        from scripts.studies import fetch_history_linux
+
+        self._write_index(
+            cursor_date="2026-10-12",
+            resume={"next_start_date": "2026-10-12"},
+            errors=["Fetch error: The read operation timed out"],
+        )
+        self.catalog_path.write_text("", encoding="utf-8")
+
+        response = _FakeResponse(b'{"vulnerabilities": [], "totalResults": 0}')
+        with mock.patch.dict(os.environ, {"KSM_TODAY": "2026-10-12"}), \
+             mock.patch.object(fetch_history_linux, "INDEX_PATH", str(self.index_path)), \
+             mock.patch.object(fetch_history_linux, "CATALOG_PATH", str(self.catalog_path)), \
+             mock.patch("urllib.request.urlopen", return_value=response), \
+             mock.patch("time.sleep"), redirect_stdout(io.StringIO()):
+            completed = fetch_history_linux.fetch_history(max_calls=1000)
+
+        index = json.loads(self.index_path.read_text(encoding="utf-8"))
+        self.assertTrue(completed, "a previous run's error must not park the cursor")
+        self.assertEqual(index["coverage"], "COMPLETE")
+        self.assertEqual(index["errors"], [])
+        self.assertIn("Fetch error: The read operation timed out", index["error_history"])
+
+    def test_corrupt_index_is_fatal_and_named(self):
+        from scripts.studies import fetch_history_linux
+
+        self.index_path.write_text('{"project": "linux", "window"', encoding="utf-8")
+        self.catalog_path.write_text("", encoding="utf-8")
+        with mock.patch.object(fetch_history_linux, "INDEX_PATH", str(self.index_path)), \
+             mock.patch.object(fetch_history_linux, "CATALOG_PATH", str(self.catalog_path)), \
+             mock.patch("time.sleep"):
+            with self.assertRaises(CorruptStateError) as ctx:
+                fetch_history_linux.fetch_history(max_calls=1)
+        self.assertIn(str(self.index_path), str(ctx.exception))
+
+    def test_complete_window_is_not_rewritten_as_incomplete(self):
+        from scripts.studies import fetch_history_linux
+
+        record = {"advisory_id": "CVE-2020-1234", "published": "2020-01-01"}
+        self.catalog_path.write_text(json.dumps(record) + "\n", encoding="utf-8")
+        self._write_index(coverage="COMPLETE", status="COMPLETE", cursor_date=None,
+                          window_closed=True, entry_count=1, requests=113, resume=None)
+        before = self.index_path.read_text(encoding="utf-8")
+
+        with mock.patch.object(fetch_history_linux, "INDEX_PATH", str(self.index_path)), \
+             mock.patch.object(fetch_history_linux, "CATALOG_PATH", str(self.catalog_path)), \
+             mock.patch("urllib.request.urlopen") as urlopen, \
+             mock.patch("time.sleep"), redirect_stdout(io.StringIO()):
+            completed = fetch_history_linux.fetch_history(max_calls=1000)
+
+        urlopen.assert_not_called()
+        self.assertTrue(completed)
+        self.assertEqual(self.index_path.read_text(encoding="utf-8"), before)
