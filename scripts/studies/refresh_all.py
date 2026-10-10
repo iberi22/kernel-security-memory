@@ -92,10 +92,10 @@ OPTIONAL_ENRICHERS: Tuple[str, ...] = (ENRICH_FROM_OSV, FETCH_KERNEL_CNA)
 FETCH_UPSTREAM = "fetch_upstream_advisories.py"
 
 # Projects whose fetch_history_*.py validator accepts the provenance keys
-# enrich_from_osv.py writes ("fix_sha_source", "cwe_source", "fix_repo") and
-# the cwe_state STATED_BY_ADVISORY it rewrites. The other six still require the
-# exact seven-key row, so enriching them would fail their own --offline step
-# and abort the refresh. Keep this list in sync with the validators:
+# enrich_from_osv.py writes ("fix_sha_source", "cwe_source") and the cwe_state
+# STATED_BY_ADVISORY it rewrites. The other six still require the exact
+# seven-key row, so enriching them would fail their own --offline step and
+# abort the refresh. Keep this list in sync with the validators:
 # tests/test_refresh_all.py derives the same set from their source.
 OSV_ENRICHABLE_PROJECTS: Tuple[str, ...] = ("curl", "glibc", "linux", "nginx", "openssh", "openssl")
 
@@ -129,9 +129,16 @@ OFFLINE_TIMEOUT_SECONDS = 120
 # rebuilds them explicitly before the manifest.
 KERNEL_CNA_CATALOG = CATALOGS_SUBDIR / "linux-cna"
 # (project, catalog directory) pairs built by fetch_upstream_advisories.py.
+# curl/openSSL come from the projects' own feeds; git/systemd/sqlite/postgres
+# come from the OSV.dev API (ecosystem GIT), which exposes their GitHub
+# Security Advisories and CVE records with fix commits.
 UPSTREAM_CATALOGS: Tuple[Tuple[str, Path], ...] = (
     ("curl", CATALOGS_SUBDIR / "curl-upstream"),
     ("openssl", CATALOGS_SUBDIR / "openssl-upstream"),
+    ("git", CATALOGS_SUBDIR / "git-upstream"),
+    ("systemd", CATALOGS_SUBDIR / "systemd-upstream"),
+    ("sqlite", CATALOGS_SUBDIR / "sqlite-upstream"),
+    ("postgres", CATALOGS_SUBDIR / "postgres-upstream"),
 )
 # The fetcher's default snapshot name; the raw snapshots are gitignored.
 UPSTREAM_SNAPSHOT = "source.json"
@@ -231,11 +238,11 @@ def budget_argv(script: Path, budget_seconds: int) -> List[str]:
 def osv_enrichable(projects: Sequence[str]) -> List[str]:
     """The selected projects ``enrich_from_osv.py`` may safely write to.
 
-    The enricher adds the provenance keys "fix_sha_source"/"cwe_source"/
-    "fix_repo" and rewrites ``cwe_state`` as STATED_BY_ADVISORY. Only the
-    validators in OSV_ENRICHABLE_PROJECTS accept those keys; the rest still
-    require the exact seven-key row, so writing them would fail that project's
-    own ``--offline`` step afterwards.
+    The enricher adds the provenance keys "fix_sha_source"/"cwe_source" and
+    rewrites ``cwe_state`` as STATED_BY_ADVISORY. Only the validators in
+    OSV_ENRICHABLE_PROJECTS accept those keys; the rest still require the exact
+    seven-key row, so writing them would fail that project's own ``--offline``
+    step afterwards.
     """
     accepted = set(OSV_ENRICHABLE_PROJECTS)
     return [project for project in projects if project in accepted]
