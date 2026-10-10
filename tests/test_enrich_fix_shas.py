@@ -91,9 +91,10 @@ class TestEnrichFixShas(unittest.TestCase):
 
             updated_lines = [json.loads(l) for l in catalog_file.read_text().splitlines()]
             self.assertEqual(updated_lines[0]["fix_shas"], ["1111111111111111111111111111111111111111"])
-            self.assertEqual(updated_lines[0]["sha_status"], "MIRROR_UNCHECKED")
+            self.assertNotIn("sha_status", updated_lines[0])
+            self.assertEqual(rep["sha_status_by_advisory"][updated_lines[0]["advisory_id"]]["sha_status"], "MIRROR_UNCHECKED")
             self.assertEqual(updated_lines[1]["fix_shas"], ["2222222222222222222222222222222222222222"])
-            self.assertEqual(updated_lines[1]["sha_status"], "MIRROR_UNCHECKED")
+            self.assertEqual(rep["sha_status_by_advisory"]["CVE-2021-2222"]["sha_status"], "MIRROR_UNCHECKED")
 
     def test_enriched_lines_are_compact_and_within_byte_budget(self):
         """Catalog lines keep the fetcher's compact form and never pass max_line_bytes.
@@ -128,7 +129,7 @@ class TestEnrichFixShas(unittest.TestCase):
 
             rep = enrich_catalog(pdir, vetted_shas={}, dry_run=False)
 
-            self.assertEqual(rep["over_limit"], 1)
+            self.assertEqual(rep["over_limit"], 0)
             written = (pdir / "catalog.jsonl").read_text().splitlines()[0]
             # Compact separators, byte-for-byte what a re-read would re-emit.
             self.assertNotIn(", ", written)
@@ -142,8 +143,30 @@ class TestEnrichFixShas(unittest.TestCase):
             self.assertNotIn("sha_statuses", parsed)
             self.assertEqual(parsed["fix_shas"], ["b" * 40])
 
-    def test_enriched_lines_keep_status_fields_when_they_fit(self):
-        """Short entries still get the derived status fields on one compact line."""
+    def test_line_that_would_exceed_budget_keeps_original(self):
+        """If adding SHAs would push a line past max_line_bytes, the original line is kept."""
+        with tempfile.TemporaryDirectory() as td:
+            pdir = Path(td)
+            (pdir / "index.json").write_text(json.dumps({
+                "schema_version": "cve-history-v1", "project": "sample",
+                "entry_count": 1, "with_fix_sha": 0,
+            }))
+            urls = [f"https://git.example.com/commit/{c * 40}" for c in "abcd"]
+            entry = {"advisory_id": "CVE-2021-5555", "published": "2021-05-01", "cwe": None,
+                     "cwe_state": "UNKNOWN", "patch_urls": urls, "fix_shas": [], "subsystem": "core"}
+            original = json.dumps(entry, separators=(",", ":"))
+            self.assertLessEqual(len(original.encode("utf-8")), MAX_LINE_BYTES)
+            (pdir / "catalog.jsonl").write_text(original + "\n")
+
+            rep = enrich_catalog(pdir, vetted_shas={}, dry_run=False)
+
+            self.assertEqual(rep["over_limit"], 1)
+            self.assertEqual((pdir / "catalog.jsonl").read_text().splitlines()[0], original)
+            self.assertEqual(rep["with_fix_sha"], 0)
+            self.assertEqual(json.loads((pdir / "index.json").read_text())["with_fix_sha"], 0)
+
+    def test_status_fields_are_reported_not_stored(self):
+        """Derived mirror status is returned in the report and never written to catalog.jsonl."""
         with tempfile.TemporaryDirectory() as td:
             pdir = Path(td)
             (pdir / "index.json").write_text(json.dumps({
@@ -161,9 +184,10 @@ class TestEnrichFixShas(unittest.TestCase):
             self.assertEqual(rep["over_limit"], 0)
             written = (pdir / "catalog.jsonl").read_text().splitlines()[0]
             parsed = json.loads(written)
-            self.assertEqual(parsed["sha_status"], "NOT_JOINED")
-            self.assertEqual(parsed["mirror_status"], "NOT_JOINED")
-            self.assertEqual(parsed["sha_statuses"], {})
+            for key in ("sha_status", "mirror_status", "sha_statuses"):
+                self.assertNotIn(key, parsed)
+            self.assertEqual(rep["sha_status_by_advisory"]["CVE-2021-4444"],
+                             {"sha_status": "NOT_JOINED", "sha_statuses": {}})
 
     def test_normal_run_preserves_index_cursor_state(self):
         """A non-dry-run enrichment updates with_fix_sha only, never the cursor state."""
@@ -354,35 +378,32 @@ class TestEnrichFixShas(unittest.TestCase):
                 rep = enrich_catalog(pdir, vetted_shas={}, dry_run=False, git_dir=git_dir)
                 self.assertEqual(rep["with_fix_sha"], 2)
 
+                status = rep["sha_status_by_advisory"]
+                self.assertEqual(status["CVE-2021-0001"]["sha_status"], "VERIFIED_IN_MIRROR")
+                self.assertEqual(status["CVE-2021-0001"]["sha_statuses"][real_sha], "VERIFIED_IN_MIRROR")
+                self.assertEqual(status["CVE-2021-0002"]["sha_status"], "NOT_IN_MIRROR")
+                self.assertEqual(status["CVE-2021-0002"]["sha_statuses"][fake_sha], "NOT_IN_MIRROR")
+                self.assertEqual(status["CVE-2021-0003"]["sha_status"], "NOT_JOINED")
                 lines = [json.loads(l) for l in catalog_file.read_text().splitlines()]
-                self.assertEqual(lines[0]["sha_status"], "VERIFIED_IN_MIRROR")
-                self.assertEqual(lines[0]["mirror_status"], "VERIFIED_IN_MIRROR")
-                self.assertEqual(lines[0]["sha_statuses"][real_sha], "VERIFIED_IN_MIRROR")
-
-                self.assertEqual(lines[1]["sha_status"], "NOT_IN_MIRROR")
-                self.assertEqual(lines[1]["mirror_status"], "NOT_IN_MIRROR")
-                self.assertEqual(lines[1]["sha_statuses"][fake_sha], "NOT_IN_MIRROR")
-
-                self.assertEqual(lines[2]["sha_status"], "NOT_JOINED")
-                self.assertEqual(lines[2]["mirror_status"], "NOT_JOINED")
+                self.assertTrue(all("sha_status" not in l for l in lines))
 
                 # Test with KSM_GIT_MIRROR env var
                 os.environ["KSM_GIT_MIRROR"] = str(git_dir)
                 try:
                     rep_env = enrich_catalog(pdir, vetted_shas={}, dry_run=False, git_dir=None)
                     self.assertEqual(rep_env["with_fix_sha"], 2)
-                    lines_env = [json.loads(l) for l in catalog_file.read_text().splitlines()]
-                    self.assertEqual(lines_env[0]["sha_status"], "VERIFIED_IN_MIRROR")
-                    self.assertEqual(lines_env[1]["sha_status"], "NOT_IN_MIRROR")
+                    st_env = rep_env["sha_status_by_advisory"]
+                    self.assertEqual(st_env["CVE-2021-0001"]["sha_status"], "VERIFIED_IN_MIRROR")
+                    self.assertEqual(st_env["CVE-2021-0002"]["sha_status"], "NOT_IN_MIRROR")
                 finally:
                     del os.environ["KSM_GIT_MIRROR"]
 
                 # Test when no mirror is configured
                 rep_none = enrich_catalog(pdir, vetted_shas={}, dry_run=False, git_dir=None)
-                lines_none = [json.loads(l) for l in catalog_file.read_text().splitlines()]
-                self.assertEqual(lines_none[0]["sha_status"], "MIRROR_UNCHECKED")
-                self.assertEqual(lines_none[1]["sha_status"], "MIRROR_UNCHECKED")
-                self.assertEqual(lines_none[2]["sha_status"], "NOT_JOINED")
+                st_none = rep_none["sha_status_by_advisory"]
+                self.assertEqual(st_none["CVE-2021-0001"]["sha_status"], "MIRROR_UNCHECKED")
+                self.assertEqual(st_none["CVE-2021-0002"]["sha_status"], "MIRROR_UNCHECKED")
+                self.assertEqual(st_none["CVE-2021-0003"]["sha_status"], "NOT_JOINED")
 
     def test_check_sha_in_mirror_rejects_non_commit_objects(self):
         """A blob or tree hash must not be reported as a verified commit.

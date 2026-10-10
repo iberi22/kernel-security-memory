@@ -322,7 +322,7 @@ def fetch_history(max_calls=None):
     save_state(catalog_records, total_requests, "INCOMPLETE", {"next_start_date": curr_start.strftime("%Y-%m-%d")}, errors)
 
     while curr_start <= end_dt:
-        if total_requests >= MAX_REQUESTS or cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
+        if cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
             coverage = "INCOMPLETE"
             resume_obj = {"next_start_date": curr_start.strftime("%Y-%m-%d")}
             break
@@ -336,7 +336,7 @@ def fetch_history(max_calls=None):
         window_consumed = False
 
         while not window_consumed:
-            if total_requests >= MAX_REQUESTS or cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
+            if cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
                 coverage = "INCOMPLETE"
                 resume_obj = {"next_start_date": curr_start.strftime("%Y-%m-%d")}
                 break

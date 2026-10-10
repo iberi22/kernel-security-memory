@@ -196,8 +196,10 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
 
     coverage, resume = "INCOMPLETE", None
 
+    # The cap is per run; the persisted lifetime total is only bookkeeping.
+    run_start_requests = requests_count
     while current_start <= end_date_limit:
-        if time.time() - start_time > max_time_seconds or requests_count >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
+        if time.time() - start_time > max_time_seconds or requests_count - run_start_requests >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
             resume = {"next_start_date": current_start.isoformat()}
             break
 
@@ -206,7 +208,7 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
         start_index, window_finished = 0, False
 
         while True:
-            if time.time() - start_time > max_time_seconds or requests_count >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
+            if time.time() - start_time > max_time_seconds or requests_count - run_start_requests >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
                 resume = {"next_start_date": current_start.isoformat()}
                 break
 

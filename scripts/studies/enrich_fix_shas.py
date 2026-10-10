@@ -194,10 +194,11 @@ def enrich_catalog(project_dir, vetted_shas, dry_run=False, git_dir=None):
     overlap_count = 0
     over_limit_count = 0
 
-    for line in lines:
-        if not line.strip():
+    sha_status_by_advisory = {}
+    for raw_line in lines:
+        if not raw_line.strip():
             continue
-        entry = json.loads(line)
+        entry = json.loads(raw_line)
         advisory_id = entry.get("advisory_id")
         current_shas = [s.lower() for s in entry.get("fix_shas", []) if SHA_RE.fullmatch(s.lower())]
 
@@ -239,23 +240,22 @@ def enrich_catalog(project_dir, vetted_shas, dry_run=False, git_dir=None):
             else:
                 sha_status = "VERIFIED_IN_MIRROR"
 
-        entry["sha_status"] = sha_status
-        entry["mirror_status"] = sha_status
-        entry["sha_statuses"] = statuses
-
-        if current_shas:
-            with_fix_sha_count += 1
+        # Mirror verification is derived metadata: it is reported, never stored
+        # in catalog.jsonl (the fetcher validators accept only data keys).
+        for key in ("sha_status", "mirror_status", "sha_statuses"):
+            entry.pop(key, None)
+        sha_status_by_advisory[advisory_id] = {"sha_status": sha_status, "sha_statuses": statuses}
 
         # Compact separators match BaseHistoryFetcher.save_state, so an already
         # enriched line is rewritten byte-for-byte instead of being inflated.
         line = json.dumps(entry, separators=(",", ":"), ensure_ascii=False)
-        if len(line.encode("utf-8")) > MAX_LINE_BYTES:
-            # Status fields are derived metadata: never trade a catalog line that
-            # validate_offline accepts for them.
-            for key in ("sha_status", "mirror_status", "sha_statuses"):
-                entry.pop(key, None)
-            line = json.dumps(entry, separators=(",", ":"), ensure_ascii=False)
+        if len(line.encode("utf-8")) > MAX_LINE_BYTES and line != raw_line.strip():
+            # Never turn a line into one validate_offline rejects: keep the original.
             over_limit_count += 1
+            line = raw_line.strip()
+        # Count what is actually written, not what was resolved.
+        if any(SHA_RE.fullmatch(str(x).lower()) for x in json.loads(line).get("fix_shas", [])):
+            with_fix_sha_count += 1
         new_lines.append(line)
 
     index_data["with_fix_sha"] = with_fix_sha_count
@@ -271,6 +271,7 @@ def enrich_catalog(project_dir, vetted_shas, dry_run=False, git_dir=None):
         "overlap": overlap_count,
         "matches": overlap_count,
         "over_limit": over_limit_count,
+        "sha_status_by_advisory": sha_status_by_advisory,
     }
 
 
