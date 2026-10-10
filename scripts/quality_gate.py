@@ -248,7 +248,7 @@ def evaluate_quality_gate(
         raw_target = target or audit.get("target")
         if repo_root is None:
             repo_root = evidence_repo_root(evidence_path, raw_target)
-        if repo_root is None:
+        if repo_root is None and not (raw_target and Path(raw_target).is_absolute()):
             return {
                 "status": "REJECTED",
                 "authorized": False,
@@ -259,7 +259,8 @@ def evaluate_quality_gate(
                 ),
                 "timestamp": now_utc,
             }
-        repo_root = Path(repo_root)
+        # An absolute target needs no anchor; paths are then compared as recorded.
+        repo_root = Path(repo_root) if repo_root is not None else None
         target = (Path(raw_target) if Path(raw_target).is_absolute()
                   else repo_root / raw_target)
         if clusters_path is None:
