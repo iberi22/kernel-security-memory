@@ -4,6 +4,308 @@
     {
       "citations": [
         {
+          "advisory_id": "CVE-2022-1292",
+          "fix_commit_sha": "1ad73b4d27bd8c1b369a3cd453681d3a4f1bb9b2",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/1ad73b4d27bd8c1b369a3cd453681d3a4f1bb9b2",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2022-2068",
+          "fix_commit_sha": "2c9c35870601b4a44d86ddbf512b38df38285cfa",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/2c9c35870601b4a44d86ddbf512b38df38285cfa",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        }
+      ],
+      "cluster_count": 4,
+      "cluster_sample_cves": [
+        "CVE-2017-14867",
+        "CVE-2019-19604",
+        "CVE-2022-1292",
+        "CVE-2022-2068"
+      ],
+      "cluster_title": "CWE Family CWE-78",
+      "cluster_with_fix_sha": 2,
+      "cwe_id": "CWE-78",
+      "preconditions": [],
+      "rules": [
+        {
+          "explanation": "Dynamic command string passed to system(), popen(), or shell exec() in C without sanitization.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Use parameterized execv/execve with discrete arguments array instead of shell invocation.",
+          "pattern": "\\b(?:system|popen)\\s*\\(\\s*(?!\"[^\\%\"\\'\\n]*\"\\s*[,)])([a-zA-Z0-9_]+|\"[^\"]*\\%[sS])|\\bexec[l|v]p?e?\\s*\\([^;]*\"/(?:bin/)?(?:sh|bash)\"[^;]*\\)",
+          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-C",
+          "severity": "CRITICAL",
+          "title": "OS Command Injection in C (system / popen / exec)"
+        },
+        {
+          "explanation": "Executing commands via shell=True, os.system, os.popen, or dynamic exec() with unsanitized input.",
+          "language": "Python",
+          "languages": [
+            "python"
+          ],
+          "lesson": "Pass arguments as a sequence without shell=True; use ast.literal_eval instead of eval/exec.",
+          "pattern": "(?:subprocess\\.(?:call|run|Popen|check_output)\\s*\\(.*shell\\s*=\\s*True|os\\.(?:system|popen)\\s*\\([^)]+\\)|(?<!\\.)\\bexec\\s*\\(\\s*[a-zA-Z0-9_]+|\\beval\\s*\\(\\s*[a-zA-Z0-9_]+)",
+          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-PYTHON",
+          "severity": "CRITICAL",
+          "title": "OS Command Injection in Python (subprocess shell=True / os.system / exec)"
+        },
+        {
+          "explanation": "Unsanitized variables passed to eval, sh -c, or exec in shell script.",
+          "language": "Shell",
+          "languages": [
+            "shell"
+          ],
+          "lesson": "Avoid eval; use direct binary execution and strictly quote/validate all external parameters.",
+          "pattern": "(?:eval\\s+[\"\\']?\\$|\\b(?:sh|bash)\\s+-c\\s+[\"\\']?\\$|\\bexec\\s+[\"\\']?\\$)",
+          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-SHELL",
+          "severity": "CRITICAL",
+          "title": "Command Injection / Unquoted Evaluation in Shell"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2021-3711",
+          "fix_commit_sha": "59f5e75f3bced8fc0e130d72a3f582cf7b480b46",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/59f5e75f3bced8fc0e130d72a3f582cf7b480b46",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2021-47040",
+          "fix_commit_sha": "38134ada0ceea3e848fe993263c0ff6207fd46e7",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/38134ada0ceea3e848fe993263c0ff6207fd46e7",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2021-47107",
+          "fix_commit_sha": "53b1119a6e5028b125f431a0116ba73510d82a72",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/53b1119a6e5028b125f431a0116ba73510d82a72",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog"
+        }
+      ],
+      "cluster_count": 59,
+      "cluster_sample_cves": [
+        "CVE-2006-2935",
+        "CVE-2014-0195",
+        "CVE-2018-15688",
+        "CVE-2021-3711",
+        "CVE-2021-47040",
+        "CVE-2021-47107",
+        "CVE-2021-47172",
+        "CVE-2021-47347",
+        "CVE-2021-47485",
+        "CVE-2021-47609"
+      ],
+      "cluster_title": "Classic Buffer Overflow",
+      "cluster_with_fix_sha": 55,
+      "cwe_id": "CWE-120",
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "rules": [
+        {
+          "explanation": "Unbounded string function (strcpy, strcat, gets, sprintf) prone to classic stack/heap buffer overflow.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Replace with bounds-checked alternatives (strncpy, strlcat, fgets, snprintf) and validate buffer bounds.",
+          "pattern": "\\b(strcpy|strcat|gets|sprintf)\\s*\\(",
+          "rule_id": "SEC-CWE-120-UNBOUNDED-COPY",
+          "severity": "HIGH",
+          "title": "Buffer Copy without Checking Size of Input (C/C++)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2019-1551",
+          "fix_commit_sha": "419102400a2811582a7a3d4a4e317d72e5ce0a8f",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/419102400a2811582a7a3d4a4e317d72e5ce0a8f",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2021-23840",
+          "fix_commit_sha": "6a51b9e1d0cf0bf8515f7201b68fb0a3482b3dc1",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/6a51b9e1d0cf0bf8515f7201b68fb0a3482b3dc1",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2021-46940",
+          "fix_commit_sha": "13a779de4175df602366d129e41782ad7168cef0",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/13a779de4175df602366d129e41782ad7168cef0",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog"
+        }
+      ],
+      "cluster_count": 135,
+      "cluster_sample_cves": [
+        "CVE-2004-2013",
+        "CVE-2016-2105",
+        "CVE-2016-2177",
+        "CVE-2018-20346",
+        "CVE-2018-20506",
+        "CVE-2019-1551",
+        "CVE-2020-13434",
+        "CVE-2021-23840",
+        "CVE-2021-46940",
+        "CVE-2021-47098"
+      ],
+      "cluster_title": "Integer Overflow or Wraparound",
+      "cluster_with_fix_sha": 127,
+      "cwe_id": "CWE-190",
+      "preconditions": [],
+      "rules": [
+        {
+          "explanation": "Multiplication or addition inside allocation argument without bound or overflow check in C.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Use overflow-checked helpers (e.g. check_mul_overflow, calloc) or explicit bounds validation before allocation.",
+          "pattern": "\\b(?:malloc|kmalloc|kzalloc|vmalloc|xmalloc)\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)\\s*(?:,[^)]+)?\\)",
+          "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-C",
+          "severity": "MEDIUM",
+          "title": "Integer Overflow or Wraparound in Allocation (C/C++)"
+        },
+        {
+          "explanation": "Unchecked arithmetic inside allocation size or capacity in Rust.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Use checked_mul() or checked_add() before computing collection capacity or layout size.",
+          "pattern": "\\b(?:Vec::with_capacity|alloc::alloc|Layout::array|Layout::from_size_align)\\s*(?:<[^>]+>)?\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)",
+          "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-RUST",
+          "severity": "MEDIUM",
+          "title": "Integer Overflow in Allocation / Capacity (Rust)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2021-46925",
+          "fix_commit_sha": "349d43127dac00c15231e8ffbcaabd70f7b0e544",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/349d43127dac00c15231e8ffbcaabd70f7b0e544",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2021-46982",
+          "fix_commit_sha": "a949dc5f2c5cfe0c910b664650f45371254c0744",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/a949dc5f2c5cfe0c910b664650f45371254c0744",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog"
+        }
+      ],
+      "cluster_count": 405,
+      "cluster_sample_cves": [
+        "CVE-2006-0039",
+        "CVE-2010-3864",
+        "CVE-2010-5298",
+        "CVE-2014-3509",
+        "CVE-2015-1791",
+        "CVE-2015-3196",
+        "CVE-2018-1049",
+        "CVE-2018-15687",
+        "CVE-2021-46925",
+        "CVE-2021-46982"
+      ],
+      "cluster_title": "Concurrent Execution using Shared Resource (Race Condition)",
+      "cluster_with_fix_sha": 397,
+      "cwe_id": "CWE-362",
+      "preconditions": [
+        "Multithreaded / interrupt context without adequate lock barrier"
+      ],
+      "rules": [
+        {
+          "explanation": "TOCTOU check-then-open pattern or rapid unlock-relock window in C creates concurrency race window.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Use atomic open with O_CREAT|O_EXCL, or hold critical section invariants continuously.",
+          "pattern": "(?:(?:access|stat|lstat)\\s*\\(\\s*([a-zA-Z0-9_\\\"'/]+)\\s*,[^)]+\\)(?:[^;]*;|[^\\n]*)\\s*[^;]*\\b(?:fopen|open)\\s*\\(\\s*\\1\\b|(?:spin_unlock|pthread_mutex_unlock|mutex_unlock)\\s*\\(&?([a-zA-Z0-9_]+)\\);\\s*(?:spin_lock|pthread_mutex_lock|mutex_lock)\\s*\\(&?\\2\\);)",
+          "rule_id": "SEC-CWE-362-CONCURRENCY-RACE-C",
+          "severity": "MEDIUM",
+          "title": "Race Condition / TOCTOU Window (C/C++)"
+        },
+        {
+          "explanation": "Checking os.path.exists() before open() introduces a TOCTOU race condition in Python.",
+          "language": "Python",
+          "languages": [
+            "python"
+          ],
+          "lesson": "Use atomic file operations (e.g. open with 'x' mode) or try/except FileExistsError/FileNotFoundError.",
+          "pattern": "(?:if\\s+os\\.path\\.exists\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*\\):[^:\\n]*\\n\\s*(?:with\\s+open|open)\\s*\\(\\s*\\1\\b)",
+          "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON",
+          "severity": "MEDIUM",
+          "title": "Race Condition / TOCTOU File Access (Python)"
+        },
+        {
+          "explanation": "Testing file existence before operating on it in shell creates a TOCTOU race condition.",
+          "language": "Shell",
+          "languages": [
+            "shell"
+          ],
+          "lesson": "Use atomic file operations or mktemp; handle command error codes directly.",
+          "pattern": "(?:if\\s+\\[\\s*-[efrwxd]\\s+[\"\\']?\\$[a-zA-Z0-9_]+[\"\\']?\\s*\\];?\\s*then[^;]+(?:\\bcat\\b|\\bcp\\b|\\bmv\\b|\\brm\\b|>)\\s+[^;]*\\$)",
+          "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL",
+          "severity": "MEDIUM",
+          "title": "Race Condition / TOCTOU File Operation (Shell)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
           "advisory_id": "CVE-2023-25136",
           "fix_commit_sha": "486c4dc3b83b4b67d663fb0fa62bc24138ec3946",
           "fix_commit_url": "https://github.com/openssh/openssh-portable/commit/486c4dc3b83b4b67d663fb0fa62bc24138ec3946",
@@ -14,6 +316,16 @@
           "source_kind": "pack_record"
         },
         {
+          "advisory_id": "CVE-2016-6309",
+          "fix_commit_sha": "acacbfa7565c78d2273c0b2a2e5e803f44afefeb",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/acacbfa7565c78d2273c0b2a2e5e803f44afefeb",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
           "advisory_id": "CVE-2016-8623",
           "fix_commit_sha": "c5be3d7267c725dbd093ff3a883e07ee8cf2a1d5",
           "fix_commit_url": "https://github.com/curl/curl/commit/c5be3d7267c725dbd093ff3a883e07ee8cf2a1d5",
@@ -22,33 +334,23 @@
           "recorded_cwe": "CWE-416",
           "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
           "source_kind": "catalog"
-        },
-        {
-          "advisory_id": "CVE-2018-16840",
-          "fix_commit_sha": "81d135d67155c5295b1033679c606165d4e28f3f",
-          "fix_commit_url": "https://github.com/curl/curl/commit/81d135d67155c5295b1033679c606165d4e28f3f",
-          "linked_by": "recorded_cwe",
-          "project": "curl-upstream",
-          "recorded_cwe": "CWE-416",
-          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
         }
       ],
-      "cluster_count": 16,
+      "cluster_count": 1380,
       "cluster_sample_cves": [
         "CVE-2006-4997",
         "CVE-2016-5421",
+        "CVE-2016-6309",
         "CVE-2016-8623",
         "CVE-2018-16840",
-        "CVE-2021-22901",
-        "CVE-2022-43552",
-        "CVE-2023-28319",
-        "CVE-2024-4741",
-        "CVE-2026-10536",
-        "CVE-2026-18924"
+        "CVE-2019-25162",
+        "CVE-2019-5018",
+        "CVE-2020-11656",
+        "CVE-2020-13630",
+        "CVE-2020-13871"
       ],
       "cluster_title": "Use After Free",
-      "cluster_with_fix_sha": 14,
+      "cluster_with_fix_sha": 1372,
       "cwe_id": "CWE-416",
       "preconditions": [
         "Asynchronous lifecycle, double free, or aliased pointer reuse"
@@ -94,6 +396,16 @@
           "source_kind": "catalog"
         },
         {
+          "advisory_id": "CVE-2016-7052",
+          "fix_commit_sha": "6e629b5be45face20b4ca71c4fcbfed78b864a2e",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/6e629b5be45face20b4ca71c4fcbfed78b864a2e",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
           "advisory_id": "CVE-2018-1000121",
           "fix_commit_sha": "9889db043393092e9d4b5a42720bba0b3d58deba",
           "fix_commit_url": "https://github.com/curl/curl/commit/9889db043393092e9d4b5a42720bba0b3d58deba",
@@ -102,19 +414,9 @@
           "recorded_cwe": "CWE-476",
           "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
           "source_kind": "catalog"
-        },
-        {
-          "advisory_id": "CVE-2025-15468",
-          "fix_commit_sha": "1f08e54bad32843044fe8a675948d65e3b4ece65",
-          "fix_commit_url": "https://github.com/openssl/openssl/commit/1f08e54bad32843044fe8a675948d65e3b4ece65",
-          "linked_by": "recorded_cwe",
-          "project": "openssl-upstream",
-          "recorded_cwe": "CWE-476",
-          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
         }
       ],
-      "cluster_count": 19,
+      "cluster_count": 2078,
       "cluster_sample_cves": [
         "CVE-2004-0079",
         "CVE-2005-2459",
@@ -122,13 +424,13 @@
         "CVE-2008-1672",
         "CVE-2009-1386",
         "CVE-2009-1387",
-        "CVE-2018-1000121",
-        "CVE-2025-15468",
-        "CVE-2025-69421",
-        "CVE-2026-14457"
+        "CVE-2014-0198",
+        "CVE-2014-3470",
+        "CVE-2015-3194",
+        "CVE-2016-7052"
       ],
       "cluster_title": "NULL Pointer Dereference",
-      "cluster_with_fix_sha": 14,
+      "cluster_with_fix_sha": 2063,
       "cwe_id": "CWE-476",
       "preconditions": [
         "Unchecked return value from allocator or lookup function"
@@ -162,175 +464,7 @@
       ]
     }
   ],
-  "families_without_evidence": [
-    {
-      "cluster_count": null,
-      "cluster_sample_cves": [],
-      "cluster_title": null,
-      "cluster_with_fix_sha": null,
-      "cwe_id": "CWE-78",
-      "preconditions": [],
-      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
-      "rules": [
-        {
-          "explanation": "Dynamic command string passed to system(), popen(), or shell exec() in C without sanitization.",
-          "language": "C",
-          "languages": [
-            "c",
-            "cpp"
-          ],
-          "lesson": "Use parameterized execv/execve with discrete arguments array instead of shell invocation.",
-          "pattern": "\\b(?:system|popen)\\s*\\(\\s*(?!\"[^\\%\"\\'\\n]*\"\\s*[,)])([a-zA-Z0-9_]+|\"[^\"]*\\%[sS])|\\bexec[l|v]p?e?\\s*\\([^;]*\"/(?:bin/)?(?:sh|bash)\"[^;]*\\)",
-          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-C",
-          "severity": "CRITICAL",
-          "title": "OS Command Injection in C (system / popen / exec)"
-        },
-        {
-          "explanation": "Executing commands via shell=True, os.system, os.popen, or dynamic exec() with unsanitized input.",
-          "language": "Python",
-          "languages": [
-            "python"
-          ],
-          "lesson": "Pass arguments as a sequence without shell=True; use ast.literal_eval instead of eval/exec.",
-          "pattern": "(?:subprocess\\.(?:call|run|Popen|check_output)\\s*\\(.*shell\\s*=\\s*True|os\\.(?:system|popen)\\s*\\([^)]+\\)|(?<!\\.)\\bexec\\s*\\(\\s*[a-zA-Z0-9_]+|\\beval\\s*\\(\\s*[a-zA-Z0-9_]+)",
-          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-PYTHON",
-          "severity": "CRITICAL",
-          "title": "OS Command Injection in Python (subprocess shell=True / os.system / exec)"
-        },
-        {
-          "explanation": "Unsanitized variables passed to eval, sh -c, or exec in shell script.",
-          "language": "Shell",
-          "languages": [
-            "shell"
-          ],
-          "lesson": "Avoid eval; use direct binary execution and strictly quote/validate all external parameters.",
-          "pattern": "(?:eval\\s+[\"\\']?\\$|\\b(?:sh|bash)\\s+-c\\s+[\"\\']?\\$|\\bexec\\s+[\"\\']?\\$)",
-          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-SHELL",
-          "severity": "CRITICAL",
-          "title": "Command Injection / Unquoted Evaluation in Shell"
-        }
-      ]
-    },
-    {
-      "cluster_count": 1,
-      "cluster_sample_cves": [
-        "CVE-2006-2935"
-      ],
-      "cluster_title": "Classic Buffer Overflow",
-      "cluster_with_fix_sha": 0,
-      "cwe_id": "CWE-120",
-      "preconditions": [
-        "Untrusted buffer length or unbounded string processing"
-      ],
-      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
-      "rules": [
-        {
-          "explanation": "Unbounded string function (strcpy, strcat, gets, sprintf) prone to classic stack/heap buffer overflow.",
-          "language": "C",
-          "languages": [
-            "c",
-            "cpp"
-          ],
-          "lesson": "Replace with bounds-checked alternatives (strncpy, strlcat, fgets, snprintf) and validate buffer bounds.",
-          "pattern": "\\b(strcpy|strcat|gets|sprintf)\\s*\\(",
-          "rule_id": "SEC-CWE-120-UNBOUNDED-COPY",
-          "severity": "HIGH",
-          "title": "Buffer Copy without Checking Size of Input (C/C++)"
-        }
-      ]
-    },
-    {
-      "cluster_count": 1,
-      "cluster_sample_cves": [
-        "CVE-2004-2013"
-      ],
-      "cluster_title": "Integer Overflow or Wraparound",
-      "cluster_with_fix_sha": 0,
-      "cwe_id": "CWE-190",
-      "preconditions": [],
-      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
-      "rules": [
-        {
-          "explanation": "Multiplication or addition inside allocation argument without bound or overflow check in C.",
-          "language": "C",
-          "languages": [
-            "c",
-            "cpp"
-          ],
-          "lesson": "Use overflow-checked helpers (e.g. check_mul_overflow, calloc) or explicit bounds validation before allocation.",
-          "pattern": "\\b(?:malloc|kmalloc|kzalloc|vmalloc|xmalloc)\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)\\s*(?:,[^)]+)?\\)",
-          "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-C",
-          "severity": "MEDIUM",
-          "title": "Integer Overflow or Wraparound in Allocation (C/C++)"
-        },
-        {
-          "explanation": "Unchecked arithmetic inside allocation size or capacity in Rust.",
-          "language": "Rust",
-          "languages": [
-            "rust"
-          ],
-          "lesson": "Use checked_mul() or checked_add() before computing collection capacity or layout size.",
-          "pattern": "\\b(?:Vec::with_capacity|alloc::alloc|Layout::array|Layout::from_size_align)\\s*(?:<[^>]+>)?\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)",
-          "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-RUST",
-          "severity": "MEDIUM",
-          "title": "Integer Overflow in Allocation / Capacity (Rust)"
-        }
-      ]
-    },
-    {
-      "cluster_count": 2,
-      "cluster_sample_cves": [
-        "CVE-2006-0039",
-        "CVE-2010-3864"
-      ],
-      "cluster_title": "Concurrent Execution using Shared Resource (Race Condition)",
-      "cluster_with_fix_sha": 0,
-      "cwe_id": "CWE-362",
-      "preconditions": [
-        "Multithreaded / interrupt context without adequate lock barrier"
-      ],
-      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
-      "rules": [
-        {
-          "explanation": "TOCTOU check-then-open pattern or rapid unlock-relock window in C creates concurrency race window.",
-          "language": "C",
-          "languages": [
-            "c",
-            "cpp"
-          ],
-          "lesson": "Use atomic open with O_CREAT|O_EXCL, or hold critical section invariants continuously.",
-          "pattern": "(?:(?:access|stat|lstat)\\s*\\(\\s*([a-zA-Z0-9_\\\"'/]+)\\s*,[^)]+\\)(?:[^;]*;|[^\\n]*)\\s*[^;]*\\b(?:fopen|open)\\s*\\(\\s*\\1\\b|(?:spin_unlock|pthread_mutex_unlock|mutex_unlock)\\s*\\(&?([a-zA-Z0-9_]+)\\);\\s*(?:spin_lock|pthread_mutex_lock|mutex_lock)\\s*\\(&?\\2\\);)",
-          "rule_id": "SEC-CWE-362-CONCURRENCY-RACE-C",
-          "severity": "MEDIUM",
-          "title": "Race Condition / TOCTOU Window (C/C++)"
-        },
-        {
-          "explanation": "Checking os.path.exists() before open() introduces a TOCTOU race condition in Python.",
-          "language": "Python",
-          "languages": [
-            "python"
-          ],
-          "lesson": "Use atomic file operations (e.g. open with 'x' mode) or try/except FileExistsError/FileNotFoundError.",
-          "pattern": "(?:if\\s+os\\.path\\.exists\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*\\):[^:\\n]*\\n\\s*(?:with\\s+open|open)\\s*\\(\\s*\\1\\b)",
-          "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON",
-          "severity": "MEDIUM",
-          "title": "Race Condition / TOCTOU File Access (Python)"
-        },
-        {
-          "explanation": "Testing file existence before operating on it in shell creates a TOCTOU race condition.",
-          "language": "Shell",
-          "languages": [
-            "shell"
-          ],
-          "lesson": "Use atomic file operations or mktemp; handle command error codes directly.",
-          "pattern": "(?:if\\s+\\[\\s*-[efrwxd]\\s+[\"\\']?\\$[a-zA-Z0-9_]+[\"\\']?\\s*\\];?\\s*then[^;]+(?:\\bcat\\b|\\bcp\\b|\\bmv\\b|\\brm\\b|>)\\s+[^;]*\\$)",
-          "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL",
-          "severity": "MEDIUM",
-          "title": "Race Condition / TOCTOU File Operation (Shell)"
-        }
-      ]
-    }
-  ],
+  "families_without_evidence": [],
   "gate_command": "python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json",
   "generated_by": "scripts/build_guardrails.py",
   "schema_version": "defensive-guardrails-v1",
@@ -342,10 +476,10 @@
     "rules": "scripts/defensive_auditor.py:SECURITY_RULES"
   },
   "summary": {
-    "citations_total": 6,
-    "families_covered": 2,
+    "citations_total": 16,
+    "families_covered": 6,
     "rule_families_total": 6,
-    "rule_families_without_evidence": 4,
-    "rules_covered": 4
+    "rule_families_without_evidence": 0,
+    "rules_covered": 13
   }
 }

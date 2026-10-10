@@ -112,23 +112,29 @@ class TestBuildGuardrailsCli(TestCase):
             capture_output=True, text=True, cwd=str(cwd),
         )
 
+    # Generation tests write into a temporary --out-dir: the test suite must never
+    # rewrite the committed skill references.
     def test_generate_then_check_is_clean(self):
-        self.assertEqual(self._run().returncode, 0)
-        result = self._run("--check")
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("guardrails up to date", result.stdout)
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(self._run("--out-dir", tmp).returncode, 0)
+            result = self._run("--check", "--out-dir", tmp)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("guardrails up to date", result.stdout)
 
     def test_check_fails_on_drift(self):
-        self.assertEqual(self._run().returncode, 0)
-        original = MD_PATH.read_text(encoding="utf-8")
-        try:
-            MD_PATH.write_text(original + "\ndrift\n", encoding="utf-8")
-            result = self._run("--check")
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(self._run("--out-dir", tmp).returncode, 0)
+            md = Path(tmp) / MD_PATH.name
+            md.write_text(md.read_text(encoding="utf-8") + "\ndrift\n", encoding="utf-8")
+            result = self._run("--check", "--out-dir", tmp)
             self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
             self.assertIn("DRIFT", result.stderr)
-        finally:
-            MD_PATH.write_text(original, encoding="utf-8")
-        self.assertEqual(self._run("--check").returncode, 0)
+
+    def test_suite_does_not_touch_committed_references(self):
+        before = (MD_PATH.read_bytes(), JSON_PATH.read_bytes())
+        with tempfile.TemporaryDirectory() as tmp:
+            self._run("--out-dir", tmp)
+        self.assertEqual((MD_PATH.read_bytes(), JSON_PATH.read_bytes()), before)
 
     def test_check_is_cwd_independent(self):
         with tempfile.TemporaryDirectory() as tmp:

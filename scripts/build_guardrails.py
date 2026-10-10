@@ -473,7 +473,12 @@ def main(argv=None):
                         help="Fail if the generated files differ from the ones on disk")
     parser.add_argument("--verify-citations", action="store_true",
                         help="Re-read every cited source file and confirm each fix SHA exists")
+    parser.add_argument("--out-dir", type=Path, default=None,
+                        help="Write/check guardrails.md and guardrails.json here instead of the skill references dir")
     args = parser.parse_args(argv)
+    out_dir = args.out_dir.resolve() if args.out_dir else SKILL_REFERENCES_DIR
+    md_path = out_dir / MD_PATH.name
+    json_path = out_dir / JSON_PATH.name
 
     markdown, guardrails = build_document()
 
@@ -491,8 +496,8 @@ def main(argv=None):
             exit_code = 1
 
     if args.check:
-        expected = [(MD_PATH, markdown),
-                    (JSON_PATH, json.dumps(guardrails, indent=2, sort_keys=True,
+        expected = [(md_path, markdown),
+                    (json_path, json.dumps(guardrails, indent=2, sort_keys=True,
                                            ensure_ascii=False) + "\n")]
         drifted = []
         for path, text in expected:
@@ -507,20 +512,20 @@ def main(argv=None):
                   file=sys.stderr)
             exit_code = 1
         else:
-            print(f"guardrails up to date: {_repo_relative(MD_PATH)}, "
-                  f"{_repo_relative(JSON_PATH)}")
+            print(f"guardrails up to date: {_repo_relative(md_path)}, "
+                  f"{_repo_relative(json_path)}")
 
     if args.check or args.verify_citations:
         return exit_code
 
-    SKILL_REFERENCES_DIR.mkdir(parents=True, exist_ok=True)
-    MD_PATH.write_text(markdown, encoding="utf-8", newline="\n")
-    JSON_PATH.write_text(
+    out_dir.mkdir(parents=True, exist_ok=True)
+    md_path.write_text(markdown, encoding="utf-8", newline="\n")
+    json_path.write_text(
         json.dumps(guardrails, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8", newline="\n")
 
     summary = guardrails["summary"]
-    print(f"Wrote {_repo_relative(MD_PATH)} and {_repo_relative(JSON_PATH)}")
+    print(f"Wrote {_repo_relative(md_path)} and {_repo_relative(json_path)}")
     print(f"Families covered: {summary['families_covered']} "
           f"({', '.join(f['cwe_id'] for f in guardrails['families']) or 'none'})")
     print(f"Citations: {summary['citations_total']} "

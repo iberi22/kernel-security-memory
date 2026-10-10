@@ -9,7 +9,7 @@ Every number, pattern and citation below is read from repository data:
 - advisory rows with a 40-hex fix SHA: `docs/studies/cve-history/*/catalog.jsonl` (commit URL derived from the `repo` recorded in the sibling `index.json`)
 - verified fix commits: `docs/memory/records/*.json`
 
-A family gets a section only when it has **both** an auditor rule **and** at least one 40-hex fix commit in this repository. Covered: **2** families, **6** citations, **4** rules (of 6 rule families).
+A family gets a section only when it has **both** an auditor rule **and** at least one 40-hex fix commit in this repository. Covered: **6** families, **16** citations, **13** rules (of 6 rule families).
 
 ## How to use a section
 
@@ -27,9 +27,167 @@ python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies
 
 The gate exits non-zero with verdict `STALE` when the stored `evidence_chain_hash` no longer matches a fresh audit of the same target.
 
+## CWE-78 — CWE Family CWE-78
+
+Cluster `CWE-78` "CWE Family CWE-78": **4** advisories, **2** with a fix SHA (`docs/studies/pattern_clusters.json`).
+
+### SEC-CWE-78-COMMAND-INJECTION-C (CRITICAL, C)
+
+- **Trigger** — language family `c`, `cpp` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "OS Command Injection in C (system / popen / exec)": Dynamic command string passed to system(), popen(), or shell exec() in C without sanitization.
+
+  ```python
+  \b(?:system|popen)\s*\(\s*(?!"[^\%"\'\n]*"\s*[,)])([a-zA-Z0-9_]+|"[^"]*\%[sS])|\bexec[l|v]p?e?\s*\([^;]*"/(?:bin/)?(?:sh|bash)"[^;]*\)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-78-COMMAND-INJECTION-C"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Use parameterized execv/execve with discrete arguments array instead of shell invocation.
+
+### SEC-CWE-78-COMMAND-INJECTION-PYTHON (CRITICAL, Python)
+
+- **Trigger** — language family `python` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "OS Command Injection in Python (subprocess shell=True / os.system / exec)": Executing commands via shell=True, os.system, os.popen, or dynamic exec() with unsanitized input.
+
+  ```python
+  (?:subprocess\.(?:call|run|Popen|check_output)\s*\(.*shell\s*=\s*True|os\.(?:system|popen)\s*\([^)]+\)|(?<!\.)\bexec\s*\(\s*[a-zA-Z0-9_]+|\beval\s*\(\s*[a-zA-Z0-9_]+)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-78-COMMAND-INJECTION-PYTHON"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Pass arguments as a sequence without shell=True; use ast.literal_eval instead of eval/exec.
+
+### SEC-CWE-78-COMMAND-INJECTION-SHELL (CRITICAL, Shell)
+
+- **Trigger** — language family `shell` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Command Injection / Unquoted Evaluation in Shell": Unsanitized variables passed to eval, sh -c, or exec in shell script.
+
+  ```python
+  (?:eval\s+["\']?\$|\b(?:sh|bash)\s+-c\s+["\']?\$|\bexec\s+["\']?\$)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-78-COMMAND-INJECTION-SHELL"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Avoid eval; use direct binary execution and strictly quote/validate all external parameters.
+
+#### Evidence
+
+| Advisory | Project | Fix commit | Linked by | Source |
+|---|---|---|---|---|
+| CVE-2022-1292 | openssl-upstream | [`1ad73b4d27bd`](https://github.com/openssl/openssl/commit/1ad73b4d27bd8c1b369a3cd453681d3a4f1bb9b2) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
+| CVE-2022-2068 | openssl-upstream | [`2c9c35870601`](https://github.com/openssl/openssl/commit/2c9c35870601b4a44d86ddbf512b38df38285cfa) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
+
+## CWE-120 — Classic Buffer Overflow
+
+Cluster `CWE-120` "Classic Buffer Overflow": **59** advisories, **55** with a fix SHA (`docs/studies/pattern_clusters.json`).
+
+Preconditions recorded in the cluster: Untrusted buffer length or unbounded string processing.
+
+### SEC-CWE-120-UNBOUNDED-COPY (HIGH, C)
+
+- **Trigger** — language family `c`, `cpp` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Buffer Copy without Checking Size of Input (C/C++)": Unbounded string function (strcpy, strcat, gets, sprintf) prone to classic stack/heap buffer overflow.
+
+  ```python
+  \b(strcpy|strcat|gets|sprintf)\s*\(
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-120-UNBOUNDED-COPY"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Replace with bounds-checked alternatives (strncpy, strlcat, fgets, snprintf) and validate buffer bounds.
+
+#### Evidence
+
+| Advisory | Project | Fix commit | Linked by | Source |
+|---|---|---|---|---|
+| CVE-2021-3711 | openssl-upstream | [`59f5e75f3bce`](https://github.com/openssl/openssl/commit/59f5e75f3bced8fc0e130d72a3f582cf7b480b46) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
+| CVE-2021-47040 | linux-cna | [`38134ada0cee`](https://github.com/torvalds/linux/commit/38134ada0ceea3e848fe993263c0ff6207fd46e7) | cluster_sample_cves | `docs/studies/cve-history/linux-cna/catalog.jsonl` |
+| CVE-2021-47107 | linux-cna | [`53b1119a6e50`](https://github.com/torvalds/linux/commit/53b1119a6e5028b125f431a0116ba73510d82a72) | cluster_sample_cves | `docs/studies/cve-history/linux-cna/catalog.jsonl` |
+
+## CWE-190 — Integer Overflow or Wraparound
+
+Cluster `CWE-190` "Integer Overflow or Wraparound": **135** advisories, **127** with a fix SHA (`docs/studies/pattern_clusters.json`).
+
+### SEC-CWE-190-INTEGER-OVERFLOW-C (MEDIUM, C)
+
+- **Trigger** — language family `c`, `cpp` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Integer Overflow or Wraparound in Allocation (C/C++)": Multiplication or addition inside allocation argument without bound or overflow check in C.
+
+  ```python
+  \b(?:malloc|kmalloc|kzalloc|vmalloc|xmalloc)\s*\(\s*([a-zA-Z0-9_]+)\s*(\*|\+)\s*([a-zA-Z0-9_]+)\s*(?:,[^)]+)?\)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-C"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Use overflow-checked helpers (e.g. check_mul_overflow, calloc) or explicit bounds validation before allocation.
+
+### SEC-CWE-190-INTEGER-OVERFLOW-RUST (MEDIUM, Rust)
+
+- **Trigger** — language family `rust` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Integer Overflow in Allocation / Capacity (Rust)": Unchecked arithmetic inside allocation size or capacity in Rust.
+
+  ```python
+  \b(?:Vec::with_capacity|alloc::alloc|Layout::array|Layout::from_size_align)\s*(?:<[^>]+>)?\s*\(\s*([a-zA-Z0-9_]+)\s*(\*|\+)\s*([a-zA-Z0-9_]+)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-RUST"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Use checked_mul() or checked_add() before computing collection capacity or layout size.
+
+#### Evidence
+
+| Advisory | Project | Fix commit | Linked by | Source |
+|---|---|---|---|---|
+| CVE-2019-1551 | openssl-upstream | [`419102400a28`](https://github.com/openssl/openssl/commit/419102400a2811582a7a3d4a4e317d72e5ce0a8f) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
+| CVE-2021-23840 | openssl-upstream | [`6a51b9e1d0cf`](https://github.com/openssl/openssl/commit/6a51b9e1d0cf0bf8515f7201b68fb0a3482b3dc1) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
+| CVE-2021-46940 | linux-cna | [`13a779de4175`](https://github.com/torvalds/linux/commit/13a779de4175df602366d129e41782ad7168cef0) | cluster_sample_cves | `docs/studies/cve-history/linux-cna/catalog.jsonl` |
+
+## CWE-362 — Concurrent Execution using Shared Resource (Race Condition)
+
+Cluster `CWE-362` "Concurrent Execution using Shared Resource (Race Condition)": **405** advisories, **397** with a fix SHA (`docs/studies/pattern_clusters.json`).
+
+Preconditions recorded in the cluster: Multithreaded / interrupt context without adequate lock barrier.
+
+### SEC-CWE-362-CONCURRENCY-RACE-C (MEDIUM, C)
+
+- **Trigger** — language family `c`, `cpp` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Race Condition / TOCTOU Window (C/C++)": TOCTOU check-then-open pattern or rapid unlock-relock window in C creates concurrency race window.
+
+  ```python
+  (?:(?:access|stat|lstat)\s*\(\s*([a-zA-Z0-9_\"'/]+)\s*,[^)]+\)(?:[^;]*;|[^\n]*)\s*[^;]*\b(?:fopen|open)\s*\(\s*\1\b|(?:spin_unlock|pthread_mutex_unlock|mutex_unlock)\s*\(&?([a-zA-Z0-9_]+)\);\s*(?:spin_lock|pthread_mutex_lock|mutex_lock)\s*\(&?\2\);)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-362-CONCURRENCY-RACE-C"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Use atomic open with O_CREAT\|O_EXCL, or hold critical section invariants continuously.
+
+### SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON (MEDIUM, Python)
+
+- **Trigger** — language family `python` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Race Condition / TOCTOU File Access (Python)": Checking os.path.exists() before open() introduces a TOCTOU race condition in Python.
+
+  ```python
+  (?:if\s+os\.path\.exists\s*\(\s*([a-zA-Z0-9_]+)\s*\):[^:\n]*\n\s*(?:with\s+open|open)\s*\(\s*\1\b)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Use atomic file operations (e.g. open with 'x' mode) or try/except FileExistsError/FileNotFoundError.
+
+### SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL (MEDIUM, Shell)
+
+- **Trigger** — language family `shell` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Race Condition / TOCTOU File Operation (Shell)": Testing file existence before operating on it in shell creates a TOCTOU race condition.
+
+  ```python
+  (?:if\s+\[\s*-[efrwxd]\s+["\']?\$[a-zA-Z0-9_]+["\']?\s*\];?\s*then[^;]+(?:\bcat\b|\bcp\b|\bmv\b|\brm\b|>)\s+[^;]*\$)
+  ```
+
+- **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
+
+- **Required invariant** — Use atomic file operations or mktemp; handle command error codes directly.
+
+#### Evidence
+
+| Advisory | Project | Fix commit | Linked by | Source |
+|---|---|---|---|---|
+| CVE-2021-46925 | linux-cna | [`349d43127dac`](https://github.com/torvalds/linux/commit/349d43127dac00c15231e8ffbcaabd70f7b0e544) | cluster_sample_cves | `docs/studies/cve-history/linux-cna/catalog.jsonl` |
+| CVE-2021-46982 | linux-cna | [`a949dc5f2c5c`](https://github.com/torvalds/linux/commit/a949dc5f2c5cfe0c910b664650f45371254c0744) | cluster_sample_cves | `docs/studies/cve-history/linux-cna/catalog.jsonl` |
+
 ## CWE-416 — Use After Free
 
-Cluster `CWE-416` "Use After Free": **16** advisories, **14** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-416` "Use After Free": **1380** advisories, **1372** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 Preconditions recorded in the cluster: Asynchronous lifecycle, double free, or aliased pointer reuse.
 
@@ -62,12 +220,12 @@ Preconditions recorded in the cluster: Asynchronous lifecycle, double free, or a
 | Advisory | Project | Fix commit | Linked by | Source |
 |---|---|---|---|---|
 | CVE-2023-25136 | openssh | [`486c4dc3b83b`](https://github.com/openssh/openssh-portable/commit/486c4dc3b83b4b67d663fb0fa62bc24138ec3946) | recorded_cwe | `docs/memory/records/openssh-CVE-2023-25136.json` |
+| CVE-2016-6309 | openssl-upstream | [`acacbfa7565c`](https://github.com/openssl/openssl/commit/acacbfa7565c78d2273c0b2a2e5e803f44afefeb) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
 | CVE-2016-8623 | curl-upstream | [`c5be3d7267c7`](https://github.com/curl/curl/commit/c5be3d7267c725dbd093ff3a883e07ee8cf2a1d5) | recorded_cwe | `docs/studies/cve-history/curl-upstream/catalog.jsonl` |
-| CVE-2018-16840 | curl-upstream | [`81d135d67155`](https://github.com/curl/curl/commit/81d135d67155c5295b1033679c606165d4e28f3f) | recorded_cwe | `docs/studies/cve-history/curl-upstream/catalog.jsonl` |
 
 ## CWE-476 — NULL Pointer Dereference
 
-Cluster `CWE-476` "NULL Pointer Dereference": **19** advisories, **14** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-476` "NULL Pointer Dereference": **2078** advisories, **2063** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 Preconditions recorded in the cluster: Unchecked return value from allocator or lookup function.
 
@@ -100,16 +258,9 @@ Preconditions recorded in the cluster: Unchecked return value from allocator or 
 | Advisory | Project | Fix commit | Linked by | Source |
 |---|---|---|---|---|
 | CVE-2009-1386 | openssl-upstream | [`1cbf663a6c89`](https://github.com/openssl/openssl/commit/1cbf663a6c89dcf8f7706d30a8bae675e2e0199a) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
+| CVE-2016-7052 | openssl-upstream | [`6e629b5be45f`](https://github.com/openssl/openssl/commit/6e629b5be45face20b4ca71c4fcbfed78b864a2e) | cluster_sample_cves | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
 | CVE-2018-1000121 | curl-upstream | [`9889db043393`](https://github.com/curl/curl/commit/9889db043393092e9d4b5a42720bba0b3d58deba) | recorded_cwe | `docs/studies/cve-history/curl-upstream/catalog.jsonl` |
-| CVE-2025-15468 | openssl-upstream | [`1f08e54bad32`](https://github.com/openssl/openssl/commit/1f08e54bad32843044fe8a675948d65e3b4ece65) | recorded_cwe | `docs/studies/cve-history/openssl-upstream/catalog.jsonl` |
 
 ## Rule families without in-repo fix evidence
 
-These families keep their `SECURITY_RULES` entries in `scripts/defensive_auditor.py` and stay enforced, but this repository holds no 40-hex fix commit linked to them, so no evidence section can be generated without inventing data:
-
-| Rule family | Rules | Cluster count / with_fix_sha | Why no section |
-|---|---|---|---|---|
-| CWE-78 | `SEC-CWE-78-COMMAND-INJECTION-C`, `SEC-CWE-78-COMMAND-INJECTION-PYTHON`, `SEC-CWE-78-COMMAND-INJECTION-SHELL` | no cluster entry | no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history |
-| CWE-120 | `SEC-CWE-120-UNBOUNDED-COPY` | 1 / 0 | no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history |
-| CWE-190 | `SEC-CWE-190-INTEGER-OVERFLOW-C`, `SEC-CWE-190-INTEGER-OVERFLOW-RUST` | 1 / 0 | no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history |
-| CWE-362 | `SEC-CWE-362-CONCURRENCY-RACE-C`, `SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON`, `SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL` | 2 / 0 | no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history |
+None: every auditor rule family has at least one 40-hex fix commit.
