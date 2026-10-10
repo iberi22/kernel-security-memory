@@ -17,3 +17,8 @@ node_modules/
 # kept as a local cache only; index.json records the source URL and sha256.
 docs/studies/cve-history/osv-cache/
 docs/studies/cve-history/*-upstream/source.*
+
+# mine_pack_fragments.py cache: raw upstream patches + file contents fetched from
+# the fix commits (third-party terms, docs/DATA-POLICY.md). Only derived,
+# code-free features are committed under docs/studies/fragments/.
+docs/studies/fragments-cache/
