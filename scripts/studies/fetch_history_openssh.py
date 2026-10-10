@@ -15,6 +15,11 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
+try:  # importable as a script, as scripts.studies.fetch_history_x and top-level
+    from . import fetcher_io
+except ImportError:  # direct execution / sys.path import
+    import fetcher_io
+
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent.parent
 DEFAULT_OUT_DIR = BASE_DIR / "docs" / "studies" / "cve-history" / "openssh"
 INDEX_FILE = DEFAULT_OUT_DIR / "index.json"
@@ -163,7 +168,7 @@ def fetch_nvd_data(out_dir=DEFAULT_OUT_DIR, max_time_seconds=180):
     catalog_path = out_dir_path / "catalog.jsonl"
 
     start_date_default = datetime.date(1999, 1, 1)
-    end_date_limit = datetime.date(2026, 10, 8)
+    end_date_limit = fetcher_io.resolve_run_date()
 
     cumulative_bytes = [0]
     requests_count = 0
@@ -172,30 +177,23 @@ def fetch_nvd_data(out_dir=DEFAULT_OUT_DIR, max_time_seconds=180):
 
     current_start = start_date_default
 
-    # Resume if existing index.json is present
-    if index_path.is_file():
-        try:
-            with open(index_path, "r", encoding="utf-8") as f:
-                prev_index = json.load(f)
-                requests_count = prev_index.get("requests", 0)
-                errors = prev_index.get("errors", [])
-                if prev_index.get("resume") and "next_start_date" in prev_index["resume"]:
-                    current_start = datetime.date.fromisoformat(prev_index["resume"]["next_start_date"])
-                elif prev_index.get("coverage") == "COMPLETE":
-                    print("Catalog is already COMPLETE.")
-                    return
-        except Exception:
-            pass
+    # Resume from the persisted cursor. A corrupt file is fatal: the old loader
+    # swallowed the error and rewrote the truncated catalog as a shorter
+    # "valid" one. Errors from earlier runs are history, not a reason to stop:
+    # only this run's failures may gate progress (see fetcher_io).
+    errors, error_history = [], []
+    prev_index = fetcher_io.read_index(index_path)
+    if prev_index is not None:
+        requests_count = prev_index.get("requests", 0)
+        errors, error_history = fetcher_io.load_error_history(prev_index)
+        if prev_index.get("resume") and "next_start_date" in prev_index["resume"]:
+            current_start = datetime.date.fromisoformat(prev_index["resume"]["next_start_date"])
+        elif prev_index.get("coverage") == "COMPLETE":
+            print("Catalog is already COMPLETE.")
+            return
 
-    if catalog_path.is_file():
-        try:
-            with open(catalog_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip():
-                        rec = json.loads(line.strip())
-                        kept_records[rec["advisory_id"]] = rec
-        except Exception:
-            pass
+    # A corrupt catalog line is fatal too (fetcher_io.read_catalog).
+    kept_records = fetcher_io.read_catalog(catalog_path)
 
     coverage = "INCOMPLETE"
     resume = None
@@ -278,6 +276,8 @@ def fetch_nvd_data(out_dir=DEFAULT_OUT_DIR, max_time_seconds=180):
                 window_finished = True
                 break
 
+        # `errors` holds this run's failures only; the ones from earlier
+        # runs live in error_history and must not block new progress.
         if not window_finished or errors:
             if resume is None:
                 resume = {"next_start_date": current_start.isoformat()}
@@ -291,10 +291,7 @@ def fetch_nvd_data(out_dir=DEFAULT_OUT_DIR, max_time_seconds=180):
 
     # Write catalog.jsonl (sorted by published, then advisory_id)
     sorted_records = sorted(kept_records.values(), key=lambda r: (r["published"], r["advisory_id"]))
-    with open(catalog_path, "w", encoding="utf-8") as f:
-        for rec in sorted_records:
-            line = json.dumps(rec, separators=(",", ":"))
-            f.write(line + "\n")
+    fetcher_io.write_catalog_atomic(catalog_path, sorted_records)
 
     entry_count = len(sorted_records)
     with_fix_sha = sum(1 for r in sorted_records if len(r["fix_shas"]) > 0)
@@ -303,7 +300,7 @@ def fetch_nvd_data(out_dir=DEFAULT_OUT_DIR, max_time_seconds=180):
         "schema_version": "cve-history-v1",
         "project": "openssh",
         "repo": "https://github.com/openssh/openssh-portable",
-        "window": {"start": "1999-01-01", "end": "2026-10-08"},
+        "window": fetcher_io.expected_window(),
         "keyword": "openssh",
         "coverage": coverage,
         "entry_count": entry_count,
@@ -311,12 +308,11 @@ def fetch_nvd_data(out_dir=DEFAULT_OUT_DIR, max_time_seconds=180):
         "requests": requests_count,
         "resume": resume,
         "errors": errors,
+        "error_history": fetcher_io.merge_error_history(error_history, errors),
         "notes": "Descriptions were omitted per policy.",
     }
 
-    with open(index_path, "w", encoding="utf-8") as f:
-        json.dump(index_data, f, indent=2)
-        f.write("\n")
+    fetcher_io.write_index_atomic(index_path, index_data)
 
     print(f"Fetch run completed: {entry_count} entries ({with_fix_sha} with fix SHAs), {requests_count} total requests.")
     print(f"Coverage: {coverage}, resume: {resume}")
@@ -363,8 +359,9 @@ def validate_offline(out_dir=DEFAULT_OUT_DIR):
         print(f"Error: repo mismatch", file=sys.stderr)
         return False
 
-    if index_data["window"] != {"start": "1999-01-01", "end": "2026-10-08"}:
-        print(f"Error: window mismatch", file=sys.stderr)
+    window_ok, window_reason = fetcher_io.check_window(index_data.get("window"))
+    if not window_ok:
+        print(f"Error: invalid window: {window_reason}", file=sys.stderr)
         return False
 
     if index_data["coverage"] not in ("COMPLETE", "INCOMPLETE"):
@@ -467,7 +464,11 @@ def main():
         sys.exit(0 if ok else 1)
 
     if args.fetch:
-        fetch_nvd_data(args.out_dir, max_time_seconds=args.max_time)
+        try:
+            fetch_nvd_data(args.out_dir, max_time_seconds=args.max_time)
+        except fetcher_io.CorruptStateError as err:
+            print(f"Error: {err}", file=sys.stderr)
+            sys.exit(2)
 
 
 if __name__ == "__main__":
