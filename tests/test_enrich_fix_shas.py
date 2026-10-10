@@ -7,10 +7,13 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts/studies"))
 from enrich_fix_shas import (
+    GIT_TIMEOUT_SECONDS,
+    MAX_LINE_BYTES,
     SHA_RE,
     ROOT,
     VETTED_SHAS_SIDECAR,
@@ -19,6 +22,7 @@ from enrich_fix_shas import (
     check_sha_in_mirror,
     extract_vetted_shas_records,
     generate_vetted_shas_sidecar,
+    git_env,
     load_vetted_shas,
 )
 
@@ -91,6 +95,110 @@ class TestEnrichFixShas(unittest.TestCase):
             self.assertEqual(updated_lines[1]["fix_shas"], ["2222222222222222222222222222222222222222"])
             self.assertEqual(updated_lines[1]["sha_status"], "MIRROR_UNCHECKED")
 
+    def test_enriched_lines_are_compact_and_within_byte_budget(self):
+        """Catalog lines keep the fetcher's compact form and never pass max_line_bytes.
+
+        Regression: enrich_catalog used json.dumps() default separators and appended
+        three status fields, inflating every line (measured +51% bytes over the whole
+        catalog tree) and pushing lines past the 500-byte limit that
+        BaseHistoryFetcher.validate_offline enforces.
+        """
+        long_url = "https://git.example.com/org/project/-/commit/" + "b" * 40
+        with tempfile.TemporaryDirectory() as td:
+            pdir = Path(td)
+            (pdir / "index.json").write_text(json.dumps({
+                "schema_version": "cve-history-v1",
+                "project": "sample",
+                "entry_count": 1,
+                "with_fix_sha": 0,
+            }))
+            entry = {
+                "advisory_id": "CVE-2021-3333",
+                "published": "2021-03-01",
+                "cwe": "CWE-119",
+                "cwe_state": "STATED_BY_ADVISORY",
+                "patch_urls": [long_url + "/one", long_url + "/two", long_url + "/three"],
+                "fix_shas": [],
+                "subsystem": "core",
+            }
+            # Sanity: the entry alone fits, but it cannot also carry the status fields.
+            data_only = json.dumps(entry, separators=(",", ":"), ensure_ascii=False)
+            self.assertLessEqual(len(data_only.encode("utf-8")), MAX_LINE_BYTES)
+            (pdir / "catalog.jsonl").write_text(data_only + "\n")
+
+            rep = enrich_catalog(pdir, vetted_shas={}, dry_run=False)
+
+            self.assertEqual(rep["over_limit"], 1)
+            written = (pdir / "catalog.jsonl").read_text().splitlines()[0]
+            # Compact separators, byte-for-byte what a re-read would re-emit.
+            self.assertNotIn(", ", written)
+            self.assertEqual(written, json.dumps(json.loads(written), separators=(",", ":"), ensure_ascii=False))
+            # Within the budget that validate_offline enforces.
+            self.assertLessEqual(len(written.encode("utf-8")), MAX_LINE_BYTES)
+            # The derived status fields were dropped, the data was not.
+            parsed = json.loads(written)
+            self.assertNotIn("sha_status", parsed)
+            self.assertNotIn("mirror_status", parsed)
+            self.assertNotIn("sha_statuses", parsed)
+            self.assertEqual(parsed["fix_shas"], ["b" * 40])
+
+    def test_enriched_lines_keep_status_fields_when_they_fit(self):
+        """Short entries still get the derived status fields on one compact line."""
+        with tempfile.TemporaryDirectory() as td:
+            pdir = Path(td)
+            (pdir / "index.json").write_text(json.dumps({
+                "schema_version": "cve-history-v1", "project": "sample",
+                "entry_count": 1, "with_fix_sha": 0,
+            }))
+            (pdir / "catalog.jsonl").write_text(json.dumps({
+                "advisory_id": "CVE-2021-4444", "published": "2021-04-01",
+                "cwe": None, "cwe_state": "UNKNOWN", "patch_urls": [],
+                "fix_shas": [], "subsystem": "unassigned",
+            }, separators=(",", ":")) + "\n")
+
+            rep = enrich_catalog(pdir, vetted_shas={}, dry_run=False)
+
+            self.assertEqual(rep["over_limit"], 0)
+            written = (pdir / "catalog.jsonl").read_text().splitlines()[0]
+            parsed = json.loads(written)
+            self.assertEqual(parsed["sha_status"], "NOT_JOINED")
+            self.assertEqual(parsed["mirror_status"], "NOT_JOINED")
+            self.assertEqual(parsed["sha_statuses"], {})
+
+    def test_normal_run_preserves_index_cursor_state(self):
+        """A non-dry-run enrichment updates with_fix_sha only, never the cursor state."""
+        original_index = {
+            "schema_version": "cve-history-v1",
+            "project": "sample",
+            "coverage": "INCOMPLETE",
+            "status": "CURSOR_PAUSED",
+            "cursor_date": "2008-08-11",
+            "window_closed": False,
+            "entry_count": 1,
+            "with_fix_sha": 0,
+            "requests": 39,
+            "resume": {"next_start_date": "2008-08-11"},
+            "errors": [],
+            "notes": "Cursor paused at 2008-08-11; window remains open (not closed).",
+        }
+        with tempfile.TemporaryDirectory() as td:
+            pdir = Path(td)
+            (pdir / "index.json").write_text(json.dumps(original_index, indent=2) + "\n")
+            (pdir / "catalog.jsonl").write_text(json.dumps({
+                "advisory_id": "CVE-1999-0001", "published": "1999-01-01",
+                "cwe": None, "cwe_state": "UNKNOWN",
+                "patch_urls": ["https://example.com/commit/" + "c" * 40],
+                "fix_shas": [], "subsystem": "unassigned",
+            }, separators=(",", ":")) + "\n")
+
+            enrich_catalog(pdir, vetted_shas={}, dry_run=False)
+
+            updated = json.loads((pdir / "index.json").read_text())
+            self.assertEqual(updated["with_fix_sha"], 1)
+            for key in ("coverage", "status", "cursor_date", "window_closed",
+                        "requests", "resume", "errors", "notes", "entry_count"):
+                self.assertEqual(updated[key], original_index[key], f"index key {key!r} must survive")
+
     def test_b1_zero_overlap_honest_reporting(self):
         """B1: When overlap is zero, report honestly and do NOT print 'Enrichment complete and verified'."""
         with tempfile.TemporaryDirectory() as td:
@@ -125,41 +233,84 @@ class TestEnrichFixShas(unittest.TestCase):
             self.assertEqual(rep["matches"], 0)
             self.assertEqual(rep["with_fix_sha"], 0)
 
-        # Run script on real tree with --dry-run and verify terminal message
-        res = subprocess.run(
-            [sys.executable, str(ROOT / "scripts/studies/enrich_fix_shas.py"), "--dry-run"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        self.assertIn("Catalog scanned: 0 overlaps found with vetted records", res.stdout)
-        self.assertIn("overlap: 0", res.stdout)
-        self.assertIn("0 matches", res.stdout)
-        self.assertNotIn("Enrichment complete and verified", res.stdout)
+        # Run the real script against a temporary fixture tree, never the live
+        # repository data (whose overlap changes as fetching continues).
+        with tempfile.TemporaryDirectory() as td:
+            fixture_root = Path(td) / "cve-history"
+            project_dir = fixture_root / "fixture"
+            project_dir.mkdir(parents=True)
+            fixture_catalog = (
+                json.dumps({
+                    "advisory_id": "CVE-1999-0001",
+                    "published": "1999-01-01",
+                    "cwe": None,
+                    "cwe_state": "UNKNOWN",
+                    "patch_urls": ["https://example.com/commit/" + "d" * 40],
+                    "fix_shas": [],
+                    "subsystem": "unassigned",
+                }, separators=(",", ":")) + "\n" +
+                json.dumps({
+                    "advisory_id": "CVE-1999-0002",
+                    "published": "1999-02-01",
+                    "cwe": None,
+                    "cwe_state": "UNKNOWN",
+                    "patch_urls": ["https://example.com/advisory"],
+                    "fix_shas": [],
+                    "subsystem": "unassigned",
+                }, separators=(",", ":")) + "\n"
+            )
+            (project_dir / "catalog.jsonl").write_text(fixture_catalog)
+            (project_dir / "index.json").write_text(json.dumps({
+                "schema_version": "cve-history-v1",
+                "project": "fixture",
+                "coverage": "INCOMPLETE",
+                "status": "CURSOR_PAUSED",
+                "cursor_date": "1999-03-01",
+                "window_closed": False,
+                "entry_count": 2,
+                "with_fix_sha": 0,
+                "requests": 4,
+                "resume": {"next_start_date": "1999-03-01"},
+                "errors": [],
+                "notes": "fixture",
+            }, indent=2) + "\n")
 
-        # Also verify --check mode honest output
-        res_check = subprocess.run(
-            [sys.executable, str(ROOT / "scripts/studies/enrich_fix_shas.py"), "--check"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        self.assertIn("Catalog scanned: 0 overlaps found with vetted records", res_check.stdout)
-        self.assertNotIn("Verification successful", res_check.stdout)
+            for mode in ("--dry-run", "--check"):
+                res = subprocess.run(
+                    [
+                        sys.executable,
+                        str(ROOT / "scripts/studies/enrich_fix_shas.py"),
+                        mode,
+                        "--cve-history-dir", str(fixture_root),
+                    ],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                self.assertIn("Catalog scanned: 0 overlaps found with vetted records", res.stdout, mode)
+                self.assertIn("overlap: 0", res.stdout, mode)
+                self.assertIn("0 matches", res.stdout, mode)
+                self.assertNotIn("Enrichment complete and verified", res.stdout, mode)
+                self.assertNotIn("Verification successful", res.stdout, mode)
+
+            # Check/dry-run modes must not touch the fixture tree.
+            self.assertEqual((project_dir / "catalog.jsonl").read_text(), fixture_catalog)
 
     def test_b2_git_mirror_verification(self):
         """B2: Check candidate SHAs against local git mirror and record NOT_IN_MIRROR or MIRROR_UNCHECKED."""
         with tempfile.TemporaryDirectory() as git_td:
             git_dir = Path(git_td)
-            # Initialize a real git repo and make a commit
-            subprocess.run(["git", "init", str(git_dir)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-            subprocess.run(["git", "-C", str(git_dir), "config", "user.name", "Tester"], check=True)
-            subprocess.run(["git", "-C", str(git_dir), "config", "user.email", "tester@example.com"], check=True)
+            # Initialize a real git repo and make a commit. The cleaned environment
+            # is passed to every command, exactly like check_sha_in_mirror does.
+            clean_env = git_env()
+            subprocess.run(["git", "init", str(git_dir)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True, env=clean_env)
+            subprocess.run(["git", "-C", str(git_dir), "config", "user.name", "Tester"], check=True, env=clean_env)
+            subprocess.run(["git", "-C", str(git_dir), "config", "user.email", "tester@example.com"], check=True, env=clean_env)
             (git_dir / "file.txt").write_text("test commit content\n")
-            subprocess.run(["git", "-C", str(git_dir), "add", "file.txt"], check=True)
-            subprocess.run(["git", "-C", str(git_dir), "commit", "-m", "initial commit"], stdout=subprocess.DEVNULL, check=True)
+            subprocess.run(["git", "-C", str(git_dir), "add", "file.txt"], check=True, env=clean_env)
+            subprocess.run(["git", "-C", str(git_dir), "commit", "-m", "initial commit"], stdout=subprocess.DEVNULL, check=True, env=clean_env)
 
-            rev_res = subprocess.run(["git", "-C", str(git_dir), "rev-parse", "HEAD"], capture_output=True, text=True, check=True)
+            rev_res = subprocess.run(["git", "-C", str(git_dir), "rev-parse", "HEAD"], capture_output=True, text=True, check=True, env=clean_env)
             real_sha = rev_res.stdout.strip().lower()
             fake_sha = "0000000000000000000000000000000000000000"
 
@@ -232,6 +383,82 @@ class TestEnrichFixShas(unittest.TestCase):
                 self.assertEqual(lines_none[0]["sha_status"], "MIRROR_UNCHECKED")
                 self.assertEqual(lines_none[1]["sha_status"], "MIRROR_UNCHECKED")
                 self.assertEqual(lines_none[2]["sha_status"], "NOT_JOINED")
+
+    def test_check_sha_in_mirror_rejects_non_commit_objects(self):
+        """A blob or tree hash must not be reported as a verified commit.
+
+        Regression: after the `sha^{commit}` lookup failed, a bare `cat-file -e <sha>`
+        succeeded for any blob or tree, so such an entry was marked VERIFIED_IN_MIRROR.
+        """
+        with tempfile.TemporaryDirectory() as git_td:
+            git_dir = Path(git_td)
+            env = git_env()
+            subprocess.run(["git", "init", str(git_dir)], check=True, env=env,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            (git_dir / "file.txt").write_text("test commit content\n")
+            blob = subprocess.run(["git", "-C", str(git_dir), "hash-object", "-w", "file.txt"],
+                                  capture_output=True, text=True, check=True, env=env
+                                  ).stdout.strip().lower()
+            subprocess.run(["git", "-C", str(git_dir), "add", "file.txt"], check=True, env=env)
+            tree = subprocess.run(["git", "-C", str(git_dir), "write-tree"],
+                                  capture_output=True, text=True, check=True, env=env
+                                  ).stdout.strip().lower()
+
+            for sha, kind in ((blob, "blob"), (tree, "tree")):
+                self.assertTrue(SHA_RE.fullmatch(sha), f"{kind} hash must be 40-hex")
+                self.assertFalse(
+                    check_sha_in_mirror(git_dir, sha),
+                    f"{kind} {sha} must not count as a verified commit",
+                )
+
+    def test_check_sha_in_mirror_isolates_git_environment(self):
+        """Inherited GIT_* variables must not redirect the lookup to another repository."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            repos = {}
+            for name in ("host", "foreign"):
+                repo = root / name
+                repo.mkdir()
+                env = git_env()
+                subprocess.run(["git", "init", str(repo)], check=True, env=env,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run(["git", "-C", str(repo), "config", "user.name", "T"], check=True, env=env)
+                subprocess.run(["git", "-C", str(repo), "config", "user.email", "t@e.com"], check=True, env=env)
+                (repo / "file.txt").write_text(name + "\n")
+                subprocess.run(["git", "-C", str(repo), "add", "file.txt"], check=True, env=env)
+                subprocess.run(["git", "-C", str(repo), "commit", "-m", "c"], check=True, env=env,
+                               stdout=subprocess.DEVNULL)
+                repos[name] = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"],
+                                             capture_output=True, text=True, check=True, env=env
+                                             ).stdout.strip().lower()
+
+            foreign_commit = repos["foreign"]
+            foreign_objects = root / "foreign/.git/objects"
+            with patch.dict(os.environ, {
+                "GIT_OBJECT_DIRECTORY": str(foreign_objects),
+                "GIT_ALTERNATE_OBJECT_DIRECTORIES": str(foreign_objects),
+            }):
+                # Still verified in its own repository...
+                self.assertTrue(check_sha_in_mirror(root / "foreign", foreign_commit))
+                # ...but not in the host repository, whose object store was hijacked.
+                self.assertFalse(check_sha_in_mirror(root / "host", foreign_commit))
+
+    def test_check_sha_in_mirror_uses_timeout_and_clean_env(self):
+        """The git subprocess gets a bounded lifetime and a GIT_*-free environment."""
+        seen = {}
+
+        def _fake_run(cmd, **kwargs):
+            seen["cmd"] = cmd
+            seen["kwargs"] = kwargs
+            return subprocess.CompletedProcess(cmd, 0)
+
+        with patch("subprocess.run", side_effect=_fake_run):
+            self.assertTrue(check_sha_in_mirror(".", "a" * 40))
+
+        self.assertEqual(seen["kwargs"]["timeout"], GIT_TIMEOUT_SECONDS)
+        self.assertEqual(seen["kwargs"]["env"], git_env())
+        self.assertFalse([k for k in seen["kwargs"]["env"] if k.startswith("GIT_")])
+        self.assertEqual(seen["cmd"][-1], ("a" * 40) + "^{commit}")
 
     def test_b3_vetted_shas_sidecar(self):
         """B3: Sidecar vetted-shas.jsonl cleanly extracts all 34 unique SHAs from Fable records."""

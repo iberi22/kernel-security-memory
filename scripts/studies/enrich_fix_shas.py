@@ -22,6 +22,20 @@ FABLE_DIR = ROOT / "docs/studies/fable-2026-06"
 VETTED_SHAS_SIDECAR = ROOT / "docs/studies/vetted-shas.jsonl"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 URL_COMMIT_RE = re.compile(r"(?:/commit/|[?&]id=)([0-9a-f]{40})\b", re.IGNORECASE)
+# Catalog lines must stay within the byte budget that
+# BaseHistoryFetcher.validate_offline enforces (BaseHistoryFetcher.max_line_bytes).
+MAX_LINE_BYTES = 500
+GIT_TIMEOUT_SECONDS = 30
+
+
+def git_env() -> dict:
+    """Child environment for git, with inherited GIT_* variables removed.
+
+    GIT_OBJECT_DIRECTORY and GIT_ALTERNATE_OBJECT_DIRECTORIES silently redirect
+    object lookups to another repository, so an inherited value can make a foreign
+    object look present (reproduced 2026-10-09 with two throwaway repositories).
+    """
+    return {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
 
 
 def resolve_git_dir(base_git_dir, project_name=None):
@@ -41,7 +55,7 @@ def resolve_git_dir(base_git_dir, project_name=None):
 
 
 def check_sha_in_mirror(git_dir, sha: str) -> bool:
-    """Check if 40-hex commit SHA exists in the local git repository."""
+    """Check if 40-hex commit SHA exists in the local git repository as a commit."""
     if not git_dir:
         return False
     git_dir_path = resolve_git_dir(git_dir)
@@ -53,16 +67,12 @@ def check_sha_in_mirror(git_dir, sha: str) -> bool:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             check=False,
+            timeout=GIT_TIMEOUT_SECONDS,
+            env=git_env(),
         )
-        if res.returncode == 0:
-            return True
-        res2 = subprocess.run(
-            ["git", "--git-dir", str(git_dir_path), "cat-file", "-e", sha],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False,
-        )
-        return res2.returncode == 0
+        # Only the commit-specific lookup counts: `cat-file -e <sha>` also succeeds
+        # for a blob or tree sharing that hash.
+        return res.returncode == 0
     except Exception:
         return False
 
@@ -153,6 +163,16 @@ def extract_commit_shas_from_urls(urls):
     return shas
 
 
+def _warn_over_limit(report: dict) -> None:
+    """Report entries whose derived status fields had to be dropped."""
+    if report.get("over_limit"):
+        print(
+            f"  warning: {report['project']}: {report['over_limit']} entries exceed "
+            f"{MAX_LINE_BYTES} bytes; derived status fields omitted",
+            file=sys.stderr,
+        )
+
+
 def enrich_catalog(project_dir, vetted_shas, dry_run=False, git_dir=None):
     """Enrich a single project's catalog.jsonl and index.json."""
     index_file = project_dir / "index.json"
@@ -172,6 +192,7 @@ def enrich_catalog(project_dir, vetted_shas, dry_run=False, git_dir=None):
     new_lines = []
     with_fix_sha_count = 0
     overlap_count = 0
+    over_limit_count = 0
 
     for line in lines:
         if not line.strip():
@@ -224,7 +245,18 @@ def enrich_catalog(project_dir, vetted_shas, dry_run=False, git_dir=None):
 
         if current_shas:
             with_fix_sha_count += 1
-        new_lines.append(json.dumps(entry, ensure_ascii=False))
+
+        # Compact separators match BaseHistoryFetcher.save_state, so an already
+        # enriched line is rewritten byte-for-byte instead of being inflated.
+        line = json.dumps(entry, separators=(",", ":"), ensure_ascii=False)
+        if len(line.encode("utf-8")) > MAX_LINE_BYTES:
+            # Status fields are derived metadata: never trade a catalog line that
+            # validate_offline accepts for them.
+            for key in ("sha_status", "mirror_status", "sha_statuses"):
+                entry.pop(key, None)
+            line = json.dumps(entry, separators=(",", ":"), ensure_ascii=False)
+            over_limit_count += 1
+        new_lines.append(line)
 
     index_data["with_fix_sha"] = with_fix_sha_count
 
@@ -238,13 +270,14 @@ def enrich_catalog(project_dir, vetted_shas, dry_run=False, git_dir=None):
         "with_fix_sha": with_fix_sha_count,
         "overlap": overlap_count,
         "matches": overlap_count,
+        "over_limit": over_limit_count,
     }
 
 
-def verify_all_catalogs():
+def verify_all_catalogs(history_dir=CVE_HISTORY_DIR):
     """Verify strictly that all catalogs have valid SHAs and matching index counts."""
     errors = []
-    for project_dir in sorted(CVE_HISTORY_DIR.glob("*")):
+    for project_dir in sorted(history_dir.glob("*")):
         if not project_dir.is_dir():
             continue
         index_file = project_dir / "index.json"
@@ -282,9 +315,12 @@ def main():
     parser.add_argument("--offline", action="store_true", help="Run in offline mode using only local sources")
     parser.add_argument("--dry-run", action="store_true", help="Report planned changes without writing")
     parser.add_argument("--git-dir", type=Path, default=None, help="Path to local git mirror")
+    parser.add_argument("--cve-history-dir", type=Path, default=None,
+                        help="Catalog root to process (default: docs/studies/cve-history)")
     parser.add_argument("--generate-sidecar", action="store_true", help="Generate vetted-shas.jsonl sidecar file")
     args = parser.parse_args()
 
+    history_dir = args.cve_history_dir or CVE_HISTORY_DIR
     git_dir = args.git_dir or os.environ.get("KSM_GIT_MIRROR")
     if git_dir:
         git_dir = Path(git_dir)
@@ -298,12 +334,13 @@ def main():
     if args.check or args.offline:
         vetted = load_vetted_shas()
         enrich_reports = []
-        for p in sorted(CVE_HISTORY_DIR.glob("*")):
+        for p in sorted(history_dir.glob("*")):
             if p.is_dir():
                 rep = enrich_catalog(p, vetted, dry_run=True, git_dir=git_dir)
                 if rep:
                     enrich_reports.append(rep)
-        if not verify_all_catalogs():
+                    _warn_over_limit(rep)
+        if not verify_all_catalogs(history_dir):
             sys.exit(1)
         total_overlap = sum(r.get("overlap", 0) for r in enrich_reports)
         total_entries = sum(r.get("entry_count", 0) for r in enrich_reports)
@@ -324,14 +361,15 @@ def main():
     vetted = load_vetted_shas()
     print(f"Loaded {len(vetted)} unique vetted advisory SHAs from Fable records.")
     enrich_reports = []
-    for p in sorted(CVE_HISTORY_DIR.glob("*")):
+    for p in sorted(history_dir.glob("*")):
         if p.is_dir():
             rep = enrich_catalog(p, vetted, dry_run=args.dry_run, git_dir=git_dir)
             if rep:
                 enrich_reports.append(rep)
                 print(f"  {rep['project']}: {rep['with_fix_sha']}/{rep['entry_count']} entries with validated fix SHA (overlap: {rep.get('overlap', 0)})")
+                _warn_over_limit(rep)
 
-    if not verify_all_catalogs():
+    if not verify_all_catalogs(history_dir):
         sys.exit(1)
 
     total_overlap = sum(r.get("overlap", 0) for r in enrich_reports)
