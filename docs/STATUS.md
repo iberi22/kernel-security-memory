@@ -10,8 +10,8 @@ Date: 2026-10-09 UTC.
 | CVE catalogs | 15 catalogs, 18,340 rows, 17,696 with a 40-hex fix SHA | `docs/studies/cve-history/manifest.json` |
 | Upstream snapshot catalogs | `linux-cna` 17,337 rows (all with fix SHA, kernel CNA `vulns.git`); `curl-upstream` 215 (189 SHA, 215 CWE); `openssl-upstream` 297 (169 SHA, 74 CWE) | `fetch_kernel_cna_shas.py`, `fetch_upstream_advisories.py` |
 | NVD keyword catalogs | 12, all `CURSOR_PAUSED` between 2000 and 2012; most rows of the 7 newer ones are unrelated products | `fetch_history_*.py` |
-| CWE coverage | 17,880 of 18,275 clustered CVEs are `UNKNOWN` (the kernel CNA publishes no CWE) | `docs/studies/pattern_clusters.json` |
-| Tests | 470 run, 2 skipped (live-network smoke tests) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| CWE coverage | 17,834 of 18,275 clustered CVEs (97.6%) are `UNKNOWN`; all 17,337 `linux-cna` rows lack a CWE because the kernel CNA publishes none. 65 ids present in two catalogs are counted once | `docs/studies/pattern_clusters.json` |
+| Tests | 471 run, 2 skipped (one live-network smoke test, one that needs the local OSV cache) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 

@@ -98,7 +98,8 @@ class TestEnrichRow(unittest.TestCase):
         self.assertEqual(row["fix_sha_source"], "osv")
         self.assertEqual(row["cwe"], "CWE-787")
         self.assertEqual(row["cwe_source"], "osv")
-        self.assertEqual(row["cwe_state"], "STATED_BY_OSV")
+        self.assertEqual(row["cwe_state"], "STATED_BY_ADVISORY")
+        self.assertEqual(row["cwe_source"], "osv")
         self.assertNotIn("fix_repo", row)
 
     def test_never_overwrite_existing_values(self):

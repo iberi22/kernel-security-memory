@@ -165,6 +165,10 @@ def verify_manifest() -> bool:
         print(f"Error: total_entries mismatch: {current['total_entries']} != {expected['total_entries']}", file=sys.stderr)
         return False
 
+    if current.get("total_with_fix_sha") != expected["total_with_fix_sha"]:
+        print(f"Error: total_with_fix_sha mismatch: {current.get('total_with_fix_sha')} != {expected['total_with_fix_sha']}", file=sys.stderr)
+        return False
+
     # Check status integrity
     for p in expected["projects"]:
         matching = [cp for cp in current.get("projects", []) if cp.get("name") == p["name"]]
@@ -174,6 +178,9 @@ def verify_manifest() -> bool:
         curr_p = matching[0]
         if curr_p.get("status") != p["status"]:
             print(f"Error: status mismatch for {p['name']}: {curr_p.get('status')} != {p['status']}", file=sys.stderr)
+            return False
+        if curr_p.get("files") != p["files"]:
+            print(f"Error: file hashes changed for {p['name']}; regenerate manifest.json", file=sys.stderr)
             return False
         if curr_p.get("cursor_date") != p["cursor_date"]:
             print(f"Error: cursor_date mismatch for {p['name']}: {curr_p.get('cursor_date')} != {p['cursor_date']}", file=sys.stderr)

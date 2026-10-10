@@ -228,7 +228,9 @@ def enrich_row(row, facts, upstream_repo):
     cwe = row.get("cwe")
     if not (isinstance(cwe, str) and cwe.strip()) and facts["cwes"]:
         row["cwe"] = facts["cwes"][0]
-        row["cwe_state"] = "STATED_BY_OSV"
+        # OSV is an advisory source: same state vocabulary as the NVD fetchers
+        # validate; the provenance is recorded separately in cwe_source.
+        row["cwe_state"] = "STATED_BY_ADVISORY"
         row["cwe_source"] = "osv"
 
 

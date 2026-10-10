@@ -188,7 +188,9 @@ def validate_offline():
                 return False
 
             allowed_keys = {"advisory_id", "published", "cwe", "cwe_state", "patch_urls", "fix_shas", "subsystem"}
-            if set(rec.keys()) != allowed_keys:
+            # Optional provenance keys written by the enrichers.
+            optional_keys = {"fix_sha_source", "cwe_source", "fix_repo"}
+            if not allowed_keys <= set(rec.keys()) <= allowed_keys | optional_keys:
                 print(f"Line {line_num} keys do not match expected schema: {set(rec.keys())}", file=sys.stderr)
                 return False
 

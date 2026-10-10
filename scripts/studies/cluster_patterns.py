@@ -56,7 +56,21 @@ def load_corpus():
             entry = json.loads(line)
             cve_id = entry["advisory_id"]
             entry["project"] = project
-            cves[cve_id] = entry
+            entry["catalogs"] = [project]
+            prev = cves.get(cve_id)
+            if prev is None:
+                cves[cve_id] = entry
+                continue
+            # The same advisory can appear in an NVD keyword catalog and in an
+            # upstream snapshot (curl/curl-upstream, openssl/openssl-upstream).
+            # Keep one row, union the fix SHAs and keep any stated CWE.
+            prev["catalogs"].append(project)
+            for sha in entry.get("fix_shas") or []:
+                if sha not in prev.setdefault("fix_shas", []):
+                    prev["fix_shas"].append(sha)
+            if not prev.get("cwe") and entry.get("cwe"):
+                prev["cwe"] = entry["cwe"]
+                prev["cwe_state"] = entry.get("cwe_state")
 
     # Enrich from fable records
     if FABLE_DIR.exists():
@@ -200,11 +214,14 @@ def build_graph_db(cves, clusters, db_path: Path):
     conn.close()
 
 
-def generate_markdown(clusters, total_cves):
+def generate_markdown(clusters, total_cves, merged_duplicates=0):
     md = [
         "# Vulnerability Pattern Clusters & Graph Taxonomy",
         "",
         f"Analysis across **{total_cves}** canonical CVE entries linking software components, CWE classes, preconditions, and fix commits.",
+        "",
+        (f"{merged_duplicates} advisory ids appear in more than one catalog (an NVD keyword catalog and an "
+         "upstream snapshot); each is counted once, with fix SHAs unioned and any stated CWE kept."),
         "",
         "## Summary by CWE Family",
         "",
@@ -241,23 +258,30 @@ def main():
 
     cves = load_corpus()
     clusters = cluster_families(cves)
+    merged_duplicates = sum(1 for c in cves.values() if len(c.get("catalogs", [])) > 1)
+    json_content = json.dumps({
+        "schema_version": "pattern-clusters-v1",
+        "total_cves": len(cves),
+        "merged_duplicate_ids": merged_duplicates,
+        "cluster_count": len(clusters),
+        "clusters": clusters,
+    }, indent=2, ensure_ascii=False) + "\n"
+    md_content = generate_markdown(clusters, len(cves), merged_duplicates) + "\n"
 
     if args.check:
         assert len(cves) > 0, "No CVEs loaded"
         assert len(clusters) > 0, "No clusters generated"
-        print(f"Validation OK: {len(cves)} CVEs categorized into {len(clusters)} CWE clusters.")
+        stale = [p.name for p, c in ((OUTPUT_JSON, json_content), (OUTPUT_MD, md_content))
+                 if not p.exists() or p.read_text() != c]
+        if stale:
+            print(f"Error: stale outputs {stale}; rerun cluster_patterns.py", file=sys.stderr)
+            sys.exit(1)
+        print(f"Validation OK: {len(cves)} CVEs categorized into {len(clusters)} CWE clusters "
+              f"({merged_duplicates} ids merged across catalogs).")
         return
 
-    # Write JSON and MD
-    OUTPUT_JSON.write_text(json.dumps({
-        "schema_version": "pattern-clusters-v1",
-        "total_cves": len(cves),
-        "cluster_count": len(clusters),
-        "clusters": clusters,
-    }, indent=2, ensure_ascii=False) + "\n")
-
-    md_content = generate_markdown(clusters, len(cves))
-    OUTPUT_MD.write_text(md_content + "\n")
+    OUTPUT_JSON.write_text(json_content)
+    OUTPUT_MD.write_text(md_content)
 
     # Build typed SQLite graph
     build_graph_db(cves, clusters, GRAPH_DB_PATH)

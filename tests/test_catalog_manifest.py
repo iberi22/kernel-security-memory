@@ -136,6 +136,23 @@ class TestCatalogManifest(unittest.TestCase):
         """Verify on-disk manifest passes self-check."""
         self.assertTrue(verify_manifest())
 
+    def test_verify_manifest_detects_stale_fix_sha_total(self):
+        import build_catalog_manifest as bcm
+        import io, json, tempfile
+        from contextlib import redirect_stderr, redirect_stdout
+        data = json.loads(bcm.MANIFEST_FILE.read_text(encoding="utf-8"))
+        data["total_with_fix_sha"] -= 1
+        original = bcm.MANIFEST_FILE
+        with tempfile.TemporaryDirectory() as tmp:
+            stale = Path(tmp) / "manifest.json"
+            stale.write_text(json.dumps(data), encoding="utf-8")
+            bcm.MANIFEST_FILE = stale
+            try:
+                with redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
+                    self.assertFalse(bcm.verify_manifest())
+            finally:
+                bcm.MANIFEST_FILE = original
+
 
 if __name__ == "__main__":
     unittest.main()
