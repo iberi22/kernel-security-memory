@@ -17,6 +17,11 @@ import urllib.parse
 import urllib.request
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+try:  # importable as a script, as scripts.studies.base_history_fetcher and top-level
+    from . import fetcher_io
+except ImportError:  # direct execution / sys.path import
+    import fetcher_io
+
 NVD_API_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 CWE_PATTERN = re.compile(r"^CWE-\d+$", re.IGNORECASE)
 CVE_PATTERN = re.compile(r"^CVE-[0-9]{4}-[0-9]{4,}$")
@@ -34,7 +39,7 @@ class BaseHistoryFetcher:
         keyword: str,
         out_dir: Path | str,
         window_start: str = "1999-01-01",
-        window_end: str = "2026-10-08",
+        window_end: Optional[str] = None,
         slice_days: int = 90,
         results_per_page: int = 200,
         max_calls: int = 400,
@@ -58,7 +63,9 @@ class BaseHistoryFetcher:
         self.catalog_path = self.out_dir / "catalog.jsonl"
 
         self.window_start = window_start
-        self.window_end = window_end
+        # window.end is the run date (UTC today, or KSM_TODAY), never a frozen
+        # literal: a frozen end stopped the refresh from scanning new CVEs.
+        self.window_end = window_end or fetcher_io.window_end_iso()
         self.slice_days = slice_days
         self.results_per_page = results_per_page
         self.max_calls = max_calls
@@ -84,41 +91,43 @@ class BaseHistoryFetcher:
         self.status: str = "NOT_FETCHED"
         self.cursor_date: Optional[str] = None
         self.window_closed: bool = False
+        # resume_present records whether a cursor was actually loaded, so the
+        # in-progress pre-save can never rewind (or overwrite) a COMPLETE state.
+        self.resume_present: bool = False
+        # errors holds this run's failures only; older ones are kept as capped
+        # history in error_history and never gate a later run.
+        self.error_history: List[str] = []
         self.current_start: datetime.date = datetime.date.fromisoformat(self.window_start)
         self.end_date_limit: datetime.date = datetime.date.fromisoformat(self.window_end)
 
         self.load_state()
 
     def load_state(self) -> None:
-        """Load persistent cursor and catalog state from disk if present."""
-        if self.catalog_path.is_file():
-            try:
-                for line in self.catalog_path.read_text(encoding="utf-8").splitlines():
-                    line = line.strip()
-                    if line:
-                        rec = json.loads(line)
-                        if "advisory_id" in rec:
-                            self.kept_records[rec["advisory_id"]] = rec
-            except Exception as e:
-                self.errors.append(f"Warning loading catalog {self.catalog_path}: {e}")
+        """Load persistent cursor and catalog state from disk if present.
 
-        if self.index_path.is_file():
-            try:
-                data = json.loads(self.index_path.read_text(encoding="utf-8"))
-                self.requests_count = data.get("requests", 0)
-                self.errors.extend([err for err in data.get("errors", []) if err not in self.errors])
-                self.coverage = data.get("coverage", "INCOMPLETE")
-                self.status = data.get("status", "NOT_FETCHED")
-                self.cursor_date = data.get("cursor_date")
-                self.window_closed = data.get("window_closed", False)
+        Corrupt files are fatal (``fetcher_io.CorruptStateError``): the previous
+        version appended a warning and kept going, so a truncated file was
+        rewritten as a shorter "valid" catalog.
+        """
+        self.kept_records = fetcher_io.read_catalog(self.catalog_path)
 
-                resume = data.get("resume")
-                if resume and isinstance(resume, dict) and "next_start_date" in resume:
-                    next_date_str = resume["next_start_date"]
-                    self.current_start = datetime.date.fromisoformat(next_date_str)
-                    self.cursor_date = next_date_str
-            except Exception as e:
-                self.errors.append(f"Warning loading index {self.index_path}: {e}")
+        data = fetcher_io.read_index(self.index_path)
+        if data is None:
+            return
+
+        self.requests_count = data.get("requests", 0)
+        self.errors, self.error_history = fetcher_io.load_error_history(data)
+        self.coverage = data.get("coverage", "INCOMPLETE")
+        self.status = data.get("status", "NOT_FETCHED")
+        self.cursor_date = data.get("cursor_date")
+        self.window_closed = data.get("window_closed", False)
+
+        resume = data.get("resume")
+        if resume and isinstance(resume, dict) and "next_start_date" in resume:
+            next_date_str = resume["next_start_date"]
+            self.current_start = datetime.date.fromisoformat(next_date_str)
+            self.cursor_date = next_date_str
+            self.resume_present = True
 
     def determine_status(self, entry_count: int, coverage: str, cursor_date: Optional[str]) -> Tuple[str, Optional[str], bool]:
         """Compute status, cursor date, and window_closed flag."""
@@ -137,17 +146,19 @@ class BaseHistoryFetcher:
         return "NOT_FETCHED", None, False
 
     def save_state(self, coverage: str, resume_obj: Optional[Dict[str, str]]) -> None:
-        """Persist catalog.jsonl and index.json deterministically."""
+        """Persist catalog.jsonl and index.json atomically, index last.
+
+        ``fetcher_io.write_catalog_atomic`` replaces ``catalog.jsonl`` through a
+        temp file, then ``write_index_atomic`` replaces ``index.json`` the same
+        way, so a run killed mid-write keeps the previous committed pair instead
+        of leaving a half-written file, and the index can never describe a
+        catalog that does not exist.
+        """
         self.out_dir.mkdir(parents=True, exist_ok=True)
         sorted_records = sorted(
             self.kept_records.values(),
             key=lambda r: (r.get("published", ""), r.get("advisory_id", ""))
         )
-
-        with open(self.catalog_path, "w", encoding="utf-8") as f:
-            for rec in sorted_records:
-                line = json.dumps(rec, separators=(",", ":"), ensure_ascii=False)
-                f.write(line + "\n")
 
         entry_count = len(sorted_records)
         with_fix_sha = sum(1 for r in sorted_records if r.get("fix_shas"))
@@ -181,10 +192,12 @@ class BaseHistoryFetcher:
             "requests": self.requests_count,
             "resume": resume_obj if coverage == "INCOMPLETE" else None,
             "errors": self.errors,
+            "error_history": fetcher_io.merge_error_history(self.error_history, self.errors),
             "notes": notes,
         }
 
-        self.index_path.write_text(json.dumps(index_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        fetcher_io.write_catalog_atomic(self.catalog_path, sorted_records)
+        fetcher_io.write_index_atomic(self.index_path, index_data)
         self.coverage = coverage
         self.status = status
         self.cursor_date = determined_cursor
@@ -323,10 +336,21 @@ class BaseHistoryFetcher:
         call_limit = max_calls or self.max_calls
         calls_this_run = 0
 
+        if self.coverage == "COMPLETE":
+            # The window is closed: return instead of re-fetching it, and above
+            # all without writing an INCOMPLETE cursor first (that used to rewind
+            # a COMPLETE catalog to window_start and lose its status).
+            print(f"Catalog is already COMPLETE ({self.status}); nothing to fetch.")
+            return True
+
         curr_start = self.current_start
 
-        # Pre-save state showing cursor paused or in progress
-        self.save_state("INCOMPLETE", {"next_start_date": curr_start.isoformat()})
+        # Pre-save the carried cursor so a crash mid-run keeps the previous
+        # position. Only ever written when a cursor was actually loaded: with no
+        # resume it would record an INCOMPLETE state at window_start, which is
+        # both a rewind and an overwrite of a COMPLETE catalog.
+        if self.resume_present:
+            self.save_state("INCOMPLETE", {"next_start_date": curr_start.isoformat()})
 
         while curr_start <= self.end_date_limit:
             if time.time() - start_wall_time > time_limit:
@@ -395,6 +419,10 @@ class BaseHistoryFetcher:
 
             curr_start = curr_end + datetime.timedelta(days=1)
 
+            if curr_start > self.end_date_limit:
+                # Coverage is COMPLETE: stop instead of looping on.
+                break
+
         # Window completed without interruption
         self.save_state("COMPLETE", None)
         print(f"Fetch completed across full window. Total records: {len(self.kept_records)}")
@@ -440,6 +468,11 @@ class BaseHistoryFetcher:
 
         if coverage == "COMPLETE" and index_data.get("resume") is not None:
             print("Error: resume must be null when coverage is COMPLETE", file=sys.stderr)
+            return False
+
+        window_ok, window_reason = fetcher_io.check_window(index_data.get("window"))
+        if not window_ok:
+            print(f"Error: invalid window: {window_reason}", file=sys.stderr)
             return False
 
         catalog_lines = []

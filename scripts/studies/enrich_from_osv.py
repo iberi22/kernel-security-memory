@@ -6,10 +6,18 @@ raw OSV response cached under docs/studies/cve-history/osv-cache/<ID>.json, so
 reruns and --offline reproduce the same output byte-for-byte.
 
 Data mapping (verified against https://api.osv.dev/v1/vulns/<CVE-ID>):
-  * fix SHAs  <- affected[].ranges[] with type == "GIT", events {"fixed": <sha>}
-                (strict 40-hex, reusing enrich_fix_shas.SHA_RE)
+  * fix SHAs  <- references typed FIX (or PATCH) whose URL is a 40-hex commit
+                in the project's own repository. Only those commits are the
+                fix: the advisory itself points at them.
   * CWE ids   <- database_specific.cwe_ids
   * aliases listed by a response are queried too and merged into the same facts.
+
+Deliberately NOT written: the GIT-range boundary commits (``fixed`` /
+``last_affected`` events). OSV derives those from the affected version range, so
+they are the first commit that contains the fix - usually a merge, a release
+stamp or a version bump, and sometimes in another repository the CVE record also
+lists. They delimit a version range; they are not the fix, and writing them into
+fix_shas is what round 1 of the upstream catalogs did and had to undo.
 
 KSM_CVE_HISTORY_DIR overrides the catalog root (used by tests/test_enrich_from_osv.py).
 
@@ -38,6 +46,11 @@ USER_AGENT = "ksm-osv-enrich/1.0 (+https://github.com/iberi22/kernel-security-me
 MIN_DELAY_S = 0.25  # polite rate limit (spec: >= 0.2s between requests)
 MAX_ATTEMPTS = 5
 REQUEST_TIMEOUT_S = 30
+# Reference types an advisory uses to point at the commit that fixes it.
+# "PATCH" is the CVE 5.x spelling; OSV itself emits "FIX".
+FIX_REFERENCE_TYPES = ("FIX", "PATCH")
+HEX40_URL_RE = re.compile(r"[0-9a-f]{40}")
+HEX_CHARS = "0123456789abcdef"
 CWE_RE = re.compile(r"^CWE-\d+$")
 SAFE_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
@@ -60,24 +73,44 @@ def is_osv_vuln(doc):
     return isinstance(doc, dict) and bool(doc.get("id")) and "code" not in doc
 
 
-def extract_fix_events(doc):
-    """Return [(sha, repo_url|None)] from GIT ranges 'fixed' events of an OSV doc."""
-    fixes = []
-    for affected in doc.get("affected") or []:
-        if not isinstance(affected, dict):
+def repo_path(url):
+    """The host/path part of a repository URL, e.g. github.com/curl/curl.
+
+    Used with a trailing "/" to match links inside that repository, so that
+    github.com/systemd/systemd never matches github.com/systemd/systemd-stable.
+    """
+    value = normalize_repo(url)
+    return value.split("://", 1)[-1] if value else ""
+
+
+def extract_fix_reference_shas(doc, upstream_repo):
+    """Return the commit SHAs the advisory itself types as FIX/PATCH.
+
+    Only links that are a 40-hex commit inside ``upstream_repo`` qualify. GIT
+    range events are not consulted: they are version boundaries, not fix
+    commits (see the module docstring).
+    """
+    marker = repo_path(upstream_repo)
+    if not marker:
+        return []
+    marker += "/"
+    shas = []
+    for reference in doc.get("references") or []:
+        if not isinstance(reference, dict) or reference.get("type") not in FIX_REFERENCE_TYPES:
             continue
-        for rng in affected.get("ranges") or []:
-            if not isinstance(rng, dict) or rng.get("type") != "GIT":
+        url = reference.get("url")
+        if not isinstance(url, str) or marker not in url:
+            continue
+        for match in HEX40_URL_RE.finditer(url):
+            begin, end = match.span()
+            if begin > 0 and url[begin - 1] in HEX_CHARS:
                 continue
-            repo = rng.get("repo")
-            repo = repo.strip() if isinstance(repo, str) and repo.strip() else None
-            for event in rng.get("events") or []:
-                if not isinstance(event, dict) or "fixed" not in event:
-                    continue
-                sha = str(event["fixed"]).strip().lower()
-                if SHA_RE.fullmatch(sha):
-                    fixes.append((sha, repo))
-    return fixes
+            if end < len(url) and url[end] in HEX_CHARS:
+                continue
+            sha = match.group(0)
+            if SHA_RE.fullmatch(sha) and sha not in shas:
+                shas.append(sha)
+    return shas
 
 
 def extract_cwe_ids(doc):
@@ -178,7 +211,7 @@ class OsvClient:
         return doc
 
 
-def collect_osv_facts(client, advisory_id):
+def collect_osv_facts(client, advisory_id, upstream_repo):
     """Merge fix SHAs and CWE ids from the advisory and the aliases OSV lists."""
     facts = {"fixes": [], "cwes": [], "queried": [], "missing": []}
     pending = [(advisory_id, 0)]
@@ -193,9 +226,9 @@ def collect_osv_facts(client, advisory_id):
             facts["missing"].append(vuln_id)
             continue
         facts["queried"].append(vuln_id)
-        for fix in extract_fix_events(doc):
-            if fix not in facts["fixes"]:
-                facts["fixes"].append(fix)
+        for sha in extract_fix_reference_shas(doc, upstream_repo):
+            if sha not in facts["fixes"]:
+                facts["fixes"].append(sha)
         for cwe in extract_cwe_ids(doc):
             if cwe not in facts["cwes"]:
                 facts["cwes"].append(cwe)
@@ -206,24 +239,17 @@ def collect_osv_facts(client, advisory_id):
     return facts
 
 
-def enrich_row(row, facts, upstream_repo):
+def enrich_row(row, facts):
     """Fill fix_shas/cwe from OSV facts without ever overwriting existing values."""
-    upstream = normalize_repo(upstream_repo)
-
     current = [s for s in (row.get("fix_shas") or []) if isinstance(s, str)]
-    foreign_repos = []
     added_sha = False
-    for sha, repo in facts["fixes"]:
+    for sha in facts["fixes"]:
         if sha not in current:
             current.append(sha)
             added_sha = True
-        if repo and normalize_repo(repo) != upstream and repo not in foreign_repos:
-            foreign_repos.append(repo)
     if added_sha:
         row["fix_shas"] = current
         row["fix_sha_source"] = "osv"
-        if foreign_repos and not (isinstance(row.get("fix_repo"), str) and row["fix_repo"].strip()):
-            row["fix_repo"] = foreign_repos[0] if len(foreign_repos) == 1 else sorted(foreign_repos)
 
     cwe = row.get("cwe")
     if not (isinstance(cwe, str) and cwe.strip()) and facts["cwes"]:
@@ -272,10 +298,10 @@ def enrich_project(project_dir, client):
         if not advisory_id:
             stats["not_in_osv"] += 1
             continue
-        facts = collect_osv_facts(client, str(advisory_id))
+        facts = collect_osv_facts(client, str(advisory_id), upstream_repo)
         if not facts["queried"]:
             stats["not_in_osv"] += 1
-        enrich_row(row, facts, upstream_repo)
+        enrich_row(row, facts)
 
     stats["with_fix_sha_before"] = index_data.get("with_fix_sha_before", baseline_fix_sha)
     stats["with_fix_sha"] = count(lambda row: bool(row.get("fix_shas")))

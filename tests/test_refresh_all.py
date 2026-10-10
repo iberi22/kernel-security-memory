@@ -302,10 +302,10 @@ class PlanBuildingTest(unittest.TestCase):
             self.assertNotIn(str(root / "docs" / "studies" / "cve-history" / "linux"), cna.argv)
 
     def test_osv_enricher_skips_projects_whose_validator_rejects_its_keys(self):
-        # The enricher writes fix_sha_source / cwe_source / fix_repo and
-        # rewrites cwe_state; git, postgresql, qemu, sqlite, systemd and
-        # unbound still require the exact seven-key row, so enriching them
-        # fails their own --offline step and would abort the refresh.
+        # The enricher writes fix_sha_source / cwe_source and rewrites
+        # cwe_state; git, postgresql, qemu, sqlite, systemd and unbound still
+        # require the exact seven-key row, so enriching them fails their own
+        # --offline step and would abort the refresh.
         with StubRepo([], enrichers=[refresh_all.ENRICH_FROM_OSV]) as repo:
             with contextlib.redirect_stdout(io.StringIO()):
                 plan = plan_of(repo.root, list(refresh_all.PROJECTS), 600, False)
@@ -592,8 +592,8 @@ class SnapshotCatalogStepsTest(unittest.TestCase):
     def test_offline_only_checks_snapshots_when_the_cache_exists(self):
         with StubRepo([], snapshots=True) as repo:
             (repo.root / "vulns" / CNA_RECORDS_DIR).mkdir(parents=True)
-            for subdir in ("curl-upstream", "openssl-upstream"):
-                snapshot = repo.root / "docs" / "studies" / "cve-history" / subdir / "source.json"
+            for _project, relative in refresh_all.UPSTREAM_CATALOGS:
+                snapshot = repo.root / "docs" / "studies" / "cve-history" / relative.name / "source.json"
                 snapshot.parent.mkdir(parents=True, exist_ok=True)
                 snapshot.write_text("{}\n", encoding="utf-8")
             code = refresh_all.main(["--offline-only"])
@@ -602,7 +602,7 @@ class SnapshotCatalogStepsTest(unittest.TestCase):
         keys = [inv[0] for inv in invocations]
         self.assertIn(f"{KERNEL_CNA_SCRIPT} --check", keys)
         self.assertIn(f"{UPSTREAM_SCRIPT} --offline", keys)
-        self.assertEqual(keys.count(f"{UPSTREAM_SCRIPT} --offline"), 2)
+        self.assertEqual(keys.count(f"{UPSTREAM_SCRIPT} --offline"), len(refresh_all.UPSTREAM_CATALOGS))
         cna = [args for args in invocations if args[0] == f"{KERNEL_CNA_SCRIPT} --check"][0]
         self.assertIn("--build-catalog", cna)
         self.assertIn(str(repo.root / "docs" / "studies" / "cve-history" / "linux-cna"), cna)

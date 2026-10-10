@@ -1,11 +1,12 @@
 {
-  "evidence_chain_hash": "c5d4e845edce636477e65f279062f190fd9f95b880e7f4466d358026ba95b7d3",
+  "evidence_chain_hash": "cc5d8dbb0bc050e1ed422c1452ba09e20e70797276e6a59ebc2575b6fa406a0a",
   "audit": {
     "schema_version": "defensive-evidence-chain-v1",
     "target": "scripts",
-    "timestamp": "2026-10-10T02:55:08.023146+00:00",
-    "files_audited_count": 49,
+    "timestamp": "2026-10-10T13:54:10.164187+00:00",
+    "files_audited_count": 53,
     "files_audited": [
+      "scripts/build_guardrails.py",
       "scripts/build_pack.py",
       "scripts/convert_fable_records.py",
       "scripts/defensive_auditor.py",
@@ -14,6 +15,7 @@
       "scripts/measure_baseline.py",
       "scripts/mine_ast.py",
       "scripts/mine_candidates.py",
+      "scripts/mine_pack_fragments.py",
       "scripts/open_pack.py",
       "scripts/pack_to_xavier.py",
       "scripts/quality_gate.py",
@@ -22,6 +24,7 @@
       "scripts/render_review.py",
       "scripts/studies/base_history_fetcher.py",
       "scripts/studies/build_catalog_manifest.py",
+      "scripts/studies/build_cwe_overlay.py",
       "scripts/studies/cluster_patterns.py",
       "scripts/studies/enrich_fix_shas.py",
       "scripts/studies/enrich_from_osv.py",
@@ -54,9 +57,11 @@
       "scripts/studies/fetch_systemd.py",
       "scripts/studies/fetch_unbound.py",
       "scripts/studies/fetch_upstream_advisories.py",
+      "scripts/studies/fetcher_io.py",
       "scripts/studies/refresh_all.py"
     ],
     "file_digests": {
+      "scripts/build_guardrails.py": "2d6e69c75e5133b5afe1c0ecc1504c61518d901c964a6b74bc4e68c6d9c5a936",
       "scripts/build_pack.py": "6e99f2400a44b05633259a447e91f9dafe39e1fa5111d7978309b2f6cc6d1f0c",
       "scripts/convert_fable_records.py": "c748c090d009a1e7f9283ec1cdf0eb43b9ef947119a87b5554b763377985dbd2",
       "scripts/defensive_auditor.py": "1d2884af5e6d6e569592520df27737b55d3212e7f9020ac5deec00c7067712fa",
@@ -65,32 +70,34 @@
       "scripts/measure_baseline.py": "9ed893e6a327574c4716e05fbd10ecc91765bfa5002bd9dc4a4df0b2e805daa3",
       "scripts/mine_ast.py": "4c0d4e8b885ad9ff2b86706a4592b1041b5fec6a69e006a9ba5b5eb51220353f",
       "scripts/mine_candidates.py": "bdaa9b731122f41961c08e15a97a24d59990e863f38bc8ba42b3a0873a2e3e99",
+      "scripts/mine_pack_fragments.py": "b13817827fe89c3f53005dfe6067857df40e3c668aab2b052c0ee523dd147d1c",
       "scripts/open_pack.py": "1ba0a4f87f3ce33f4ae242160ba0fcb8926569c3d423a03abc22ab17ca8f194b",
       "scripts/pack_to_xavier.py": "91c6500b7b10320988ff3c227e5c77d1ddab7d2ef3a3f22e8bc37f8dc3203de4",
-      "scripts/quality_gate.py": "6ce744f9c98129534035f96428e1ff41598eb626e982eef1b68fac072adf1e30",
+      "scripts/quality_gate.py": "802f7227f43310dd4d3b42e484230cd8210abffee2a4e1b3cf8c91a58ed7393f",
       "scripts/query_graph.py": "82fdb1c7a5ed116e72ff99b99ab8532e0cf8ef5108786bedebe41389404a7e18",
       "scripts/query_pack.py": "954f8c0571fe802eec5bea65290a1d2e3e1e64feec5ce91bcaaa3857d97d90a0",
       "scripts/render_review.py": "560b94c960adc48225062cfe0d7a9a9e612fa42a08ee37e55cab05ea705dd3e2",
-      "scripts/studies/base_history_fetcher.py": "47d9894db35ce0fac9dfb56599792df46a736f2faa892a72d7466379a8ba70e6",
+      "scripts/studies/base_history_fetcher.py": "c652fb51ac4887a8d4a884264a0af1fc522cff84ae424c23b32cfc4666fc8acc",
       "scripts/studies/build_catalog_manifest.py": "10f92709cec883ad599756940609ed32697576306ceb8c8f5be9334002f7f200",
-      "scripts/studies/cluster_patterns.py": "790f19dd8aacca60daaac2ab692d7a92b6f86df2a4217babd0e0657c7ff7cb80",
-      "scripts/studies/enrich_fix_shas.py": "e569a34994dd06005d2998abeb27044d3b832939b5f911a24b286fae13ab33ae",
-      "scripts/studies/enrich_from_osv.py": "e359a56152192d58dedc9e8ba64f7999ecd135432ada7e6c4ea268f560a4bb18",
+      "scripts/studies/build_cwe_overlay.py": "12fef0ead68c0dac4983d27486a781254e7c80486f59276da1ac418e9d078d95",
+      "scripts/studies/cluster_patterns.py": "d8d5e8ee076a376236e835b320dda433bd7890d604c492a01d2979ad9f449962",
+      "scripts/studies/enrich_fix_shas.py": "2aa28132e24afbfcfeb23e0a993ba9ecc8049bcbf69cda9082865fb8a08878cf",
+      "scripts/studies/enrich_from_osv.py": "30dd08d0a1a139dc57c7c5071ee57e5f70314e22220c336c704256f57a9e6b3f",
       "scripts/studies/fetch_curl.py": "a30e8231775e5a6a2b8c8d976d8676ba75fcc2c8bd4fff246dcc8e83b45d2506",
       "scripts/studies/fetch_git.py": "f5d4073ccec4ea774c54466351a5373951504f491598a4ef401bd49a8b4aad85",
       "scripts/studies/fetch_glibc.py": "b976cb013bd118ec2a3e2b74100e4ce07954964cba0beea64239262ddf65d890",
-      "scripts/studies/fetch_history_curl.py": "f5994ce96864fadb624e38ec50522882143084feef4f6de485a7112be5ca59ce",
-      "scripts/studies/fetch_history_git.py": "39557ea8b62d6454d38ae370cc4f1fab991ec394d7c2b23e89f8a9679e72fa22",
-      "scripts/studies/fetch_history_glibc.py": "e8698fec4002f5adf4e8a84839973921f65eaa5f2c85036767cbab6f4877edc6",
-      "scripts/studies/fetch_history_linux.py": "76b5367b1aa006d8f1027d187d8882525d4e547f0317ff2b656a4cd4fd410cf5",
-      "scripts/studies/fetch_history_nginx.py": "ed4f02759fa08b99d3498a94dcbc3843174413b2d9d45e10d6de571b509f2a00",
-      "scripts/studies/fetch_history_openssh.py": "1f8051d3e83e645045e7e7ad6b177659c096c6518ae58ec88fda225bc25bef8f",
-      "scripts/studies/fetch_history_openssl.py": "71fccf4cc2cf7af878f4f5494732fc5b0268ad2317b86093d6376644fb928dc2",
-      "scripts/studies/fetch_history_postgresql.py": "aa4eb0379f80fcc844f961ddbd82c1e5dd97d4ba729af6b4b51be03ce8aa1410",
-      "scripts/studies/fetch_history_qemu.py": "3d15e252ffb5a53cd4381718734e35033163d133e93518254cfd679b229444da",
-      "scripts/studies/fetch_history_sqlite.py": "6cc5455ec84e00ca05d63f32c0586cd020ed205b39d02b5c4fb751755463b6f9",
-      "scripts/studies/fetch_history_systemd.py": "bf22ffb19bf8593f357aba229c44b84714eb96690718a2c734595270323614dc",
-      "scripts/studies/fetch_history_unbound.py": "88edb24688b001024c6df9f8b86b69f16c1c72cf7d48976dbdf38d93e2444a43",
+      "scripts/studies/fetch_history_curl.py": "4cd5165bf80fd525516a30a1f7c11bde8d5e08438cebf8201270e14b525f5412",
+      "scripts/studies/fetch_history_git.py": "433147f004b20e81f1466261e273b3ed1dfe015c4cd8ef16f32334505afaa348",
+      "scripts/studies/fetch_history_glibc.py": "fb24c415062631fc88835c7085e9b2d58c97cb7efee44909fa8d49b35137547d",
+      "scripts/studies/fetch_history_linux.py": "60112b77899dbbdc790ba5609646ae735ede2344efa885b4696e17c7427c564a",
+      "scripts/studies/fetch_history_nginx.py": "39ec933ef63353b59f1a49a274bea6368593a937c6cd1d9200db89e86652591b",
+      "scripts/studies/fetch_history_openssh.py": "116e0d63ace4a34ed65cfa371a8a138d4bf57d2a41cb2ba569ed1180ed37ec4f",
+      "scripts/studies/fetch_history_openssl.py": "f2f977e0e06c6528464596dd11ed95d58e40820a2fa6d8db738e3ee1fe7d819e",
+      "scripts/studies/fetch_history_postgresql.py": "4259e3233bbb824eed3d587473595e51a16c2fddf6c1384cd1990f669b137a34",
+      "scripts/studies/fetch_history_qemu.py": "457c3a5664644aa4e928633270c9963ebc8b5e56fe08797f4145ac5225e1ce13",
+      "scripts/studies/fetch_history_sqlite.py": "8d72cd34313d2e5778e15bf60fbb8f0304bede789f2ce38e4324719498d379e9",
+      "scripts/studies/fetch_history_systemd.py": "a17486c022601a98a2ec3652dbd9e65838556cdb335e0d6e79a04d4d1ed4aed3",
+      "scripts/studies/fetch_history_unbound.py": "f6b63476f6df0c02c5eb5c031673d8b52f90eadad5f8c60aab3b7948c2be7f22",
       "scripts/studies/fetch_kernel_cna_shas.py": "8d4ebd74e13b7dec0eaafdf3b9f1316cb1b503fa9633c3843fd52558a3de0307",
       "scripts/studies/fetch_linux_bpf.py": "9ac25ef904e4531038b5541db52c39ac67a0263f808508545f8daac6f3af7073",
       "scripts/studies/fetch_linux_fs.py": "f08df40917d148533630d95c4a6d38b73e21df45c454137ed11c82ed95e84105",
@@ -104,8 +111,9 @@
       "scripts/studies/fetch_sqlite.py": "e18bcfa42c44cc692361bbd187e4e054f70305c9b4cc528ae68c10784fb5f0eb",
       "scripts/studies/fetch_systemd.py": "c6e01b8f967567f13cb59ce2aba2c937ee64983dda2d5b62e75f94cc8399d1bf",
       "scripts/studies/fetch_unbound.py": "3fcc6771f79ac1171123c58e3f37d3f8758632701b323526e3d74eabb3d5a91d",
-      "scripts/studies/fetch_upstream_advisories.py": "6bc58f7733e907a46797618d13551f70b6f797745f89695d2537da8272f0c888",
-      "scripts/studies/refresh_all.py": "9bf8e01aa7836dfa4d900e74fea86a59a25a20cbcfa4d8f992201b81bc33431a"
+      "scripts/studies/fetch_upstream_advisories.py": "8f90ff0d2196fa81fecd4abc693d0f20c275beabf18633daa1e75d739a00d806",
+      "scripts/studies/fetcher_io.py": "cb92600a6ffa0b209ef06b64af18108dfa3cbc9cd79c209c86ba11b60ccbdde3",
+      "scripts/studies/refresh_all.py": "e9b079f4bb7990d63b887832ad085d76826bb97d08a3adc76db063c936718795"
     },
     "findings_count": 0,
     "findings": [],
@@ -128,6 +136,7 @@
     ],
     "deterministic_payload": {
       "files_audited": [
+        "scripts/build_guardrails.py",
         "scripts/build_pack.py",
         "scripts/convert_fable_records.py",
         "scripts/defensive_auditor.py",
@@ -136,6 +145,7 @@
         "scripts/measure_baseline.py",
         "scripts/mine_ast.py",
         "scripts/mine_candidates.py",
+        "scripts/mine_pack_fragments.py",
         "scripts/open_pack.py",
         "scripts/pack_to_xavier.py",
         "scripts/quality_gate.py",
@@ -144,6 +154,7 @@
         "scripts/render_review.py",
         "scripts/studies/base_history_fetcher.py",
         "scripts/studies/build_catalog_manifest.py",
+        "scripts/studies/build_cwe_overlay.py",
         "scripts/studies/cluster_patterns.py",
         "scripts/studies/enrich_fix_shas.py",
         "scripts/studies/enrich_from_osv.py",
@@ -176,9 +187,14 @@
         "scripts/studies/fetch_systemd.py",
         "scripts/studies/fetch_unbound.py",
         "scripts/studies/fetch_upstream_advisories.py",
+        "scripts/studies/fetcher_io.py",
         "scripts/studies/refresh_all.py"
       ],
       "file_digests": [
+        [
+          "scripts/build_guardrails.py",
+          "2d6e69c75e5133b5afe1c0ecc1504c61518d901c964a6b74bc4e68c6d9c5a936"
+        ],
         [
           "scripts/build_pack.py",
           "6e99f2400a44b05633259a447e91f9dafe39e1fa5111d7978309b2f6cc6d1f0c"
@@ -212,6 +228,10 @@
           "bdaa9b731122f41961c08e15a97a24d59990e863f38bc8ba42b3a0873a2e3e99"
         ],
         [
+          "scripts/mine_pack_fragments.py",
+          "b13817827fe89c3f53005dfe6067857df40e3c668aab2b052c0ee523dd147d1c"
+        ],
+        [
           "scripts/open_pack.py",
           "1ba0a4f87f3ce33f4ae242160ba0fcb8926569c3d423a03abc22ab17ca8f194b"
         ],
@@ -221,7 +241,7 @@
         ],
         [
           "scripts/quality_gate.py",
-          "6ce744f9c98129534035f96428e1ff41598eb626e982eef1b68fac072adf1e30"
+          "802f7227f43310dd4d3b42e484230cd8210abffee2a4e1b3cf8c91a58ed7393f"
         ],
         [
           "scripts/query_graph.py",
@@ -237,23 +257,27 @@
         ],
         [
           "scripts/studies/base_history_fetcher.py",
-          "47d9894db35ce0fac9dfb56599792df46a736f2faa892a72d7466379a8ba70e6"
+          "c652fb51ac4887a8d4a884264a0af1fc522cff84ae424c23b32cfc4666fc8acc"
         ],
         [
           "scripts/studies/build_catalog_manifest.py",
           "10f92709cec883ad599756940609ed32697576306ceb8c8f5be9334002f7f200"
         ],
         [
+          "scripts/studies/build_cwe_overlay.py",
+          "12fef0ead68c0dac4983d27486a781254e7c80486f59276da1ac418e9d078d95"
+        ],
+        [
           "scripts/studies/cluster_patterns.py",
-          "790f19dd8aacca60daaac2ab692d7a92b6f86df2a4217babd0e0657c7ff7cb80"
+          "d8d5e8ee076a376236e835b320dda433bd7890d604c492a01d2979ad9f449962"
         ],
         [
           "scripts/studies/enrich_fix_shas.py",
-          "e569a34994dd06005d2998abeb27044d3b832939b5f911a24b286fae13ab33ae"
+          "2aa28132e24afbfcfeb23e0a993ba9ecc8049bcbf69cda9082865fb8a08878cf"
         ],
         [
           "scripts/studies/enrich_from_osv.py",
-          "e359a56152192d58dedc9e8ba64f7999ecd135432ada7e6c4ea268f560a4bb18"
+          "30dd08d0a1a139dc57c7c5071ee57e5f70314e22220c336c704256f57a9e6b3f"
         ],
         [
           "scripts/studies/fetch_curl.py",
@@ -269,51 +293,51 @@
         ],
         [
           "scripts/studies/fetch_history_curl.py",
-          "f5994ce96864fadb624e38ec50522882143084feef4f6de485a7112be5ca59ce"
+          "4cd5165bf80fd525516a30a1f7c11bde8d5e08438cebf8201270e14b525f5412"
         ],
         [
           "scripts/studies/fetch_history_git.py",
-          "39557ea8b62d6454d38ae370cc4f1fab991ec394d7c2b23e89f8a9679e72fa22"
+          "433147f004b20e81f1466261e273b3ed1dfe015c4cd8ef16f32334505afaa348"
         ],
         [
           "scripts/studies/fetch_history_glibc.py",
-          "e8698fec4002f5adf4e8a84839973921f65eaa5f2c85036767cbab6f4877edc6"
+          "fb24c415062631fc88835c7085e9b2d58c97cb7efee44909fa8d49b35137547d"
         ],
         [
           "scripts/studies/fetch_history_linux.py",
-          "76b5367b1aa006d8f1027d187d8882525d4e547f0317ff2b656a4cd4fd410cf5"
+          "60112b77899dbbdc790ba5609646ae735ede2344efa885b4696e17c7427c564a"
         ],
         [
           "scripts/studies/fetch_history_nginx.py",
-          "ed4f02759fa08b99d3498a94dcbc3843174413b2d9d45e10d6de571b509f2a00"
+          "39ec933ef63353b59f1a49a274bea6368593a937c6cd1d9200db89e86652591b"
         ],
         [
           "scripts/studies/fetch_history_openssh.py",
-          "1f8051d3e83e645045e7e7ad6b177659c096c6518ae58ec88fda225bc25bef8f"
+          "116e0d63ace4a34ed65cfa371a8a138d4bf57d2a41cb2ba569ed1180ed37ec4f"
         ],
         [
           "scripts/studies/fetch_history_openssl.py",
-          "71fccf4cc2cf7af878f4f5494732fc5b0268ad2317b86093d6376644fb928dc2"
+          "f2f977e0e06c6528464596dd11ed95d58e40820a2fa6d8db738e3ee1fe7d819e"
         ],
         [
           "scripts/studies/fetch_history_postgresql.py",
-          "aa4eb0379f80fcc844f961ddbd82c1e5dd97d4ba729af6b4b51be03ce8aa1410"
+          "4259e3233bbb824eed3d587473595e51a16c2fddf6c1384cd1990f669b137a34"
         ],
         [
           "scripts/studies/fetch_history_qemu.py",
-          "3d15e252ffb5a53cd4381718734e35033163d133e93518254cfd679b229444da"
+          "457c3a5664644aa4e928633270c9963ebc8b5e56fe08797f4145ac5225e1ce13"
         ],
         [
           "scripts/studies/fetch_history_sqlite.py",
-          "6cc5455ec84e00ca05d63f32c0586cd020ed205b39d02b5c4fb751755463b6f9"
+          "8d72cd34313d2e5778e15bf60fbb8f0304bede789f2ce38e4324719498d379e9"
         ],
         [
           "scripts/studies/fetch_history_systemd.py",
-          "bf22ffb19bf8593f357aba229c44b84714eb96690718a2c734595270323614dc"
+          "a17486c022601a98a2ec3652dbd9e65838556cdb335e0d6e79a04d4d1ed4aed3"
         ],
         [
           "scripts/studies/fetch_history_unbound.py",
-          "88edb24688b001024c6df9f8b86b69f16c1c72cf7d48976dbdf38d93e2444a43"
+          "f6b63476f6df0c02c5eb5c031673d8b52f90eadad5f8c60aab3b7948c2be7f22"
         ],
         [
           "scripts/studies/fetch_kernel_cna_shas.py",
@@ -369,14 +393,18 @@
         ],
         [
           "scripts/studies/fetch_upstream_advisories.py",
-          "6bc58f7733e907a46797618d13551f70b6f797745f89695d2537da8272f0c888"
+          "8f90ff0d2196fa81fecd4abc693d0f20c275beabf18633daa1e75d739a00d806"
+        ],
+        [
+          "scripts/studies/fetcher_io.py",
+          "cb92600a6ffa0b209ef06b64af18108dfa3cbc9cd79c209c86ba11b60ccbdde3"
         ],
         [
           "scripts/studies/refresh_all.py",
-          "9bf8e01aa7836dfa4d900e74fea86a59a25a20cbcfa4d8f992201b81bc33431a"
+          "e9b079f4bb7990d63b887832ad085d76826bb97d08a3adc76db063c936718795"
         ]
       ],
-      "files_audited_count": 49,
+      "files_audited_count": 53,
       "findings": [],
       "findings_count": 0,
       "ksm_pack_reference": "kernel-security-memory-bootstrap-v0",

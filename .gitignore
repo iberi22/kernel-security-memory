@@ -17,3 +17,16 @@ node_modules/
 # kept as a local cache only; index.json records the source URL and sha256.
 docs/studies/cve-history/osv-cache/
 docs/studies/cve-history/*-upstream/source.*
+
+# Raw NVD 2.0 JSON data feeds and CISA vulnrichment files (third-party, may
+# carry weak-type text): local cache only, never committed. The deterministic
+# overlay in docs/studies/cwe-overlay.jsonl stores only advisory_id -> CWE plus
+# the feed and a feed_ref (the sha256 of the cached NVD .gz, or the vulnrichment
+# commit SHA for cisa-adp rows). CWE ids are facts; descriptions are not stored.
+docs/studies/nvd-cache/
+docs/studies/cisa-cache/
+
+# mine_pack_fragments.py cache: raw upstream patches + file contents fetched from
+# the fix commits (third-party terms, docs/DATA-POLICY.md). Only derived,
+# code-free features are committed under docs/studies/fragments/.
+docs/studies/fragments-cache/

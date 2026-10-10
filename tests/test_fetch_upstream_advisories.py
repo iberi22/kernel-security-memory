@@ -26,13 +26,22 @@ from fetch_upstream_advisories import (  # noqa: E402
     OPENSSL_CVE_RE,
     OPENSSL_ENTRY_RE,
     OPENSSL_INDEX_URL,
+    OSV_API_URL,
+    OSV_GIT_ECOSYSTEM,
+    OSV_PROJECTS,
+    PROJECT_META,
     SNAPSHOT_LIMIT_BYTES,
     SNAPSHOT_SCHEMA,
     FetchError,
+    _commit_sha_in_repo,
     _curl_rows,
     _first_sha,
     _http_get,
+    _http_post_json,
     _openssl_rows,
+    _osv_advisory_id,
+    _osv_rows,
+    _standalone_hex40,
     build_catalog,
     _dump,
 )
@@ -45,6 +54,19 @@ ROW_KEYS = [
     "cwe_state",
     "patch_urls",
     "fix_shas",
+    "subsystem",
+    "fix_sha_source",
+]
+# The OSV rows carry one extra column: the GIT-range boundaries are kept apart
+# from the commits the advisory itself calls the fix (see _osv_rows).
+OSV_ROW_KEYS = [
+    "advisory_id",
+    "published",
+    "cwe",
+    "cwe_state",
+    "patch_urls",
+    "fix_shas",
+    "fixed_in_shas",
     "subsystem",
     "fix_sha_source",
 ]
@@ -404,7 +426,8 @@ class TestCliOffline(unittest.TestCase):
         directory = self._prepare("curl", curl_fixture())
         check = run_cli("--project", "curl", "--out-dir", str(directory), "--offline", "--check")
         self.assertEqual(check.returncode, 0, check.stderr)
-        self.assertIn("3 entries, 2 with fix sha, 3 with cwe", check.stdout)
+        # curl rows keep the seven-key shape, so they carry no fixed_in_shas.
+        self.assertIn("OK curl: 3 entries, 2 with fix sha, 0 with fixed_in, 3 with cwe", check.stdout)
 
     def test_check_fails_when_catalog_is_tampered(self):
         directory = self._prepare("curl", curl_fixture())
@@ -471,6 +494,437 @@ class TestSnapshotGuard(unittest.TestCase):
         try:
             with self.assertRaises(FetchError) as caught:
                 _http_get("https://curl.se/docs/vuln.json")
+        finally:
+            urllib.request.urlopen = original
+        self.assertIn("exceeds", str(caught.exception))
+
+
+# ------------------------------------------------------------------------- OSV
+
+
+def osv_fixture_records():
+    """OSV.dev GIT-ecosystem records covering every extraction branch."""
+    return [
+        {
+            "id": "CVE-2024-32002",
+            "aliases": ["GHSA-8h77-4q3w-gfgv", "BIT-git-2024-32002"],
+            "published": "2024-01-24T00:00:00Z",
+            "modified": "2026-08-07T00:00:00Z",
+            "database_specific": {
+                "cwe_ids": ["CWE-22", "CWE-434"],
+                "osv_generated_from": "https://github.com/CVEProject/cvelistV5/tree/x.json",
+            },
+            "references": [
+                {"url": "https://github.com/git/git/security/advisories/GHSA-8h77-4q3w-gfgv"},
+                {"type": "FIX", "url": "https://github.com/git/git/commit/" + "a" * 40},
+                {"type": "PATCH", "url": "https://github.com/git/git/commit/" + "a" * 40},
+            ],
+            "affected": [
+                {
+                    "ranges": [
+                        {"type": "GIT", "repo": "https://github.com/git/git", "events": [
+                            {"introduced": "0" * 40},
+                            {"fixed": "b" * 40},
+                            {"fixed": "b" * 40},
+                            {"fixed": "c" * 40},
+                            {"last_affected": "d" * 40},
+                        ]},
+                        {"type": "SEMVER", "events": [{"fixed": "2.43.4"}]},
+                    ]
+                }
+            ],
+        },
+        {
+            "id": "CVE-2016-2315",
+            "published": "2016-04-08T14:59:01Z",
+            "modified": "2016-04-09T00:00:00Z",
+            "database_specific": {
+                "osv_generated_from": "https://github.com/CVEProject/cvelistV5/tree/y.json",
+            },
+            "references": [{"url": "https://nvd.nist.gov/vuln/detail/CVE-2016-2315"}],
+            "affected": [
+                {"ranges": [{"type": "GIT", "repo": "https://github.com/git/git", "events": [
+                    {"introduced": "594730e980521310d88006d91f3f14ef5eff1e2b"},
+                    {"last_affected": "594730e980521310d88006d91f3f14ef5eff1e2b"},
+                    {"fixed": "34fa79a6cde56d6d428ab0d3160cb094ebad3305"},
+                    {"fixed": "de1e67d0703894cb6ea782e36abb63976ab07e60"},
+                ]}]}
+            ],
+        },
+        {
+            "id": "GHSA-aaaa-bbbb-cccc",
+            "aliases": ["CVE-2023-9999"],
+            "published": "2023-05-05T00:00:00Z",
+            "modified": "2023-05-06T00:00:00Z",
+            "database_specific": {"cwe_ids": ["CWE-125"]},
+            "references": [],
+            "affected": [],
+        },
+        {
+            "id": "OSV-2020-0001",
+            "published": "2020-01-01T00:00:00Z",
+            "modified": "2020-01-02T00:00:00Z",
+            "references": [
+                # 41 hex characters: not a commit id, so not a fix sha.
+                {"type": "FIX", "url": "https://github.com/git/git/commit/" + "e" * 41}
+            ],
+            "affected": [
+                {"ranges": [{"type": "GIT", "repo": "https://github.com/git/git",
+                             "events": [{"fixed": "e" * 41}]}]}
+            ],
+        },
+        {
+            # The real CVE-2020-11008 shape: the CVE record also lists
+            # git-for-windows, whose GIT range boundary is a merge and whose
+            # FIX reference is a commit in that other repository.
+            "id": "CVE-2020-11008",
+            "published": "2020-04-21T00:00:00Z",
+            "modified": "2020-04-22T00:00:00Z",
+            "references": [
+                {"type": "FIX", "url": "https://github.com/git-for-windows/git/commit/" + "f" * 40},
+                {"type": "FIX", "url": "https://github.com/git/git/issues/1234"},
+            ],
+            "affected": [
+                {"ranges": [{"type": "GIT", "repo": "https://github.com/git-for-windows/git",
+                             "events": [
+                                 {"introduced": "0" * 40},
+                                 {"fixed": "f" * 40},
+                             ]}]},
+                {"ranges": [{"type": "GIT", "repo": "https://github.com/git/git",
+                             "events": [{"fixed": "1" * 40}]}]},
+            ],
+        },
+        {
+            # A stable-branch mirror must not be mistaken for the project repo;
+            # see systemd_stable_fixture() for that case with systemd's own meta.
+            "id": "CVE-2026-40223",
+            "published": "2026-02-02T00:00:00Z",
+            "modified": "2026-02-03T00:00:00Z",
+            "references": [
+                {"type": "PATCH", "url": "https://github.com/git/git/commit/" + "3" * 40},
+            ],
+            "affected": [
+                {"ranges": [{"type": "GIT", "repo": "https://github.com/git/git",
+                             "events": [{"fixed": "4" * 40}]}]},
+            ],
+        },
+    ]
+
+
+def systemd_stable_fixture():
+    """One systemd record whose FIX reference points at systemd-stable.
+
+    github.com/systemd/systemd is a prefix of github.com/systemd/systemd-stable,
+    so a plain substring match would accept the mirror's commit as a fix of
+    systemd itself. The record also publishes a real FIX reference.
+    """
+    return [
+        {
+            "id": "CVE-2026-40223",
+            "published": "2026-02-02T00:00:00Z",
+            "modified": "2026-02-03T00:00:00Z",
+            "references": [
+                {"type": "FIX",
+                 "url": "https://github.com/systemd/systemd-stable/commit/" + "2" * 40},
+                {"type": "FIX",
+                 "url": "https://github.com/systemd/systemd/commit/" + "3" * 40},
+            ],
+            "affected": [
+                {"ranges": [{"type": "GIT", "repo": "https://github.com/systemd/systemd",
+                             "events": [{"fixed": "4" * 40}]}]},
+            ],
+        }
+    ]
+
+
+def osv_snapshot_bytes(project, records):
+    meta = PROJECT_META[project]
+    return _dump(
+        {
+            "schema": SNAPSHOT_SCHEMA,
+            "project": project,
+            "source_url": OSV_API_URL,
+            "package": meta["package"],
+            "ecosystem": OSV_GIT_ECOSYSTEM,
+            "records": records,
+        }
+    ).encode("utf-8")
+
+
+def write_osv_snapshot(directory, project, records):
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / "source.json").write_bytes(osv_snapshot_bytes(project, records))
+    return directory
+
+
+class TestOsvAdvisoryId(unittest.TestCase):
+    def test_record_id_cve_wins(self):
+        self.assertEqual(_osv_advisory_id({"id": "CVE-2024-32002", "aliases": ["GHSA-x"]}), "CVE-2024-32002")
+
+    def test_first_cve_alias_when_id_is_not_a_cve(self):
+        self.assertEqual(
+            _osv_advisory_id({"id": "GHSA-aaaa-bbbb-cccc", "aliases": ["BIT-x-1", "CVE-2023-9999"]}),
+            "CVE-2023-9999",
+        )
+
+    def test_id_fallback_without_any_cve(self):
+        self.assertEqual(_osv_advisory_id({"id": "OSV-2020-0001", "aliases": ["GHSA-z"]}), "OSV-2020-0001")
+
+
+class TestOsvRows(unittest.TestCase):
+    def setUp(self):
+        self.rows, self.stats = _osv_rows(osv_fixture_records(), PROJECT_META["git"])
+        self.by_id = {r["advisory_id"]: r for r in self.rows}
+
+    def test_row_keys_and_source(self):
+        for row in self.rows:
+            self.assertEqual(list(row.keys()), OSV_ROW_KEYS)
+            self.assertEqual(row["fix_sha_source"], "git-upstream")
+            self.assertIsNone(row["subsystem"])
+
+    def test_fix_shas_come_only_from_the_advisorys_fix_references(self):
+        # The FIX/PATCH reference is the fix; the GIT-range events are not.
+        self.assertEqual(self.by_id["CVE-2024-32002"]["fix_shas"], ["a" * 40])
+        # No reference of its own: no fix sha, even though the range bounds are known.
+        self.assertEqual(self.by_id["CVE-2016-2315"]["fix_shas"], [])
+        # The advisory only lists git-for-windows: nothing for git/git itself.
+        self.assertEqual(self.by_id["CVE-2020-11008"]["fix_shas"], [])
+        # No advisory data at all.
+        self.assertEqual(self.by_id["CVE-2023-9999"]["fix_shas"], [])
+
+    def test_fixed_in_shas_are_the_git_range_boundaries(self):
+        row = self.by_id["CVE-2024-32002"]
+        self.assertEqual(row["fixed_in_shas"], ["b" * 40, "c" * 40, "d" * 40])
+        # 'introduced' is a lower bound and never a boundary to keep here.
+        self.assertNotIn("0" * 40, row["fixed_in_shas"])
+        # Only the range that names git/git: the git-for-windows one is another
+        # product the CVE record also lists.
+        self.assertEqual(self.by_id["CVE-2020-11008"]["fixed_in_shas"], ["1" * 40])
+
+    def test_fix_shas_and_fixed_in_shas_are_never_derived_from_each_other(self):
+        for row in self.rows:
+            self.assertFalse(
+                set(row["fix_shas"]) - {"a" * 40, "3" * 40},
+                f"{row['advisory_id']}: a fix sha is not published by a FIX/PATCH reference",
+            )
+
+    def test_41_hex_and_non_git_are_rejected(self):
+        row = self.by_id["OSV-2020-0001"]
+        self.assertEqual(row["fix_shas"], [])  # 41 hex is not a 40-hex commit id
+        self.assertEqual(row["fixed_in_shas"], [])
+        # the repo-scoped reference URL is still kept as a patch pointer, faithfully
+        self.assertEqual(row["patch_urls"], ["https://github.com/git/git/commit/" + "e" * 41])
+
+    def test_fix_reference_outside_the_project_repo_is_not_a_fix(self):
+        # The CVE record's own FIX reference points at git-for-windows.
+        self.assertEqual(self.by_id["CVE-2020-11008"]["fix_shas"], [])
+        # An issue tracker is not a commit either.
+        self.assertEqual(self.by_id["CVE-2020-11008"]["fix_shas"], [])
+
+    def test_cwe_is_first_of_cwe_ids(self):
+        self.assertEqual(self.by_id["CVE-2024-32002"]["cwe"], "CWE-22")
+        self.assertEqual(self.by_id["CVE-2024-32002"]["cwe_state"], "STATED_BY_ADVISORY")
+        self.assertIsNone(self.by_id["CVE-2016-2315"]["cwe"])
+        self.assertEqual(self.by_id["CVE-2016-2315"]["cwe_state"], "UNKNOWN")
+
+    def test_patch_urls_are_repo_scoped_and_sorted(self):
+        self.assertEqual(
+            self.by_id["CVE-2024-32002"]["patch_urls"],
+            [
+                "https://github.com/git/git/commit/" + "a" * 40,
+                "https://github.com/git/git/security/advisories/GHSA-8h77-4q3w-gfgv",
+            ],
+        )
+
+    def test_patch_urls_fall_back_to_cvelist_record(self):
+        # No github.com/git/git reference: keep the canonical CVE record OSV cites.
+        self.assertEqual(
+            self.by_id["CVE-2016-2315"]["patch_urls"],
+            ["https://github.com/CVEProject/cvelistV5/tree/y.json"],
+        )
+
+    def test_published_is_date_only(self):
+        self.assertEqual(self.by_id["CVE-2024-32002"]["published"], "2024-01-24")
+
+    def test_only_40_hex_shas_emitted(self):
+        hex40 = re.compile(r"^[0-9a-f]{40}$")
+        for row in self.rows:
+            for sha in row["fix_shas"] + row["fixed_in_shas"]:
+                self.assertRegex(sha, hex40)
+
+    def test_stats_report_what_the_scoping_left_out(self):
+        # 3 FIX references are not a 40-hex commit in git/git: the two
+        # git-for-windows / issue-tracker links and the 41-hex id.
+        self.assertEqual(self.stats["excluded_fix_refs"], 3)
+        self.assertEqual(self.stats["foreign_boundaries"], 1)
+
+
+class TestSystemdStableMirror(unittest.TestCase):
+    """A repo path that prefixes another repo path must not swallow its commits."""
+
+    def setUp(self):
+        self.rows, self.stats = _osv_rows(systemd_stable_fixture(), PROJECT_META["systemd"])
+        self.row = self.rows[0]
+
+    def test_mirror_commit_is_not_a_fix_of_systemd(self):
+        self.assertEqual(self.row["fix_sha_source"], "systemd-upstream")
+        self.assertEqual(self.row["fix_shas"], ["3" * 40])
+
+    def test_stats_count_the_excluded_mirror_reference(self):
+        self.assertEqual(self.stats["excluded_fix_refs"], 1)
+
+
+class TestCommitShaInRepo(unittest.TestCase):
+    def test_commit_url_inside_the_repo(self):
+        self.assertEqual(
+            _commit_sha_in_repo("https://github.com/git/git/commit/" + "a" * 40, "github.com/git/git"),
+            "a" * 40,
+        )
+
+    def test_repo_path_must_be_followed_by_a_slash(self):
+        # github.com/systemd/systemd is a prefix of github.com/systemd/systemd-stable.
+        url = "https://github.com/systemd/systemd-stable/commit/" + "a" * 40
+        self.assertIsNone(_commit_sha_in_repo(url, "github.com/systemd/systemd"))
+
+    def test_non_commit_urls_inside_the_repo(self):
+        for url in (
+            "https://github.com/git/git/issues/1234",
+            "https://github.com/git/git/compare/v2.30.0...v2.30.1",
+            "https://github.com/git/git/security/advisories/GHSA-hjc9-x69f-jqj7",
+            "https://github.com/git/git/commit/" + "a" * 41,
+        ):
+            self.assertIsNone(_commit_sha_in_repo(url, "github.com/git/git"), url)
+
+    def test_commit_url_of_another_repo(self):
+        url = "https://github.com/git-for-windows/git/commit/" + "a" * 40
+        self.assertIsNone(_commit_sha_in_repo(url, "github.com/git/git"))
+
+
+class TestStandaloneHex40(unittest.TestCase):
+    def test_bare_40_hex(self):
+        self.assertEqual(_standalone_hex40("a" * 40), "a" * 40)
+
+    def test_41_or_more_hex_rejected(self):
+        self.assertIsNone(_standalone_hex40("a" * 41))
+        self.assertIsNone(_standalone_hex40("a" * 40 + "0"))
+
+    def test_neighbouring_hex_character_rejected(self):
+        self.assertIsNone(_standalone_hex40("1" + "a" * 40))
+
+    def test_first_standalone_run_wins(self):
+        self.assertEqual(_standalone_hex40("a" * 40 + "/" + "b" * 40), "a" * 40)
+        self.assertEqual(_standalone_hex40("x" + "a" * 41 + " " + "b" * 40), "b" * 40)
+
+
+class TestOsvCatalogContract(unittest.TestCase):
+    def _catalog(self, project, records):
+        snapshot = osv_snapshot_bytes(project, records)
+        catalog_text, index_text, rows = build_catalog(project, snapshot)
+        return snapshot, catalog_text, index_text, rows
+
+    def test_rows_sorted_by_advisory_id(self):
+        _, catalog_text, _, _ = self._catalog("git", osv_fixture_records())
+        ids = [json.loads(line)["advisory_id"] for line in catalog_text.splitlines()]
+        self.assertEqual(ids, sorted(ids))
+
+    def test_index_fields_and_provenance(self):
+        snapshot, _, index_text, rows = self._catalog("git", osv_fixture_records())
+        index = json.loads(index_text)
+        self.assertEqual(index["project"], "git-upstream")
+        self.assertEqual(index["repo"], "https://github.com/git/git")
+        self.assertEqual(index["source_url"], OSV_API_URL)
+        self.assertEqual(index["source_snapshot"], "source.json")
+        self.assertEqual(index["source_sha256"], hashlib.sha256(snapshot).hexdigest())
+        self.assertEqual(index["source_bytes"], len(snapshot))
+        self.assertEqual(index["coverage"], "COMPLETE_AT_SNAPSHOT")
+        self.assertEqual(index["status"], "FETCHED")
+        self.assertEqual(index["entry_count"], len(rows))
+        self.assertEqual(index["errors"], [])
+        # fetched_at is the newest record 'modified', never the wall clock.
+        self.assertEqual(index["fetched_at"], "2026-08-07T00:00:00Z")
+        self.assertIn("docs/DATA-POLICY.md", index["notes"])
+
+    def test_index_counts_the_two_columns_separately(self):
+        _, _, index_text, rows = self._catalog("git", osv_fixture_records())
+        index = json.loads(index_text)
+        self.assertEqual(index["with_fix_sha"], sum(1 for r in rows if r["fix_shas"]))
+        self.assertEqual(index["with_fixed_in"], sum(1 for r in rows if r["fixed_in_shas"]))
+        # 2 advisories name a fix commit, 4 publish a GIT range boundary.
+        self.assertEqual(index["with_fix_sha"], 2)
+        self.assertEqual(index["with_fixed_in"], 4)
+
+    def test_notes_separate_the_fix_references_from_the_range_boundaries(self):
+        _, _, index_text, _ = self._catalog("git", osv_fixture_records())
+        notes = json.loads(index_text)["notes"]
+        self.assertIn("fix_shas are only the commits the advisory itself identifies as the fix", notes)
+        self.assertIn("references typed FIX or PATCH", notes)
+        self.assertIn("fixed_in_shas are the GIT range boundary commits", notes)
+        self.assertIn("never fix commits", notes)
+        # What the scoping left out is disclosed, not silently dropped.
+        self.assertIn("3 such reference(s) point somewhere else", notes)
+        self.assertIn("1 boundary event(s) belong to a range that names another repository", notes)
+
+    def test_curl_and_openssl_indexes_stay_unchanged(self):
+        """The curl/openssl rows keep the seven-key shape and no fixed_in count."""
+        for project, snapshot in (
+            ("curl", json.dumps(curl_fixture()).encode("utf-8")),
+            ("openssl", openssl_snapshot_bytes(openssl_fixture_records())),
+        ):
+            with self.subTest(project=project):
+                _catalog, index_text, _rows = build_catalog(project, snapshot)
+                index = json.loads(index_text)
+                self.assertNotIn("with_fixed_in", index)
+                for line in _catalog.splitlines():
+                    self.assertNotIn("fixed_in_shas", line)
+    def test_catalog_bytes_are_identical_across_rebuilds(self):
+        for project in OSV_PROJECTS:
+            with self.subTest(project=project):
+                snapshot = osv_snapshot_bytes(project, osv_fixture_records())
+                first, first_index, _ = build_catalog(project, snapshot)
+                second, second_index, _ = build_catalog(project, snapshot)
+                self.assertEqual(first, second)
+                self.assertEqual(first_index, second_index)
+
+    def test_empty_snapshot_is_rejected(self):
+        for project in OSV_PROJECTS:
+            with self.subTest(project=project):
+                with self.assertRaises(FetchError):
+                    build_catalog(project, osv_snapshot_bytes(project, []))
+
+
+class TestCliOfflineOsv(unittest.TestCase):
+    def test_check_passes_after_offline_build(self):
+        directory = write_osv_snapshot(Path(tempfile.mkdtemp()) / "git", "git", osv_fixture_records())
+        build = run_cli("--project", "git", "--out-dir", str(directory), "--offline")
+        self.assertEqual(build.returncode, 0, build.stderr)
+        self.assertTrue((directory / "catalog.jsonl").exists())
+        self.assertTrue((directory / "index.json").exists())
+        check = run_cli("--project", "git", "--out-dir", str(directory), "--offline", "--check")
+        self.assertEqual(check.returncode, 0, check.stderr)
+        self.assertIn("entries,", check.stdout)
+
+
+class TestOsvPostGuard(unittest.TestCase):
+    """The snapshot cap is enforced on the POSTed response read, not the header."""
+
+    def test_oversized_response_rejected(self):
+        oversized = b"x" * (SNAPSHOT_LIMIT_BYTES + 1)
+
+        class FakeResponse:
+            def read(self, size=-1):
+                return oversized[:size]
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+        original = urllib.request.urlopen
+        urllib.request.urlopen = lambda *args, **kwargs: FakeResponse()
+        try:
+            with self.assertRaises(FetchError) as caught:
+                _http_post_json(OSV_API_URL, "{}")
         finally:
             urllib.request.urlopen = original
         self.assertIn("exceeds", str(caught.exception))
