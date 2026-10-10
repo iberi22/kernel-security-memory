@@ -264,12 +264,14 @@ def audit_path(target_path, cluster_map=None):
 
     all_findings = []
     files_audited = []
+    file_digests = {}
 
     if path.is_file():
         files_to_scan = [path]
     else:
-        # Scan code files
-        valid_exts = {".c", ".h", ".cpp", ".cc", ".rs", ".py", ".sh", ".bash", ".js", ".ts"}
+        # Scan code files. Extensions must mirror _detect_language(): an
+        # extension with no language mapping would receive every rule below.
+        valid_exts = {".c", ".h", ".cpp", ".cc", ".cxx", ".hpp", ".rs", ".py", ".sh", ".bash"}
         files_to_scan = [
             p for p in path.rglob("*")
             if p.is_file() and p.suffix.lower() in valid_exts and not any(part.startswith(".") for part in p.relative_to(path).parts)
@@ -281,6 +283,7 @@ def audit_path(target_path, cluster_map=None):
             f_findings = scan_content(content, filename=str(f), cluster_map=cluster_map)
             all_findings.extend(f_findings)
             files_audited.append(str(f))
+            file_digests[str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
         except (PermissionError, OSError) as exc:
             all_findings.append({
                 "rule_id": "AUDIT-ERROR-UNREADABLE-FILE",
@@ -299,7 +302,7 @@ def audit_path(target_path, cluster_map=None):
                 },
             })
 
-    return files_audited, all_findings
+    return files_audited, all_findings, file_digests
 
 
 def normalize_findings(findings):
@@ -329,12 +332,19 @@ def normalize_findings(findings):
     return normalized
 
 
-def compute_evidence_hash(target, files_audited, findings, verdict, ksm_pack_ref, rules_applied):
-    """Compute deterministic cryptographic hash over audited content."""
+def compute_evidence_hash(target, files_audited, findings, verdict, ksm_pack_ref, rules_applied, file_digests=None):
+    """Compute deterministic cryptographic hash over audited content.
+
+    ``file_digests`` maps each audited file to the SHA-256 of its raw bytes, so the
+    hash identifies the audited tree state and not only the findings: two trees
+    with the same paths and the same findings hash differently as soon as one byte
+    of audited content differs. The volatile timestamp stays excluded.
+    """
     sorted_files = sorted(str(f) for f in files_audited)
     normalized = normalize_findings(findings)
     deterministic_payload = {
         "files_audited": sorted_files,
+        "file_digests": sorted((str(p), str(d)) for p, d in (file_digests or {}).items()),
         "files_audited_count": len(sorted_files),
         "findings": normalized,
         "findings_count": len(normalized),
@@ -348,12 +358,13 @@ def compute_evidence_hash(target, files_audited, findings, verdict, ksm_pack_ref
     return chain_hash, deterministic_payload
 
 
-def build_evidence_chain(target, files_audited, findings, ksm_pack_ref="kernel-security-memory-bootstrap-v0", rules_applied=None, errors=None):
+def build_evidence_chain(target, files_audited, findings, ksm_pack_ref="kernel-security-memory-bootstrap-v0", rules_applied=None, errors=None, file_digests=None):
     """Construct a cryptographic evidence chain for the audit.
 
     The evidence_chain_hash is computed strictly from deterministic audit artifacts
-    (target, files_audited, findings, verdict, ksm_pack_reference, rules_applied),
-    excluding the volatile timestamp to ensure 100% reproducible hashes across runs.
+    (target, files_audited, file_digests, findings, verdict, ksm_pack_reference,
+    rules_applied), excluding the volatile timestamp to ensure 100% reproducible
+    hashes across runs on the same tree state.
     """
     now_utc = datetime.now(timezone.utc).isoformat()
     if rules_applied is None:
@@ -372,6 +383,7 @@ def build_evidence_chain(target, files_audited, findings, ksm_pack_ref="kernel-s
 
     sorted_files = sorted(str(f) for f in files_audited)
     normalized = normalize_findings(findings)
+    sorted_digests = dict(sorted((str(p), str(d)) for p, d in (file_digests or {}).items()))
 
     chain_hash, deterministic_payload = compute_evidence_hash(
         target=target,
@@ -380,6 +392,7 @@ def build_evidence_chain(target, files_audited, findings, ksm_pack_ref="kernel-s
         verdict=verdict,
         ksm_pack_ref=ksm_pack_ref,
         rules_applied=rules_applied,
+        file_digests=sorted_digests,
     )
 
     audit_payload = {
@@ -388,6 +401,7 @@ def build_evidence_chain(target, files_audited, findings, ksm_pack_ref="kernel-s
         "timestamp": now_utc,
         "files_audited_count": len(sorted_files),
         "files_audited": sorted_files,
+        "file_digests": sorted_digests,
         "findings_count": len(normalized),
         "findings": normalized,
         "verdict": verdict,
@@ -423,12 +437,12 @@ def main(argv=None):
         sys.exit(2)
 
     try:
-        files_audited, findings = audit_path(args.target, cluster_map=cluster_map)
+        files_audited, findings, file_digests = audit_path(args.target, cluster_map=cluster_map)
     except Exception as exc:
         print(f"Error during audit traversal: {exc}", file=sys.stderr)
         sys.exit(2)
 
-    evidence = build_evidence_chain(args.target, files_audited, findings)
+    evidence = build_evidence_chain(args.target, files_audited, findings, file_digests=file_digests)
     
     out_json = json.dumps(evidence, indent=2, ensure_ascii=False)
     if args.output:
