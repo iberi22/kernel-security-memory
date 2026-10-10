@@ -19,10 +19,10 @@ This curriculum structures defensive security lessons directly around the 34 emp
 | `git` | CVE-2024-32002 | logic | UNKNOWN | `97065761333fd62db1912d81b489db938d8c991d` | Case-folding symlink collision detection during recursive clone |
 | `nginx` | CVE-2017-20005 | logic | UNKNOWN | `0206ebe76f748bb39d9de4dd4b3fce777fdfdccf` | Validate HTTP/2 continuous frame state transitions and trailer headers |
 | `nginx` | CVE-2019-20372 | logic | UNKNOWN | `c1be55f97211d38b69ac0c2027e6812ab8b1b94e` | Explicitly discard request body before handling `error_page` internal redirects |
-| `openssh` | CVE-2018-20685 | path-resolution | CWE-20 | `6010c0303ab5306ec711a364be1dc1beec4b455b` | Reject `.` and empty target filenames emitted by remote scp servers |
-| `openssh` | CVE-2020-12062 | path-resolution | UNKNOWN | `aad87b88fc753549666ff1237e29ff85a15cfb22` | Reject duplicate filename responses in scp file transfers |
-| `openssh` | CVE-2021-28041 | memory-lifetime | UNKNOWN | `e04fd6dde17c4f420e6c5188f615ef5eb79cc0d0` | Prevent double-free in ssh-agent when handling PKCS#11 key registration failures |
-| `openssh` | CVE-2023-25136 | memory-lifetime | CWE-416 | `486c4dc3b83b4b81c16fa500845a70656a2bb2f4` | Nullify compatibility pointers during SSH2 key exchange to prevent pre-auth UAF |
+| `openssh` | CVE-2018-20685 | path-resolution | CWE-20 | `6010c0303a422a9c5fa8860c061bf7105eb7f8b2` | Reject `.` and empty target filenames emitted by remote scp servers |
+| `openssh` | CVE-2020-12062 | path-resolution | UNKNOWN | `aad87b88fc2536b1ea023213729aaf4eaabe1894` | Reject duplicate filename responses in scp file transfers |
+| `openssh` | CVE-2021-28041 | memory-lifetime | UNKNOWN | `e04fd6dde16de1cdc5a4d9946397ff60d96568db` | Prevent double-free in ssh-agent when handling PKCS#11 key registration failures |
+| `openssh` | CVE-2023-25136 | memory-lifetime | CWE-416 | `486c4dc3b83b4b67d663fb0fa62bc24138ec3946` | Nullify compatibility pointers during SSH2 key exchange to prevent pre-auth UAF |
 | `openssh` | CVE-2023-51384 | injection | CWE-88 | `881d9c6af9da4257c69c327c4e2f1508b2fa754b` | Strict allowlist escaping of hostnames and usernames before ProxyCommand shell dispatch |
 | `openssh` | CVE-2023-51385 | logic | UNKNOWN | `7ef3787c84b6b524501211b11a26c742f829af1a` | Strict string boundary validation on user identities in certificate constraints |
 | `openssh` | CVE-2023-51767 | authz | UNKNOWN | `8241b9c0529228b4b86d88b1a6076fb9f97e4a99` | Constant-time execution path during PAM authentication to eliminate user enumeration |
@@ -52,8 +52,8 @@ This curriculum structures defensive security lessons directly around the 34 emp
 **Vulnerability Archetypes**: Use-After-Free (CWE-416), Double-Free, Asynchronous Callback Lifetime Violations.
 
 #### 1. Empirical Evidence
-- **OpenSSH CVE-2023-25136** (`486c4dc3b83b4b81c16fa500845a70656a2bb2f4`): During SSH2 key exchange initialization (`kex_input_kexinit`), fallback compatibility structures retained duplicate pointers to freed packet buffers, permitting pre-authentication UAF.
-- **OpenSSH CVE-2021-28041** (`e04fd6dde17c4f420e6c5188f615ef5eb79cc0d0`): `ssh-agent` encountered double-free when processing errors during PKCS#11 provider loading.
+- **OpenSSH CVE-2023-25136** (`486c4dc3b83b4b67d663fb0fa62bc24138ec3946`): During SSH2 key exchange initialization (`kex_input_kexinit`), fallback compatibility structures retained duplicate pointers to freed packet buffers, permitting pre-authentication UAF.
+- **OpenSSH CVE-2021-28041** (`e04fd6dde16de1cdc5a4d9946397ff60d96568db`): `ssh-agent` encountered double-free when processing errors during PKCS#11 provider loading.
 - **systemd CVE-2020-1712** (`1068447e6954dc6ce52f099ed174c442cb89ed54`): Asynchronous D-Bus transactions in `systemd-homed` dereferenced freed user context objects when reply handlers executed after parent destruction.
 - **systemd CVE-2022-2526** (`d973d94dec349fb676fdd844f6fe2ada3538f27c`): Disconnected TLS streams in `systemd-resolved` failed to scrub back-pointers, causing dangling callback invocations.
 
@@ -86,8 +86,8 @@ This curriculum structures defensive security lessons directly around the 34 emp
 #### 1. Empirical Evidence
 - **Git CVE-2024-32002** (`97065761333fd62db1912d81b489db938d8c991d`): A repository containing a symlink directory alongside a submodule path colliding under case-folding filesystems (macOS / Windows NTFS) allowed checking out hooks into `.git/hooks/`, achieving Remote Code Execution upon clone.
 - **Git CVE-2021-21300** (`684dd4c2b414bcf648505e74498a608f28de4592`): Delayed clean filter execution during checkout allowed a symlink to be created before a delayed file was written through the symlink.
-- **OpenSSH CVE-2018-20685** (`6010c0303ab5306ec711a364be1dc1beec4b455b`): The `scp` client accepted server-specified directory names of `.` or empty string, allowing the remote server to write files directly into the target client directory without namespace prefixing.
-- **OpenSSH CVE-2020-12062** (`aad87b88fc753549666ff1237e29ff85a15cfb22`): Malicious scp servers sent duplicate file names in file lists, evading client overwrite confirmation prompts.
+- **OpenSSH CVE-2018-20685** (`6010c0303a422a9c5fa8860c061bf7105eb7f8b2`): The `scp` client accepted server-specified directory names of `.` or empty string, allowing the remote server to write files directly into the target client directory without namespace prefixing.
+- **OpenSSH CVE-2020-12062** (`aad87b88fc2536b1ea023213729aaf4eaabe1894`): Malicious scp servers sent duplicate file names in file lists, evading client overwrite confirmation prompts.
 
 #### 2. Causal Invariant Rules for Autonomous Agents
 1. **Case-Folded Collision Detection**: Canonicalize paths under case-insensitive comparison (`strcasecmp` / UTF-8 case folding) when operating on cross-platform repositories.

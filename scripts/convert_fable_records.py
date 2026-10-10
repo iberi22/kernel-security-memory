@@ -77,6 +77,9 @@ SHA_RE = re.compile(r'^[0-9a-f]{40}$')
 DIGEST_RE = re.compile(r'^[0-9a-f]{64}$')
 FIX_URL_RE = re.compile(r'^https://github\.com/([^/]+)/([^/]+)/(?:commit|blob)/([0-9a-f]{40})(?:[/?#].*)?$')
 ISO_RE = re.compile(r'^\d{4}-\d{2}-\d{2}T[\d:.]+Z?$')
+# Per-call timeout for the --fetch-commit-meta gh api subprocess so a stalled or
+# auth-prompting gh cannot hang a scripted refresh; raised as a clean SystemExit.
+GH_API_TIMEOUT = 120
 
 # Which advisory field each fetcher copied into fix.committed_at, read from the
 # fetcher source rather than inferred from the value:
@@ -432,8 +435,12 @@ def fetch_commit_meta(path=COMMIT_META):
     rows = []
     for repo, sha in commit_targets():
         api_url = f'https://api.github.com/repos/{repo}/commits/{sha}'
-        proc = subprocess.run(['gh', 'api', f'repos/{repo}/commits/{sha}'],
-                              capture_output=True, text=True)
+        try:
+            proc = subprocess.run(['gh', 'api', f'repos/{repo}/commits/{sha}'],
+                                  capture_output=True, text=True, timeout=GH_API_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            raise SystemExit(f'gh api repos/{repo}/commits/{sha} timed out after '
+                             f'{GH_API_TIMEOUT}s; cache left unchanged')
         if proc.returncode != 0:
             raise SystemExit(f'gh api repos/{repo}/commits/{sha} failed '
                              f'({proc.stderr.strip() or proc.returncode}); cache left unchanged')
@@ -459,6 +466,25 @@ def fetch_commit_meta(path=COMMIT_META):
     return rows
 
 
+def _orphan_records(converted, records_dir):
+    """On-disk records this converter can no longer reproduce: a converter-produced
+    record (has validation.source_record) whose id is absent from `converted` because
+    its vetted row was removed from vetted-shas.jsonl or now skips. Hand-authored
+    records without validation.source_record are never returned."""
+    orphans = []
+    for path in sorted(records_dir.glob('*.json')):
+        if path.stem in converted:
+            continue
+        try:
+            record = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        validation = record.get('validation') if isinstance(record, dict) else None
+        if isinstance(validation, dict) and validation.get('source_record'):
+            orphans.append(path)
+    return orphans
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true',
@@ -476,13 +502,22 @@ def main():
         return
 
     converted, skipped = expected_records()
+    orphans = _orphan_records(converted, RECORDS_DIR)
     if args.check:
+        if skipped or orphans:
+            raise SystemExit(
+                f'Converter drift: {len(skipped)} row(s) skipped, '
+                f'{len(orphans)} orphaned record(s) not reproducible by this converter '
+                f'({", ".join(p.name for p in orphans)}); '
+                'run scripts/convert_fable_records.py to refresh')
         for record_id, body in sorted(converted.items()):
             path = RECORDS_DIR / f'{record_id}.json'
             if not path.is_file() or path.read_bytes() != body:
                 raise SystemExit(f'Stale/missing converted record: {path}; '
                                  'run scripts/convert_fable_records.py')
     else:
+        for path in orphans:
+            path.unlink()  # its vetted row was removed or now skips: drop the stale record
         for record_id, body in sorted(converted.items()):
             (RECORDS_DIR / f'{record_id}.json').write_bytes(body)
     for label, reason in skipped:
