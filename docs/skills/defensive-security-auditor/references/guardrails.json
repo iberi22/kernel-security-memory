@@ -1,0 +1,351 @@
+{
+  "audit_command": "python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict",
+  "families": [
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2023-25136",
+          "fix_commit_sha": "486c4dc3b83b4b67d663fb0fa62bc24138ec3946",
+          "fix_commit_url": "https://github.com/openssh/openssh-portable/commit/486c4dc3b83b4b67d663fb0fa62bc24138ec3946",
+          "linked_by": "recorded_cwe",
+          "project": "openssh",
+          "recorded_cwe": "CWE-416",
+          "source": "docs/memory/records/openssh-CVE-2023-25136.json",
+          "source_kind": "pack_record"
+        },
+        {
+          "advisory_id": "CVE-2016-8623",
+          "fix_commit_sha": "c5be3d7267c725dbd093ff3a883e07ee8cf2a1d5",
+          "fix_commit_url": "https://github.com/curl/curl/commit/c5be3d7267c725dbd093ff3a883e07ee8cf2a1d5",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-416",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2018-16840",
+          "fix_commit_sha": "81d135d67155c5295b1033679c606165d4e28f3f",
+          "fix_commit_url": "https://github.com/curl/curl/commit/81d135d67155c5295b1033679c606165d4e28f3f",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-416",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        }
+      ],
+      "cluster_count": 16,
+      "cluster_sample_cves": [
+        "CVE-2006-4997",
+        "CVE-2016-5421",
+        "CVE-2016-8623",
+        "CVE-2018-16840",
+        "CVE-2021-22901",
+        "CVE-2022-43552",
+        "CVE-2023-28319",
+        "CVE-2024-4741",
+        "CVE-2026-10536",
+        "CVE-2026-18924"
+      ],
+      "cluster_title": "Use After Free",
+      "cluster_with_fix_sha": 14,
+      "cwe_id": "CWE-416",
+      "preconditions": [
+        "Asynchronous lifecycle, double free, or aliased pointer reuse"
+      ],
+      "rules": [
+        {
+          "explanation": "Pointer accessed or dereferenced after free() without nullification in C.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Distinguish object lifetime from transaction visibility; set pointers to NULL immediately after free.",
+          "pattern": "\\bfree\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*\\);\\s*(?!\\s*\\1\\s*=\\s*(?:NULL|0|nullptr)\\s*;)[^;]*\\b\\1\\b",
+          "rule_id": "SEC-CWE-416-USE-AFTER-FREE-C",
+          "severity": "HIGH",
+          "title": "Use After Free / Lifetime Invariant Violation (C/C++)"
+        },
+        {
+          "explanation": "Raw pointer or resource accessed after deallocation or drop in Rust.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Enforce Rust ownership invariants or invalidate raw pointers immediately upon manual deallocation.",
+          "pattern": "\\b(?:libc::free|dealloc|drop)\\s*\\(\\s*([a-zA-Z0-9_]+)[^)]*\\);\\s*(?!\\s*\\1\\s*=\\s*(?:ptr::null|std::ptr::null|null_mut)\\s*;)[^;]*(?:\\*+\\s*\\1|\\b\\1\\s*\\.)",
+          "rule_id": "SEC-CWE-416-USE-AFTER-FREE-RUST",
+          "severity": "HIGH",
+          "title": "Use After Free / Dereference After Drop or Deallocation (Rust)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2009-1386",
+          "fix_commit_sha": "1cbf663a6c89dcf8f7706d30a8bae675e2e0199a",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/1cbf663a6c89dcf8f7706d30a8bae675e2e0199a",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2018-1000121",
+          "fix_commit_sha": "9889db043393092e9d4b5a42720bba0b3d58deba",
+          "fix_commit_url": "https://github.com/curl/curl/commit/9889db043393092e9d4b5a42720bba0b3d58deba",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-476",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        },
+        {
+          "advisory_id": "CVE-2025-15468",
+          "fix_commit_sha": "1f08e54bad32843044fe8a675948d65e3b4ece65",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/1f08e54bad32843044fe8a675948d65e3b4ece65",
+          "linked_by": "recorded_cwe",
+          "project": "openssl-upstream",
+          "recorded_cwe": "CWE-476",
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog"
+        }
+      ],
+      "cluster_count": 19,
+      "cluster_sample_cves": [
+        "CVE-2004-0079",
+        "CVE-2005-2459",
+        "CVE-2006-4343",
+        "CVE-2008-1672",
+        "CVE-2009-1386",
+        "CVE-2009-1387",
+        "CVE-2018-1000121",
+        "CVE-2025-15468",
+        "CVE-2025-69421",
+        "CVE-2026-14457"
+      ],
+      "cluster_title": "NULL Pointer Dereference",
+      "cluster_with_fix_sha": 14,
+      "cwe_id": "CWE-476",
+      "preconditions": [
+        "Unchecked return value from allocator or lookup function"
+      ],
+      "rules": [
+        {
+          "explanation": "Pointer dereferenced immediately after allocation without NULL check in C.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Always verify pointer return values against NULL before dereferencing.",
+          "pattern": "([a-zA-Z0-9_]+)\\s*=\\s*(?:malloc|kmalloc|kzalloc|fopen|strdup)\\s*\\([^;]+\\);\\s*(?!\\s*if\\s*\\(\\s*(?:!\\s*\\1|\\1\\s*==\\s*NULL))\\s*(?:\\*\\s*\\1|\\1\\s*->)",
+          "rule_id": "SEC-CWE-476-NULL-DEREFERENCE-C",
+          "severity": "MEDIUM",
+          "title": "Unchecked Return Value / NULL Pointer Dereference (C/C++)"
+        },
+        {
+          "explanation": "Raw pointer dereferenced in unsafe block without is_null() guard in Rust.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Validate raw pointers with .is_null() before dereferencing in unsafe blocks, or use NonNull.",
+          "pattern": "(?:let\\s+([a-zA-Z0-9_]+)\\s*=\\s*[^;]*as\\s+\\*(?:mut|const)\\s+[a-zA-Z0-9_]+;(?![^;]*\\1\\.is_null\\(\\))[^;]*unsafe\\s*\\{\\s*\\*+\\s*\\1\\b)",
+          "rule_id": "SEC-CWE-476-NULL-DEREFERENCE-RUST",
+          "severity": "MEDIUM",
+          "title": "Unchecked Raw Pointer Dereference (Rust)"
+        }
+      ]
+    }
+  ],
+  "families_without_evidence": [
+    {
+      "cluster_count": null,
+      "cluster_sample_cves": [],
+      "cluster_title": null,
+      "cluster_with_fix_sha": null,
+      "cwe_id": "CWE-78",
+      "preconditions": [],
+      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
+      "rules": [
+        {
+          "explanation": "Dynamic command string passed to system(), popen(), or shell exec() in C without sanitization.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Use parameterized execv/execve with discrete arguments array instead of shell invocation.",
+          "pattern": "\\b(?:system|popen)\\s*\\(\\s*(?!\"[^\\%\"\\'\\n]*\"\\s*[,)])([a-zA-Z0-9_]+|\"[^\"]*\\%[sS])|\\bexec[l|v]p?e?\\s*\\([^;]*\"/(?:bin/)?(?:sh|bash)\"[^;]*\\)",
+          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-C",
+          "severity": "CRITICAL",
+          "title": "OS Command Injection in C (system / popen / exec)"
+        },
+        {
+          "explanation": "Executing commands via shell=True, os.system, os.popen, or dynamic exec() with unsanitized input.",
+          "language": "Python",
+          "languages": [
+            "python"
+          ],
+          "lesson": "Pass arguments as a sequence without shell=True; use ast.literal_eval instead of eval/exec.",
+          "pattern": "(?:subprocess\\.(?:call|run|Popen|check_output)\\s*\\(.*shell\\s*=\\s*True|os\\.(?:system|popen)\\s*\\([^)]+\\)|(?<!\\.)\\bexec\\s*\\(\\s*[a-zA-Z0-9_]+|\\beval\\s*\\(\\s*[a-zA-Z0-9_]+)",
+          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-PYTHON",
+          "severity": "CRITICAL",
+          "title": "OS Command Injection in Python (subprocess shell=True / os.system / exec)"
+        },
+        {
+          "explanation": "Unsanitized variables passed to eval, sh -c, or exec in shell script.",
+          "language": "Shell",
+          "languages": [
+            "shell"
+          ],
+          "lesson": "Avoid eval; use direct binary execution and strictly quote/validate all external parameters.",
+          "pattern": "(?:eval\\s+[\"\\']?\\$|\\b(?:sh|bash)\\s+-c\\s+[\"\\']?\\$|\\bexec\\s+[\"\\']?\\$)",
+          "rule_id": "SEC-CWE-78-COMMAND-INJECTION-SHELL",
+          "severity": "CRITICAL",
+          "title": "Command Injection / Unquoted Evaluation in Shell"
+        }
+      ]
+    },
+    {
+      "cluster_count": 1,
+      "cluster_sample_cves": [
+        "CVE-2006-2935"
+      ],
+      "cluster_title": "Classic Buffer Overflow",
+      "cluster_with_fix_sha": 0,
+      "cwe_id": "CWE-120",
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
+      "rules": [
+        {
+          "explanation": "Unbounded string function (strcpy, strcat, gets, sprintf) prone to classic stack/heap buffer overflow.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Replace with bounds-checked alternatives (strncpy, strlcat, fgets, snprintf) and validate buffer bounds.",
+          "pattern": "\\b(strcpy|strcat|gets|sprintf)\\s*\\(",
+          "rule_id": "SEC-CWE-120-UNBOUNDED-COPY",
+          "severity": "HIGH",
+          "title": "Buffer Copy without Checking Size of Input (C/C++)"
+        }
+      ]
+    },
+    {
+      "cluster_count": 1,
+      "cluster_sample_cves": [
+        "CVE-2004-2013"
+      ],
+      "cluster_title": "Integer Overflow or Wraparound",
+      "cluster_with_fix_sha": 0,
+      "cwe_id": "CWE-190",
+      "preconditions": [],
+      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
+      "rules": [
+        {
+          "explanation": "Multiplication or addition inside allocation argument without bound or overflow check in C.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Use overflow-checked helpers (e.g. check_mul_overflow, calloc) or explicit bounds validation before allocation.",
+          "pattern": "\\b(?:malloc|kmalloc|kzalloc|vmalloc|xmalloc)\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)\\s*(?:,[^)]+)?\\)",
+          "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-C",
+          "severity": "MEDIUM",
+          "title": "Integer Overflow or Wraparound in Allocation (C/C++)"
+        },
+        {
+          "explanation": "Unchecked arithmetic inside allocation size or capacity in Rust.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Use checked_mul() or checked_add() before computing collection capacity or layout size.",
+          "pattern": "\\b(?:Vec::with_capacity|alloc::alloc|Layout::array|Layout::from_size_align)\\s*(?:<[^>]+>)?\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)",
+          "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-RUST",
+          "severity": "MEDIUM",
+          "title": "Integer Overflow in Allocation / Capacity (Rust)"
+        }
+      ]
+    },
+    {
+      "cluster_count": 2,
+      "cluster_sample_cves": [
+        "CVE-2006-0039",
+        "CVE-2010-3864"
+      ],
+      "cluster_title": "Concurrent Execution using Shared Resource (Race Condition)",
+      "cluster_with_fix_sha": 0,
+      "cwe_id": "CWE-362",
+      "preconditions": [
+        "Multithreaded / interrupt context without adequate lock barrier"
+      ],
+      "reason_no_evidence": "no 40-hex fix commit for this CWE in docs/memory/records or docs/studies/cve-history",
+      "rules": [
+        {
+          "explanation": "TOCTOU check-then-open pattern or rapid unlock-relock window in C creates concurrency race window.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Use atomic open with O_CREAT|O_EXCL, or hold critical section invariants continuously.",
+          "pattern": "(?:(?:access|stat|lstat)\\s*\\(\\s*([a-zA-Z0-9_\\\"'/]+)\\s*,[^)]+\\)(?:[^;]*;|[^\\n]*)\\s*[^;]*\\b(?:fopen|open)\\s*\\(\\s*\\1\\b|(?:spin_unlock|pthread_mutex_unlock|mutex_unlock)\\s*\\(&?([a-zA-Z0-9_]+)\\);\\s*(?:spin_lock|pthread_mutex_lock|mutex_lock)\\s*\\(&?\\2\\);)",
+          "rule_id": "SEC-CWE-362-CONCURRENCY-RACE-C",
+          "severity": "MEDIUM",
+          "title": "Race Condition / TOCTOU Window (C/C++)"
+        },
+        {
+          "explanation": "Checking os.path.exists() before open() introduces a TOCTOU race condition in Python.",
+          "language": "Python",
+          "languages": [
+            "python"
+          ],
+          "lesson": "Use atomic file operations (e.g. open with 'x' mode) or try/except FileExistsError/FileNotFoundError.",
+          "pattern": "(?:if\\s+os\\.path\\.exists\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*\\):[^:\\n]*\\n\\s*(?:with\\s+open|open)\\s*\\(\\s*\\1\\b)",
+          "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON",
+          "severity": "MEDIUM",
+          "title": "Race Condition / TOCTOU File Access (Python)"
+        },
+        {
+          "explanation": "Testing file existence before operating on it in shell creates a TOCTOU race condition.",
+          "language": "Shell",
+          "languages": [
+            "shell"
+          ],
+          "lesson": "Use atomic file operations or mktemp; handle command error codes directly.",
+          "pattern": "(?:if\\s+\\[\\s*-[efrwxd]\\s+[\"\\']?\\$[a-zA-Z0-9_]+[\"\\']?\\s*\\];?\\s*then[^;]+(?:\\bcat\\b|\\bcp\\b|\\bmv\\b|\\brm\\b|>)\\s+[^;]*\\$)",
+          "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL",
+          "severity": "MEDIUM",
+          "title": "Race Condition / TOCTOU File Operation (Shell)"
+        }
+      ]
+    }
+  ],
+  "gate_command": "python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json",
+  "generated_by": "scripts/build_guardrails.py",
+  "schema_version": "defensive-guardrails-v1",
+  "selection_rule": "A family is emitted when it has at least one auditor rule and at least one 40-hex fix commit in this repository, linked by the row's recorded cwe or by the advisory appearing in the family cluster's sample_cves. At most 3 citations per family: pack records before catalog rows, then advisory id, lowest-sorting SHA per advisory.",
+  "sources": {
+    "catalogs": "docs/studies/cve-history/*/catalog.jsonl",
+    "clusters": "docs/studies/pattern_clusters.json",
+    "records": "docs/memory/records/*.json",
+    "rules": "scripts/defensive_auditor.py:SECURITY_RULES"
+  },
+  "summary": {
+    "citations_total": 6,
+    "families_covered": 2,
+    "rule_families_total": 6,
+    "rule_families_without_evidence": 4,
+    "rules_covered": 4
+  }
+}
