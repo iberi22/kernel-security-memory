@@ -1,20 +1,198 @@
 {
   "schema_version": "0.1.0",
   "pack_id": "kernel-security-memory-bootstrap-v0",
-  "project": "linux",
-  "record_count": 1,
-  "source_scope": "source-linked seed; not full history",
+  "project": "git,linux,nginx,openssh,sqlite,systemd",
+  "projects": [
+    "git",
+    "linux",
+    "nginx",
+    "openssh",
+    "sqlite",
+    "systemd"
+  ],
+  "record_count": 35,
+  "source_scope": "fetched seed (1 record) plus the vetted fable-2026-06 slice (34 records converted offline from cited study records); not the full history of any upstream project",
   "vectors": "NOT_BUILT",
   "files": [
     {
       "path": "kernel-security-memory.sql",
-      "sha256": "a66268f1f8c5f3ca4ede7f2d0093249924ab3a96b5727a3b3380264a4a450491",
-      "bytes": 15757
+      "sha256": "0a5b44b08bdadadaba0d761fb16eafc6e88bafe6b3f3afcd693b37ec39b5e092",
+      "bytes": 406050
+    },
+    {
+      "path": "records/git-CVE-2016-2315.json",
+      "sha256": "6cb849eae2d48838ec0c4f3b80e68b9146e24416701629243f5bf6216ba6f0db",
+      "bytes": 6625
+    },
+    {
+      "path": "records/git-CVE-2016-2324.json",
+      "sha256": "fc305b0e49bfa1fd51104a6d2ca758cba9e665eb4ea8fea9bb3c5b3c043b44de",
+      "bytes": 6625
+    },
+    {
+      "path": "records/git-CVE-2018-17456.json",
+      "sha256": "1ab1ff042d93c8b88363c1c7981a03d75ddb4172133f8d0079bba9c0eea33cc8",
+      "bytes": 6640
+    },
+    {
+      "path": "records/git-CVE-2020-11008.json",
+      "sha256": "7b8574954d5369996b26ed93ab8a18ef2d023b0c5d810a35aa64665c8df7fd70",
+      "bytes": 6640
+    },
+    {
+      "path": "records/git-CVE-2020-5260.json",
+      "sha256": "49a9c9414eece2266aad585524f316c84dd0e3b82e7c7e54ddda667b2753b135",
+      "bytes": 6625
+    },
+    {
+      "path": "records/git-CVE-2021-21300.json",
+      "sha256": "3e2b8f8b130e6b49e0440da3aecae0d7344438a0cc52b5101b8ed7d0d422bad0",
+      "bytes": 6640
+    },
+    {
+      "path": "records/git-CVE-2021-40330.json",
+      "sha256": "332d3c315adeb11bbc8e67a39a22d3f13f956ec43ee60a17d1c28453cdbeffa0",
+      "bytes": 6640
+    },
+    {
+      "path": "records/git-CVE-2024-32002.json",
+      "sha256": "f3d7bede3e13f7b1a7ab7326a4b0c2d7facc455b4364e9c54ddb6584a293f185",
+      "bytes": 6640
     },
     {
       "path": "records/linux-CVE-2024-26581-mainline.json",
-      "sha256": "8bf48427a43ddc3452da20c6a087e9bbc884b38104f0f315d08d9f6ca5c5ce52",
-      "bytes": 8459
+      "sha256": "43f75e6a90b8af0238829742b8f1f95cd943222103af43b611fcc4ba2f2abb22",
+      "bytes": 8473
+    },
+    {
+      "path": "records/nginx-CVE-2017-20005.json",
+      "sha256": "2e7af5d989de986b6ffa4a57dfaf684675bab3e14a5345ef833544239857552e",
+      "bytes": 6528
+    },
+    {
+      "path": "records/nginx-CVE-2019-20372.json",
+      "sha256": "75fdc18e4d3ce014a6050d7946c7ecabc2ff7c015ff3d376df14ce71af3058c9",
+      "bytes": 6528
+    },
+    {
+      "path": "records/openssh-CVE-2018-20685.json",
+      "sha256": "c01770534d35e61ae944375e3e68dc3fe1c54cc98c93d3273e2381f8c7981548",
+      "bytes": 6888
+    },
+    {
+      "path": "records/openssh-CVE-2020-12062.json",
+      "sha256": "5a59be4106af842fa08795f05fa4c5759e1518c8f4e96887b80c45c9cc9ec21d",
+      "bytes": 6765
+    },
+    {
+      "path": "records/openssh-CVE-2021-28041.json",
+      "sha256": "6d3effd822ece0234a35e43a4aa152c004240fd736686baaaaf72310999bc34b",
+      "bytes": 6789
+    },
+    {
+      "path": "records/openssh-CVE-2023-25136.json",
+      "sha256": "a821c68dbbd7bfe07c6b4c82f8af88d93adf59994f0cafcb88cad2c0074f741c",
+      "bytes": 6890
+    },
+    {
+      "path": "records/openssh-CVE-2023-51384.json",
+      "sha256": "0c4ff95db1a3a1dd7a29f746e83b0808f24e15211b06eaa8f602763887b4d772",
+      "bytes": 6870
+    },
+    {
+      "path": "records/openssh-CVE-2023-51385.json",
+      "sha256": "5be8c4b3d35214ac9a55495afb971998e70bbec55441b111e9ba2dfdd89fd194",
+      "bytes": 6759
+    },
+    {
+      "path": "records/openssh-CVE-2023-51767.json",
+      "sha256": "ab471023f64d048a222492b0ecb1999a50386da4bcd542584fc53567fd42cc1c",
+      "bytes": 6775
+    },
+    {
+      "path": "records/openssh-CVE-2025-32728.json",
+      "sha256": "198fcac57c1569aa925c3123b4ef5335cce4ac02ad90d400ef8d7f80c1505a4f",
+      "bytes": 6759
+    },
+    {
+      "path": "records/sqlite-CVE-2019-19244.json",
+      "sha256": "7b2648ba34fe10dade78eabcf337769beba7bd970b27f04c1b7df6a4f0c8c536",
+      "bytes": 6774
+    },
+    {
+      "path": "records/sqlite-CVE-2019-19317.json",
+      "sha256": "f96d728283eb7fbf40e650ecf8a038594713ad41f6063277dee318dfe4533742",
+      "bytes": 6810
+    },
+    {
+      "path": "records/sqlite-CVE-2019-19603.json",
+      "sha256": "4ee02deaa56d9061b5ff6592aebe72401db8750f520e19dae3aecb4a613eab60",
+      "bytes": 6768
+    },
+    {
+      "path": "records/sqlite-CVE-2019-20218.json",
+      "sha256": "b951270b2dbcac3917f59f4006d35c07c1a3fde8adb5b35fc0722882d1f0b4ea",
+      "bytes": 6774
+    },
+    {
+      "path": "records/sqlite-CVE-2025-29088.json",
+      "sha256": "5f2848c2d73b01fae7112415094a89126b7ede182145c8942814d5feda5aa57e",
+      "bytes": 6806
+    },
+    {
+      "path": "records/sqlite-CVE-2026-39113.json",
+      "sha256": "4f648c3f1d9798ddaca6912a5e3497fcff3e15a2d7f0c6f6bc75e4401e218dc4",
+      "bytes": 6767
+    },
+    {
+      "path": "records/sqlite-CVE-2026-50812.json",
+      "sha256": "c97c04fa745b078056821bfc27d62128a4c462351a2a0af80f202c62dcc96178",
+      "bytes": 6767
+    },
+    {
+      "path": "records/sqlite-CVE-2026-50813.json",
+      "sha256": "b06ddc259b4b2dee33d22c3f432bbc73f6f9a05b7cfbe34bbb0fe4029f557215",
+      "bytes": 6770
+    },
+    {
+      "path": "records/systemd-CVE-2020-1712.json",
+      "sha256": "769364edba7e7e77716dbece6b8b13a32d21cfacf6409720a3a2749b3a0b92cc",
+      "bytes": 6676
+    },
+    {
+      "path": "records/systemd-CVE-2021-33910.json",
+      "sha256": "53566c772c96e56f53af4e6219640e7ad4cdfd0ffed020b42c48ffdc12ad2302",
+      "bytes": 6664
+    },
+    {
+      "path": "records/systemd-CVE-2021-3997.json",
+      "sha256": "d437a7061cee09be5fb56304de0f96067ddda3dd068ed07ccf3f3cc9cf522201",
+      "bytes": 6688
+    },
+    {
+      "path": "records/systemd-CVE-2022-2526.json",
+      "sha256": "561c65ff0866dbf630f8860e828dd6d94f6b050332742924e674324f4dace5df",
+      "bytes": 6676
+    },
+    {
+      "path": "records/systemd-CVE-2022-3821.json",
+      "sha256": "0b24cf8bfcadd669527ea21459bd3b6305b7efc9bfa33b2717d33020e2a4e110",
+      "bytes": 6688
+    },
+    {
+      "path": "records/systemd-CVE-2022-4415.json",
+      "sha256": "d916711b08bcfdc1e5ed187cef7acb41dfd22d46b7b29870c4efe7a488aed6f7",
+      "bytes": 6655
+    },
+    {
+      "path": "records/systemd-CVE-2022-45873.json",
+      "sha256": "4b4e8dd2054cde8e4a9f7aad0fc63c9a69ffad3ac40601e03b0d34acb925e4f0",
+      "bytes": 6676
+    },
+    {
+      "path": "records/systemd-CVE-2026-29111.json",
+      "sha256": "23a914f84850047bb94afe878a41d988941ad1a1b04dd3eb9cf279515b902d60",
+      "bytes": 6661
     }
   ]
 }

@@ -15,6 +15,11 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
+try:  # importable as a script, as scripts.studies.fetch_history_x and top-level
+    from . import fetcher_io
+except ImportError:  # direct execution / sys.path import
+    import fetcher_io
+
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent.parent
 DEFAULT_OUT_DIR = BASE_DIR / "docs" / "studies" / "cve-history" / "nginx"
 INDEX_FILE = DEFAULT_OUT_DIR / "index.json"
@@ -170,6 +175,32 @@ def make_nvd_request(url, cumulative_bytes):
         return json.loads(body.decode("utf-8"))
 
 
+def determine_status(entry_count, coverage, resume, requests, window_start):
+    """Derive the honest catalog state (status, cursor_date, window_closed).
+
+    Mirrors determine_status() in scripts/studies/build_catalog_manifest.py so a fetch
+    run can never write an index state that the manifest would contradict.
+    """
+    if coverage == "COMPLETE":
+        return ("OBSERVED_EMPTY", None, True) if entry_count == 0 else ("COMPLETE", None, True)
+    cursor = resume.get("next_start_date") if resume else None
+    if cursor and (entry_count > 0 or (cursor != window_start and requests > 0)):
+        return ("CURSOR_PAUSED", cursor, False)
+    return ("NOT_FETCHED", None, False)
+
+
+def index_notes(status, cursor_date):
+    """Note that states the observed window state instead of implying completion."""
+    base = "Descriptions were omitted per policy."
+    if status == "CURSOR_PAUSED":
+        return f"{base} Cursor paused at {cursor_date}; window remains open (not closed)."
+    if status == "OBSERVED_EMPTY":
+        return f"{base} Completed scan over 1999-01-01..{fetcher_io.window_end_iso()} yielded 0 entries."
+    if status == "NOT_FETCHED":
+        return f"{base} Scaffold not yet fetched."
+    return base
+
+
 def fetch_nvd_data(out_dir, max_time_seconds=180):
     start_time = time.time()
     out_dir_path = pathlib.Path(out_dir)
@@ -178,7 +209,7 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
     catalog_path = out_dir_path / "catalog.jsonl"
 
     start_date_default = datetime.date(1999, 1, 1)
-    end_date_limit = datetime.date(2026, 10, 8)
+    end_date_limit = fetcher_io.resolve_run_date()
 
     cumulative_bytes = [0]
     requests_count = 0
@@ -187,41 +218,36 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
 
     current_start = start_date_default
 
-    # Resume if existing index.json is present
-    if index_path.is_file():
-        try:
-            with open(index_path, "r", encoding="utf-8") as f:
-                prev_index = json.load(f)
-                requests_count = prev_index.get("requests", 0)
-                errors = prev_index.get("errors", [])
-                if prev_index.get("resume") and "next_start_date" in prev_index["resume"]:
-                    current_start = datetime.date.fromisoformat(prev_index["resume"]["next_start_date"])
-                elif prev_index.get("coverage") == "COMPLETE":
-                    print("Catalog is already COMPLETE.")
-                    return
-        except Exception:
-            pass
+    # Resume from the persisted cursor. A corrupt file is fatal: the old loader
+    # swallowed the error and rewrote the truncated catalog as a shorter
+    # "valid" one. Errors from earlier runs are history, not a reason to stop:
+    # only this run's failures may gate progress (see fetcher_io).
+    errors, error_history = [], []
+    prev_index = fetcher_io.read_index(index_path)
+    if prev_index is not None:
+        requests_count = prev_index.get("requests", 0)
+        errors, error_history = fetcher_io.load_error_history(prev_index)
+        if prev_index.get("resume") and "next_start_date" in prev_index["resume"]:
+            current_start = datetime.date.fromisoformat(prev_index["resume"]["next_start_date"])
+        elif prev_index.get("coverage") == "COMPLETE":
+            print("Catalog is already COMPLETE.")
+            return
 
-    if catalog_path.is_file():
-        try:
-            with open(catalog_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip():
-                        rec = json.loads(line.strip())
-                        kept_records[rec["advisory_id"]] = rec
-        except Exception:
-            pass
+    # A corrupt catalog line is fatal too (fetcher_io.read_catalog).
+    kept_records = fetcher_io.read_catalog(catalog_path)
 
     coverage = "INCOMPLETE"
     resume = None
 
+    # The cap is per run; the persisted lifetime total is only bookkeeping.
+    run_start_requests = requests_count
     while current_start <= end_date_limit:
         if time.time() - start_time > max_time_seconds:
             resume = {"next_start_date": current_start.isoformat()}
             print(f"Time limit reached ({max_time_seconds}s). Saving progress...")
             break
 
-        if requests_count >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
+        if requests_count - run_start_requests >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
             resume = {"next_start_date": current_start.isoformat()}
             print("Request or byte cap reached. Saving progress...")
             break
@@ -234,7 +260,7 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
         window_finished = False
 
         while True:
-            if time.time() - start_time > max_time_seconds or requests_count >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
+            if time.time() - start_time > max_time_seconds or requests_count - run_start_requests >= MAX_CALLS or cumulative_bytes[0] >= CUMULATIVE_LIMIT:
                 resume = {"next_start_date": current_start.isoformat()}
                 window_finished = False
                 break
@@ -291,6 +317,8 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
                 window_finished = True
                 break
 
+        # `errors` holds this run's failures only; the ones from earlier
+        # runs live in error_history and must not block new progress.
         if not window_finished or errors:
             if resume is None:
                 resume = {"next_start_date": current_start.isoformat()}
@@ -304,31 +332,34 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
 
     # Write catalog.jsonl (sorted by published, then advisory_id)
     sorted_records = sorted(kept_records.values(), key=lambda r: (r["published"], r["advisory_id"]))
-    with open(catalog_path, "w", encoding="utf-8") as f:
-        for rec in sorted_records:
-            line = json.dumps(rec, separators=(",", ":"))
-            f.write(line + "\n")
+    fetcher_io.write_catalog_atomic(catalog_path, sorted_records)
 
     entry_count = len(sorted_records)
     with_fix_sha = sum(1 for r in sorted_records if len(r["fix_shas"]) > 0)
+
+    status, cursor_date, window_closed = determine_status(
+        entry_count, coverage, resume, requests_count, "1999-01-01")
 
     index_data = {
         "schema_version": "cve-history-v1",
         "project": "nginx",
         "repo": "https://github.com/nginx/nginx",
-        "window": {"start": "1999-01-01", "end": "2026-10-08"},
+        "window": fetcher_io.expected_window(),
         "keyword": "nginx",
         "coverage": coverage,
+        "status": status,
+        "cursor_date": cursor_date,
+        "window_closed": window_closed,
         "entry_count": entry_count,
         "with_fix_sha": with_fix_sha,
         "requests": requests_count,
         "resume": resume,
         "errors": errors,
-        "notes": "Descriptions were omitted per policy.",
+        "error_history": fetcher_io.merge_error_history(error_history, errors),
+        "notes": index_notes(status, cursor_date),
     }
 
-    with open(index_path, "w", encoding="utf-8") as f:
-        json.dump(index_data, f, indent=2)
+    fetcher_io.write_index_atomic(index_path, index_data)
 
     print(f"Fetch run completed: {entry_count} entries ({with_fix_sha} with fix SHAs), {requests_count} total requests.")
     print(f"Coverage: {coverage}, resume: {resume}")
@@ -379,8 +410,9 @@ def validate_offline(out_dir):
         print(f"Error: keyword mismatch", file=sys.stderr)
         return False
 
-    if index_data["window"] != {"start": "1999-01-01", "end": "2026-10-08"}:
-        print(f"Error: window mismatch", file=sys.stderr)
+    window_ok, window_reason = fetcher_io.check_window(index_data.get("window"))
+    if not window_ok:
+        print(f"Error: invalid window: {window_reason}", file=sys.stderr)
         return False
 
     if index_data["coverage"] not in ("COMPLETE", "INCOMPLETE"):
@@ -419,7 +451,9 @@ def validate_offline(out_dir):
             required_rec_keys = {
                 "advisory_id", "published", "cwe", "cwe_state", "patch_urls", "fix_shas", "subsystem"
             }
-            if set(rec.keys()) != required_rec_keys:
+            # Optional provenance keys written by the enrichers (enrich_from_osv.py).
+            optional_rec_keys = {"fix_sha_source", "cwe_source", "fix_repo"}
+            if not required_rec_keys <= set(rec.keys()) <= required_rec_keys | optional_rec_keys:
                 print(f"Error: catalog line {idx} has invalid keys: {rec.keys()}", file=sys.stderr)
                 return False
 
@@ -481,7 +515,11 @@ def main():
         sys.exit(0 if ok else 1)
 
     if args.fetch:
-        fetch_nvd_data(args.out_dir, max_time_seconds=args.max_time)
+        try:
+            fetch_nvd_data(args.out_dir, max_time_seconds=args.max_time)
+        except fetcher_io.CorruptStateError as err:
+            print(f"Error: {err}", file=sys.stderr)
+            sys.exit(2)
 
 
 if __name__ == "__main__":
