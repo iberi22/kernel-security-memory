@@ -60,6 +60,7 @@ def verify_evidence_integrity(evidence_dict):
     verdict = audit.get("verdict", "")
     ksm_pack_ref = audit.get("ksm_pack_reference", "kernel-security-memory-bootstrap-v0")
     rules_applied = audit.get("rules_applied", [r["id"] for r in SECURITY_RULES])
+    file_digests = audit.get("file_digests")
 
     expected_hash, _ = compute_evidence_hash(
         target=target,
@@ -68,6 +69,7 @@ def verify_evidence_integrity(evidence_dict):
         verdict=verdict,
         ksm_pack_ref=ksm_pack_ref,
         rules_applied=rules_applied,
+        file_digests=file_digests,
     )
 
     if chain_hash != expected_hash:
@@ -87,8 +89,8 @@ def verify_reproducible_runs(target, runs=2, clusters_path=None):
     last_evidence = None
 
     for _ in range(max(2, runs)):
-        files, findings = audit_path(target, cluster_map=cluster_map)
-        evidence = build_evidence_chain(target, files, findings)
+        files, findings, file_digests = audit_path(target, cluster_map=cluster_map)
+        evidence = build_evidence_chain(target, files, findings, file_digests=file_digests)
         hashes.append(evidence["evidence_chain_hash"])
         last_evidence = evidence
 
@@ -240,7 +242,7 @@ def main(argv=None):
                         help="Path to pattern_clusters.json")
     parser.add_argument("--runs", type=int, default=2,
                         help="Number of verification runs for reproducibility check")
-    parser.add_argument("--strict", action="store_true", default=True,
+    parser.add_argument("--strict", action=argparse.BooleanOptionalAction, default=True,
                         help="Enforce strict gate (reject WARN, FAIL, INCOMPLETE)")
     parser.add_argument("--prefix", default=DEFAULT_XAVIER_PREFIX,
                         help=f"Xavier publication path prefix (default: {DEFAULT_XAVIER_PREFIX})")

@@ -90,7 +90,11 @@ def validate_fragment(fragment):
     if not isinstance(lines_range, (list, tuple)) or len(lines_range) != 2:
         raise ValueError("lines_range must be a 2-element [start, end] list")
     start, end = lines_range
-    if not isinstance(start, int) or not isinstance(end, int) or start < 1 or end < start:
+    if (
+        isinstance(start, bool) or isinstance(end, bool)
+        or not isinstance(start, int) or not isinstance(end, int)
+        or start < 1 or end < start
+    ):
         raise ValueError(f"Invalid lines_range: {lines_range}")
 
     truncated = fragment["truncated"]

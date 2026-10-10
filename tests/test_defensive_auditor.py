@@ -3,9 +3,11 @@
 
 import json
 import os
+import re
 import stat
 import tempfile
 import time
+import unittest
 from pathlib import Path
 from unittest import TestCase, main
 
@@ -414,27 +416,83 @@ class TestDefensiveAuditor(TestCase):
         self.assertEqual(evidence["evidence_chain_hash"], expected_hash)
 
     def test_evidence_chain_hash_identical_across_time(self):
-        files = ["module_b.c", "module_a.c"]
-        findings = []
+        # Real files: the digests must be stable across runs and the payload must
+        # carry them, so the hash is bound to the audited tree state.
+        target = self.base_dir / "src"
+        target.mkdir()
+        (target / "a.c").write_text("int add(int a, int b) { return a + b; }\n", encoding="utf-8")
+        (target / "b.c").write_text("int sub(int a, int b) { return a - b; }\n", encoding="utf-8")
 
-        # Run 1
-        ev1 = build_evidence_chain("demo_repo", files, findings)
-        hash1 = ev1["evidence_chain_hash"]
+        import hashlib
 
-        # Simulate delay
+        files, findings, digests = audit_path(str(target))
+        self.assertEqual(len(digests), 2)
+        for path, digest in digests.items():
+            self.assertEqual(
+                digest,
+                hashlib.sha256(Path(path).read_bytes()).hexdigest(),
+                "file_digests must hold the raw-byte SHA-256 of every audited file",
+            )
+
+        ev1 = build_evidence_chain(str(target), files, findings, file_digests=digests)
+        self.assertEqual(ev1["audit"]["file_digests"], dict(sorted(digests.items())))
+
         time.sleep(0.01)
 
-        # Run 2
-        ev2 = build_evidence_chain("demo_repo", files, findings)
+        files2, findings2, digests2 = audit_path(str(target))
+        ev2 = build_evidence_chain(str(target), files2, findings2, file_digests=digests2)
         hash2 = ev2["evidence_chain_hash"]
 
-        self.assertEqual(hash1, hash2, "evidence_chain_hash must be strictly identical across runs")
+        self.assertEqual(hash2, ev1["evidence_chain_hash"], "evidence_chain_hash must be strictly identical across runs")
         # Notice that timestamps differ, but hashes remain strictly identical
         self.assertNotEqual(ev1["audit"]["timestamp"], ev2["audit"]["timestamp"])
+
+    def test_evidence_hash_changes_when_audited_content_changes(self):
+        # Two trees with identical paths and identical (empty) findings must not
+        # collide: the hash has to identify the audited tree state.
+        target = self.base_dir / "src"
+        target.mkdir()
+        (target / "a.c").write_text("int x = 1;\n", encoding="utf-8")
+
+        files, findings, digests = audit_path(str(target))
+        before = build_evidence_chain(str(target), files, findings, file_digests=digests)
+        (target / "a.c").write_text("int x = 2;\n", encoding="utf-8")
+        files2, findings2, digests2 = audit_path(str(target))
+        after = build_evidence_chain(str(target), files2, findings2, file_digests=digests2)
+
+        self.assertNotEqual(
+            before["evidence_chain_hash"],
+            after["evidence_chain_hash"],
+            "a one-byte change in audited content must alter the evidence_chain_hash",
+        )
+        self.assertNotEqual(digests, digests2)
+        self.assertEqual(before["audit"]["verdict"], after["audit"]["verdict"])
+        self.assertEqual(before["audit"]["findings"], after["audit"]["findings"])
+
+    def test_evidence_integrity_detects_post_audit_content_change(self):
+        target = self.base_dir / "src"
+        target.mkdir()
+        (target / "a.c").write_text("int add(int a, int b) { return a + b; }\n", encoding="utf-8")
+        files, findings, digests = audit_path(str(target))
+        evidence = build_evidence_chain(str(target), files, findings, file_digests=digests)
+
+        valid, _ = verify_evidence_integrity(evidence)
+        self.assertTrue(valid)
+
+        # Re-audit after the code changed: the cited hash must not still validate.
+        (target / "a.c").write_text("int add(int a, int b) { return a * b; }\n", encoding="utf-8")
+        files2, findings2, digests2 = audit_path(str(target))
+        stale = build_evidence_chain(str(target), files2, findings2, file_digests=digests2)
+        stale["evidence_chain_hash"] = evidence["evidence_chain_hash"]
+        valid, msg = verify_evidence_integrity(stale)
+        self.assertFalse(valid, "evidence citing a hash from older content must be rejected")
+        self.assertIn("Hash mismatch", msg)
 
     # -------------------------------------------------------------------------
     # D3: Incomplete Verdict on Unreadable Files and Corrupt Clusters
     # -------------------------------------------------------------------------
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0,
+                     "root bypasses file permissions and can read mode-000 files")
     def test_unreadable_file_produces_incomplete_verdict(self):
         # Create unreadable file
         target_file = self.base_dir / "unreadable.c"
@@ -442,7 +500,7 @@ class TestDefensiveAuditor(TestCase):
         target_file.chmod(0o000)
 
         try:
-            files_audited, findings = audit_path(str(self.base_dir))
+            files_audited, findings, _digests = audit_path(str(self.base_dir))
             evidence = build_evidence_chain(str(self.base_dir), files_audited, findings)
 
             self.assertEqual(
@@ -487,6 +545,8 @@ class TestDefensiveAuditor(TestCase):
         self.assertEqual(result["status"], "REJECTED")
         self.assertEqual(result["verdict"], "FAIL")
 
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0,
+                     "root bypasses file permissions and can read mode-000 files")
     def test_quality_gate_rejects_incomplete_environment(self):
         broken_file = self.base_dir / "locked.py"
         broken_file.write_text("print('hello')\n", encoding="utf-8")
@@ -514,11 +574,103 @@ class TestDefensiveAuditor(TestCase):
         self.assertIn("Hash mismatch", msg)
 
     # -------------------------------------------------------------------------
+    # D4: Extension/Language Coherence Between Traversal and Rule Selection
+    # -------------------------------------------------------------------------
+    def test_javascript_and_typescript_are_not_given_c_rules(self):
+        # .js/.ts have no language in _detect_language(); traversing them with the
+        # C rules produced false HIGH findings that flipped the verdict to FAIL.
+        target = self.base_dir / "web"
+        target.mkdir()
+        (target / "widget.js").write_text('const s = "a";\nfunction f(src) { strcpy(buf, src); free(p); }\n', encoding="utf-8")
+        (target / "widget.ts").write_text('const s = "a";\nfunction f(src) { strcpy(buf, src); free(p); }\n', encoding="utf-8")
+        files, findings, digests = audit_path(str(target))
+        self.assertEqual(files, [], "extensions without a language mapping must not be audited")
+        self.assertEqual(findings, [])
+        self.assertEqual(digests, {})
+        self.assertEqual(build_evidence_chain(str(target), files, findings)["audit"]["verdict"], "PASS")
+
+    def test_same_c_pattern_in_a_c_file_still_fails(self):
+        # Guard against the fix above simply disabling the C rules: the very same
+        # pattern in a .c file must still produce a HIGH finding and a FAIL verdict.
+        target = self.base_dir / "native"
+        target.mkdir()
+        (target / "widget.c").write_text('void f(char *src) { char buf[8]; strcpy(buf, src); free(p); }\n', encoding="utf-8")
+        files, findings, digests = audit_path(str(target))
+        self.assertEqual(len(files), 1)
+        self.assertEqual(len(digests), 1)
+        severities = {f["severity"] for f in findings}
+        self.assertIn("HIGH", severities)
+        self.assertEqual(build_evidence_chain(str(target), files, findings)["audit"]["verdict"], "FAIL")
+
+    def test_cpp_extensions_detected_as_c_are_traversed(self):
+        # .hpp/.cxx are mapped to "c" by _detect_language, so directory
+        # traversal has to include them.
+        target = self.base_dir / "native"
+        target.mkdir()
+        (target / "impl.cxx").write_text("int f(void) { return 0; }\n", encoding="utf-8")
+        (target / "impl.hpp").write_text("int f(void);\n", encoding="utf-8")
+        files, _findings, digests = audit_path(str(target))
+        self.assertEqual(sorted(Path(p).name for p in files), ["impl.cxx", "impl.hpp"])
+        self.assertEqual(len(digests), 2)
+
+    # -------------------------------------------------------------------------
+    # D5: Documented Skill Contract Matches the Auditor (code is source of truth)
+    # -------------------------------------------------------------------------
+    SKILL_DOC = Path(__file__).resolve().parents[1] / "docs" / "skills" / "defensive-security-auditor" / "SKILL.md"
+
+    def _skill_doc_text(self):
+        self.assertTrue(self.SKILL_DOC.exists(), f"skill doc missing: {self.SKILL_DOC}")
+        return self.SKILL_DOC.read_text(encoding="utf-8")
+
+    def test_documented_rule_ids_exist_in_auditor(self):
+        text = self._skill_doc_text()
+        real_ids = {r["id"] for r in SECURITY_RULES}
+        documented = set(re.findall(r"`(SEC-[A-Z0-9-]+)`", text))
+
+        self.assertTrue(documented, "skill doc must cite at least one rule id")
+        unknown = documented - real_ids
+        self.assertEqual(unknown, set(), f"skill doc cites rule IDs that do not exist: {sorted(unknown)}")
+
+    def test_documented_cwe_languages_match_auditor(self):
+        text = self._skill_doc_text()
+        language_tokens = {"C": {"c", "cpp"}, "Rust": {"rust"}, "Python": {"python"}, "Shell": {"shell"}}
+
+        rows = 0
+        for line in text.splitlines():
+            m = re.match(r"\|\s*\*\*CWE-(\d+)\*\*\s*\|[^|]*\|\s*([^|]+?)\s*\|", line)
+            if not m:
+                continue
+            rows += 1
+            cwe = f"CWE-{m.group(1)}"
+            documented_langs = set()
+            for token in re.findall(r"[A-Za-z]+", m.group(2)):
+                if token in language_tokens:
+                    documented_langs |= language_tokens[token]
+            code_langs = {lang for r in SECURITY_RULES if r["cwe_id"] == cwe for lang in r["languages"]}
+            self.assertEqual(
+                documented_langs, code_langs,
+                f"{cwe}: doc lists {sorted(documented_langs)} but auditor implements {sorted(code_langs)}",
+            )
+        self.assertGreaterEqual(rows, 6, "expected one CWE row per archetype in the skill doc")
+
+    def test_documented_reproducibility_check_audits_per_run(self):
+        # The old documented snippet hashed one (files, findings) pair twice, so the
+        # assertion could never fail. Every build_evidence_chain call in the doc must
+        # be fed by its own audit_path call.
+        text = self._skill_doc_text()
+        self.assertGreaterEqual(text.count("audit_path("), 1)
+        self.assertEqual(
+            text.count("build_evidence_chain("), text.count("audit_path("),
+            "Check 2 must audit the target once per evidence chain, not reuse one scan",
+        )
+        self.assertIn("file_digests=digests", text, "Check 2 must bind the per-file digests")
+
+    # -------------------------------------------------------------------------
     # Empirical Audit on scripts/
     # -------------------------------------------------------------------------
     def test_audit_real_swal_files(self):
         scripts_dir = Path(__file__).resolve().parents[1] / "scripts"
-        files_audited, findings = audit_path(str(scripts_dir))
+        files_audited, findings, _digests = audit_path(str(scripts_dir))
         self.assertGreater(len(files_audited), 5)
         critical_findings = [f for f in findings if f["severity"] == "CRITICAL"]
         self.assertEqual(len(critical_findings), 0)

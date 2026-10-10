@@ -194,7 +194,9 @@ class TestFragmentContract(unittest.TestCase):
         }
 
     def test_schema_file_exists_and_matches_required_fields(self):
-        schema_path = Path("schemas/fragment.schema.json")
+        # Resolve from the test file, not the process CWD, so the check holds
+        # however unittest is invoked.
+        schema_path = Path(__file__).resolve().parents[1] / "schemas" / "fragment.schema.json"
         self.assertTrue(schema_path.exists())
         with open(schema_path, "r", encoding="utf-8") as f:
             schema = json.load(f)
@@ -265,6 +267,20 @@ class TestFragmentContract(unittest.TestCase):
         bad_flags["truncated"] = "false"
         with self.assertRaises(ValueError):
             validate_fragment(bad_flags)
+
+    def test_validate_fragment_rejects_boolean_lines_range(self):
+        # bool is a subclass of int, but the JSON schema type "integer" does not
+        # match booleans, so the validator must reject them to stay in agreement.
+        for lines_range in ([True, True], [True, 5], [3, True]):
+            bad = copy.deepcopy(self.valid_fragment)
+            bad["lines_range"] = lines_range
+            with self.assertRaises(ValueError, msg=f"lines_range={lines_range} must be rejected"):
+                validate_fragment(bad)
+
+        # Sanity: the equivalent integer range is still valid.
+        ok = copy.deepcopy(self.valid_fragment)
+        ok["lines_range"] = [1, 1]
+        validate_fragment(ok)
 
     def test_extract_fragment_basic(self):
         frag = extract_fragment(

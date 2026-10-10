@@ -78,22 +78,38 @@ python3 scripts/defensive_auditor.py \
 - **Exit code 1**: Verdict is `FAIL` (HIGH/CRITICAL) or `INCOMPLETE`. Commit/PR is BLOCKED.
 
 ### Check 2: Cryptographic Hash Reproducibility Verification
-Verify that the generated evidence chain is deterministic and reproducible:
+Verify that the generated evidence chain is deterministic, reproducible, **and** bound to
+the audited tree state (each audited file's content digest is part of the hashed payload):
 
 ```bash
 python3 -c "
-import json, sys
-from pathlib import Path
 from scripts.defensive_auditor import audit_path, build_evidence_chain
 
-files, findings = audit_path('<path/to/target>')
-e1 = build_evidence_chain('<path/to/target>', files, findings)
-e2 = build_evidence_chain('<path/to/target>', files, findings)
+def run():
+    files, findings, digests = audit_path('<path/to/target>')
+    return build_evidence_chain('<path/to/target>', files, findings, file_digests=digests)
 
+e1 = run()
+e2 = run()
 assert e1['evidence_chain_hash'] == e2['evidence_chain_hash'], 'Non-deterministic evidence chain hash!'
+assert e1['audit']['file_digests'], 'Evidence chain must bind each audited file digest'
 print('Evidence chain hash verified reproducible:', e1['evidence_chain_hash'])
 "
 ```
+
+Equivalently, use the quality gate helper, which audits the target once per run:
+
+```bash
+python3 -c "
+from scripts.quality_gate import verify_reproducible_runs
+ok, hashes, evidence = verify_reproducible_runs('<path/to/target>', runs=2)
+assert ok, f'Hashes diverged: {hashes}'
+print('Reproducible across runs:', hashes[0])
+"
+```
+
+Because the payload carries per-file SHA-256 digests, re-auditing after a code change
+must produce a **different** hash: a hash cited for older content no longer verifies.
 
 ### Check 3: Language-Specific CWE Invariant Verification
 The auditor validates code against canonical CWE vulnerability archetypes:
@@ -102,10 +118,26 @@ The auditor validates code against canonical CWE vulnerability archetypes:
 |---|---|---|---|
 | **CWE-120** | Unbounded Buffer Copy | C | Bounded copy with explicit length check (`strncpy`, `snprintf`) |
 | **CWE-416** | Use-After-Free | C, Rust (unsafe) | Immediate pointer nullification after free; strict lifetime invariants |
-| **CWE-78** | OS Command Injection | Python, Shell, C | Parameterized argument lists; `shell=False`; strict quoting |
+| **CWE-78** | OS Command Injection | C, Python, Shell | Parameterized argument lists; `shell=False`; strict quoting |
 | **CWE-190** | Integer Overflow in Alloc | C, Rust | Overflow-checked arithmetic before allocation (`calloc`, `check_mul_overflow`) |
 | **CWE-476** | NULL Pointer Dereference | C, Rust (unsafe) | Mandatory non-NULL check on allocation return prior to dereference |
-| **CWE-362** | Concurrency TOCTOU Window | C, Rust, Python | Atomicity across check-and-act; no premature lock dropping |
+| **CWE-362** | Concurrency TOCTOU Window | C, Python, Shell | Atomicity across check-and-act; no premature lock dropping |
+
+Only these language families have rules: **C/C++** (`.c`, `.h`, `.cpp`, `.cc`, `.cxx`,
+`.hpp`), **Rust** (`.rs`), **Python** (`.py`), **shell** (`.sh`, `.bash`). Other extensions
+are not traversed, so no rules are applied to them.
+
+Rule IDs are language-suffixed; the full list is `SECURITY_RULES` in
+`scripts/defensive_auditor.py`:
+
+| CWE | Rule IDs |
+|---|---|
+| CWE-120 | `SEC-CWE-120-UNBOUNDED-COPY` |
+| CWE-416 | `SEC-CWE-416-USE-AFTER-FREE-C`, `SEC-CWE-416-USE-AFTER-FREE-RUST` |
+| CWE-78 | `SEC-CWE-78-COMMAND-INJECTION-C`, `SEC-CWE-78-COMMAND-INJECTION-PYTHON`, `SEC-CWE-78-COMMAND-INJECTION-SHELL` |
+| CWE-190 | `SEC-CWE-190-INTEGER-OVERFLOW-C`, `SEC-CWE-190-INTEGER-OVERFLOW-RUST` |
+| CWE-476 | `SEC-CWE-476-NULL-DEREFERENCE-C`, `SEC-CWE-476-NULL-DEREFERENCE-RUST` |
+| CWE-362 | `SEC-CWE-362-CONCURRENCY-RACE-C`, `SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON`, `SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL` |
 
 ---
 
@@ -131,12 +163,15 @@ The evidence JSON emitted by the auditor conforms to `defensive-evidence-chain-v
     "ksm_pack_reference": "kernel-security-memory-bootstrap-v0",
     "rules_applied": [
       "SEC-CWE-120-UNBOUNDED-COPY",
-      "SEC-CWE-190-INTEGER-OVERFLOW",
-      "SEC-CWE-362-CONCURRENCY-RACE",
-      "SEC-CWE-416-USE-AFTER-FREE",
-      "SEC-CWE-476-NULL-DEREFERENCE",
-      "SEC-CWE-78-COMMAND-INJECTION"
+      "SEC-CWE-190-INTEGER-OVERFLOW-C",
+      "SEC-CWE-416-USE-AFTER-FREE-C",
+      "SEC-CWE-476-NULL-DEREFERENCE-C",
+      "SEC-CWE-78-COMMAND-INJECTION-PYTHON",
+      "SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL"
     ],
+    "file_digests": {
+      "scripts/studies/base_history_fetcher.py": "9f2c1d0a7b3e4f5a6b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c"
+    },
     "deterministic_payload": { ... }
   }
 }
