@@ -17,61 +17,100 @@ from enrich_from_osv import (  # noqa: E402
     enrich_project,
     enrich_row,
     extract_cwe_ids,
-    extract_fix_events,
+    extract_fix_reference_shas,
     normalize_repo,
+    repo_path,
 )
 from enrich_fix_shas import SHA_RE  # noqa: E402  shared canonical rule
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/studies/enrich_from_osv.py"
 SHA_A = "172e54cda18412da73fd8eb4e444e8a5b371ca59"
 SHA_B = "e818b74be2170fbe957a07b0da4401c2b694b3b8"
+SHA_C = "943aea62679fb9f2d6d7abe59b5edcba21490c52"
+CURL_REPO = "https://github.com/curl/curl"
 
 
 def osv_doc(vuln_id, fixes=(), cwe_ids=(), aliases=()):
-    """Build a minimal but shape-faithful OSV vulnerability document."""
+    """Build a minimal but shape-faithful OSV vulnerability document.
+
+    ``fixes`` is now a list of commit ids published as FIX references inside the
+    project repository (the shape fetch_upstream_advisories.py and this script
+    both accept). GIT range "fixed" events are modelled separately by
+    git_boundary_doc(), because they are version boundaries, not fix commits.
+    """
     doc = {"id": vuln_id, "schema_version": "1.6.0", "aliases": list(aliases)}
     if fixes:
-        doc["affected"] = [{
-            "package": {"ecosystem": "GIT", "name": "github.com/curl/curl"},
-            "ranges": [{
-                "type": "GIT",
-                "repo": fixes[0][1],
-                "events": [{"introduced": "0" * 40}, {"fixed": fixes[0][0]}],
-            }],
-        }]
+        doc["references"] = [
+            {"type": "FIX", "url": f"{CURL_REPO}/commit/{sha}"} for sha in fixes
+        ]
     if cwe_ids:
         doc["database_specific"] = {"cwe_ids": list(cwe_ids)}
     return doc
 
 
+def git_boundary_doc(vuln_id, fixed_shas):
+    """An OSV document whose only commit data is GIT range 'fixed' events."""
+    return {
+        "id": vuln_id,
+        "schema_version": "1.6.0",
+        "references": [{"type": "ADVISORY", "url": "https://curl.se/docs/x.html"}],
+        "affected": [{
+            "package": {"ecosystem": "GIT", "name": "github.com/curl/curl"},
+            "ranges": [{
+                "type": "GIT",
+                "repo": "https://github.com/curl/curl.git",
+                "events": [{"introduced": "0" * 40}] + [{"fixed": sha} for sha in fixed_shas],
+            }],
+        }],
+    }
+
+
 class TestExtraction(unittest.TestCase):
-    def test_fix_events_from_git_ranges(self):
-        doc = osv_doc("CVE-2023-38545", fixes=[(SHA_A, "https://github.com/curl/curl")])
-        self.assertEqual(extract_fix_events(doc), [(SHA_A, "https://github.com/curl/curl")])
+    def test_fix_shas_from_fix_references(self):
+        doc = osv_doc("CVE-2023-38545", fixes=[SHA_A, SHA_B])
+        self.assertEqual(extract_fix_reference_shas(doc, CURL_REPO), [SHA_A, SHA_B])
 
-    def test_fix_events_ignore_non_git_and_bad_shas(self):
-        doc = {
-            "id": "CVE-1",
-            "affected": [
-                {"ranges": [{"type": "SEMVER", "events": [{"fixed": SHA_A}]}]},
-                {"ranges": [{"type": "GIT", "repo": "https://x/y", "events": [
-                    {"fixed": SHA_A[:8]},   # abbreviated rejected
-                    {"fixed": 0},            # non-string rejected
-                    {"introduced": SHA_B},   # no "fixed" key
-                ]}]},
-                {"ranges": [{"type": "GIT", "repo": "https://x/y", "events": [{"fixed": SHA_B}]}]},
-            ],
-        }
-        self.assertEqual(extract_fix_events(doc), [(SHA_B, "https://x/y")])
+    def test_patch_references_are_accepted_too(self):
+        doc = osv_doc("CVE-1", fixes=[SHA_A])
+        doc["references"][0]["type"] = "PATCH"
+        self.assertEqual(extract_fix_reference_shas(doc, CURL_REPO), [SHA_A])
 
-    def test_fix_events_are_normalized_to_lowercase(self):
-        doc = {"id": "CVE-1", "affected": [{"ranges": [
-            {"type": "GIT", "repo": "https://x/y", "events": [{"fixed": SHA_A.upper()}]}]}]}
-        self.assertEqual(extract_fix_events(doc), [(SHA_A, "https://x/y")])
+    def test_git_range_fixed_events_are_not_fix_shas(self):
+        """The round-1 defect: a range boundary is not a fix commit."""
+        doc = git_boundary_doc("CVE-2005-3185", [SHA_C, SHA_B])
+        self.assertEqual(extract_fix_reference_shas(doc, CURL_REPO), [])
 
-    def test_fix_events_without_affected(self):
-        self.assertEqual(extract_fix_events({"id": "CVE-2"}), [])
-        self.assertEqual(extract_fix_events({}), [])
+    def test_references_of_another_type_are_ignored(self):
+        doc = {"id": "CVE-1", "references": [
+            {"type": "ADVISORY", "url": "https://curl.se/docs/CVE-1.html"},
+            {"type": "WEB", "url": f"{CURL_REPO}/commit/{SHA_A}"},
+        ]}
+        self.assertEqual(extract_fix_reference_shas(doc, CURL_REPO), [])
+
+    def test_fix_reference_outside_the_project_repo_is_ignored(self):
+        doc = {"id": "CVE-1", "references": [
+            {"type": "FIX", "url": f"https://github.com/curl/curl-stable/commit/{SHA_A}"},
+            {"type": "FIX", "url": f"https://github.com/bminor/glibc/commit/{SHA_A}"},
+        ]}
+        self.assertEqual(extract_fix_reference_shas(doc, CURL_REPO), [])
+
+    def test_41_hex_and_non_commit_urls_are_ignored(self):
+        doc = {"id": "CVE-1", "references": [
+            {"type": "FIX", "url": f"{CURL_REPO}/commit/{'a' * 41}"},
+            {"type": "FIX", "url": f"{CURL_REPO}/issues/1234"},
+            {"type": "FIX", "url": f"{CURL_REPO}/compare/v1...v2"},
+        ]}
+        self.assertEqual(extract_fix_reference_shas(doc, CURL_REPO), [])
+
+    def test_without_a_repo_nothing_is_extracted(self):
+        self.assertEqual(extract_fix_reference_shas({"id": "CVE-1"}, CURL_REPO), [])
+        self.assertEqual(extract_fix_reference_shas({}, CURL_REPO), [])
+        self.assertEqual(extract_fix_reference_shas(osv_doc("CVE-1", fixes=[SHA_A]), ""), [])
+
+    def test_repo_path_strips_scheme_and_git_suffix(self):
+        self.assertEqual(repo_path("https://github.com/curl/curl.git/"), "github.com/curl/curl")
+        self.assertEqual(repo_path("curl"), "curl")
+        self.assertEqual(repo_path(None), "")
 
     def test_cwe_ids_normalized_and_deduplicated(self):
         doc = {"id": "CVE-3", "database_specific": {"cwe_ids": [" cwe-787 ", "CWE-787", "CWE-125", 7, "nope"]}}
@@ -92,8 +131,8 @@ class TestEnrichRow(unittest.TestCase):
     def test_new_values_and_provenance(self):
         row = {"advisory_id": "CVE-1", "cwe": None, "cwe_state": "UNKNOWN",
                "patch_urls": [], "fix_shas": [], "subsystem": None}
-        facts = {"fixes": [(SHA_A, "https://github.com/curl/curl")], "cwes": ["CWE-787"]}
-        enrich_row(row, facts, "https://github.com/curl/curl")
+        facts = {"fixes": [SHA_A], "cwes": ["CWE-787"]}
+        enrich_row(row, facts)
         self.assertEqual(row["fix_shas"], [SHA_A])
         self.assertEqual(row["fix_sha_source"], "osv")
         self.assertEqual(row["cwe"], "CWE-787")
@@ -101,34 +140,27 @@ class TestEnrichRow(unittest.TestCase):
         self.assertEqual(row["cwe_state"], "STATED_BY_ADVISORY")
         self.assertEqual(row["cwe_source"], "osv")
         self.assertNotIn("fix_repo", row)
+        # no extra columns: the NVD validators still accept the row
+        self.assertEqual(
+            sorted(row),
+            sorted(["advisory_id", "cwe", "cwe_source", "cwe_state", "fix_sha_source",
+                    "fix_shas", "patch_urls", "subsystem"]),
+        )
 
     def test_never_overwrite_existing_values(self):
         row = {"advisory_id": "CVE-1", "cwe": "CWE-119", "cwe_state": "STATED_BY_ADVISORY",
                "fix_shas": [SHA_B]}
-        facts = {"fixes": [(SHA_A, "https://github.com/curl/curl")], "cwes": ["CWE-787"]}
-        enrich_row(row, facts, "https://github.com/curl/curl")
+        facts = {"fixes": [SHA_A], "cwes": ["CWE-787"]}
+        enrich_row(row, facts)
         self.assertEqual(row["cwe"], "CWE-119")
         self.assertEqual(row["cwe_state"], "STATED_BY_ADVISORY")
         self.assertNotIn("cwe_source", row)
         self.assertEqual(row["fix_shas"], [SHA_B, SHA_A])
         self.assertEqual(row["fix_sha_source"], "osv")
 
-    def test_foreign_repo_recorded_in_fix_repo(self):
-        row = {"advisory_id": "CVE-1", "cwe": None, "fix_shas": []}
-        facts = {"fixes": [(SHA_A, "https://github.com/bminor/glibc")], "cwes": []}
-        enrich_row(row, facts, "https://sourceware.org/git/glibc")
-        self.assertEqual(row["fix_repo"], "https://github.com/bminor/glibc")
-        self.assertEqual(row["fix_shas"], [SHA_A])
-
-    def test_no_fix_repo_when_osv_repo_matches_upstream(self):
-        row = {"advisory_id": "CVE-1", "cwe": None, "fix_shas": []}
-        facts = {"fixes": [(SHA_A, "https://github.com/curl/curl.git")], "cwes": []}
-        enrich_row(row, facts, "https://github.com/curl/curl")
-        self.assertNotIn("fix_repo", row)
-
     def test_nothing_written_without_osv_facts(self):
         row = {"advisory_id": "CVE-1", "cwe": None, "cwe_state": "UNKNOWN", "fix_shas": []}
-        enrich_row(row, {"fixes": [], "cwes": []}, "https://github.com/curl/curl")
+        enrich_row(row, {"fixes": [], "cwes": []})
         self.assertEqual(row, {"advisory_id": "CVE-1", "cwe": None, "cwe_state": "UNKNOWN", "fix_shas": []})
 
 
@@ -160,10 +192,15 @@ class TestOfflinePipeline(unittest.TestCase):
         cache = root / "osv-cache"
         cache.mkdir()
         (cache / "CVE-2023-38545.json").write_text(json.dumps(
-            osv_doc("CVE-2023-38545", fixes=[(SHA_A, "https://github.com/curl/curl")],
+            osv_doc("CVE-2023-38545", fixes=[SHA_A],
                     cwe_ids=["CWE-787"], aliases=["GHSA-95gj-4pvw-c6vm"])), encoding="utf-8")
         (cache / "GHSA-95gj-4pvw-c6vm.json").write_text(json.dumps(
             osv_doc("GHSA-95gj-4pvw-c6vm", cwe_ids=["CWE-125"])), encoding="utf-8")
+        # The CVE-2005-3185 shape OSV really answers: a GIT 'fixed' event and
+        # no FIX reference in the project repo. Its commit is a range boundary,
+        # so it must not reach fix_shas.
+        (cache / "CVE-2005-3185.json").write_text(json.dumps(
+            git_boundary_doc("CVE-2005-3185", [SHA_C])), encoding="utf-8")
         (cache / "CVE-1999-0001.json").write_text(json.dumps(
             {"code": 404, "message": "not found"}), encoding="utf-8")
 
@@ -179,15 +216,23 @@ class TestOfflinePipeline(unittest.TestCase):
                 (self.project / "catalog.jsonl").read_text(encoding="utf-8").splitlines()]
 
     def test_collect_facts_merges_aliases(self):
-        facts = collect_osv_facts(self.client, "CVE-2023-38545")
-        self.assertEqual(facts["fixes"], [(SHA_A, "https://github.com/curl/curl")])
+        facts = collect_osv_facts(self.client, "CVE-2023-38545", CURL_REPO)
+        self.assertEqual(facts["fixes"], [SHA_A])
         self.assertEqual(facts["cwes"], ["CWE-787", "CWE-125"])
         self.assertEqual(facts["missing"], [])
 
+    def test_collect_facts_ignores_git_range_boundaries(self):
+        # CVE-2005-3185 is the row round 1 enriched with the GIT 'fixed' event.
+        facts = collect_osv_facts(self.client, "CVE-2005-3185", CURL_REPO)
+        self.assertEqual(facts["fixes"], [])
+        self.assertEqual(facts["queried"], ["CVE-2005-3185"])
+
     def test_collect_facts_counts_404_and_cache_miss_as_missing(self):
         # CVE-1999-0001 has a cached 404 body; CVE-2022-32221 has no cache entry.
-        self.assertEqual(collect_osv_facts(self.client, "CVE-1999-0001")["missing"], ["CVE-1999-0001"])
-        self.assertEqual(collect_osv_facts(self.client, "CVE-2022-32221")["missing"], ["CVE-2022-32221"])
+        self.assertEqual(collect_osv_facts(self.client, "CVE-1999-0001", CURL_REPO)["missing"],
+                         ["CVE-1999-0001"])
+        self.assertEqual(collect_osv_facts(self.client, "CVE-2022-32221", CURL_REPO)["missing"],
+                         ["CVE-2022-32221"])
 
     def test_offline_enrichment_and_summary(self):
         catalog_text, index_text, stats = enrich_project(self.project, self.client)
