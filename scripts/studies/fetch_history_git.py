@@ -101,6 +101,32 @@ def make_nvd_request(url, cumulative_bytes):
         return json.loads(body.decode("utf-8"))
 
 
+def determine_status(entry_count, coverage, resume, requests, window_start):
+    """Derive the honest catalog state (status, cursor_date, window_closed).
+
+    Mirrors determine_status() in scripts/studies/build_catalog_manifest.py so a fetch
+    run can never write an index state that the manifest would contradict.
+    """
+    if coverage == "COMPLETE":
+        return ("OBSERVED_EMPTY", None, True) if entry_count == 0 else ("COMPLETE", None, True)
+    cursor = resume.get("next_start_date") if resume else None
+    if cursor and (entry_count > 0 or (cursor != window_start and requests > 0)):
+        return ("CURSOR_PAUSED", cursor, False)
+    return ("NOT_FETCHED", None, False)
+
+
+def index_notes(status, cursor_date):
+    """Note that states the observed window state instead of implying completion."""
+    base = "Descriptions were omitted per policy."
+    if status == "CURSOR_PAUSED":
+        return f"{base} Cursor paused at {cursor_date}; window remains open (not closed)."
+    if status == "OBSERVED_EMPTY":
+        return f"{base} Completed scan over 1999-01-01..2026-10-08 yielded 0 entries."
+    if status == "NOT_FETCHED":
+        return f"{base} Scaffold not yet fetched."
+    return base
+
+
 def fetch_nvd_data(out_dir, max_time_seconds=180):
     start_time = time.time()
     out_dir_path = pathlib.Path(out_dir)
@@ -181,12 +207,15 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
     with open(catalog_path, "w", encoding="utf-8") as f:
         for rec in sorted_records: f.write(json.dumps(rec, separators=(",", ":")) + "\n")
 
+    status, cursor_date, window_closed = determine_status(
+        len(sorted_records), coverage, resume, requests_count, "1999-01-01")
     index_data = {
         "schema_version": "cve-history-v1", "project": "git", "repo": REPO_URL,
         "window": {"start": "1999-01-01", "end": "2026-10-08"}, "keyword": "git",
-        "coverage": coverage, "entry_count": len(sorted_records),
+        "coverage": coverage, "status": status, "cursor_date": cursor_date, "window_closed": window_closed,
+        "entry_count": len(sorted_records),
         "with_fix_sha": sum(1 for r in sorted_records if len(r["fix_shas"]) > 0),
-        "requests": requests_count, "resume": resume, "errors": errors, "notes": "Descriptions were omitted per policy.",
+        "requests": requests_count, "resume": resume, "errors": errors, "notes": index_notes(status, cursor_date),
     }
     with open(index_path, "w", encoding="utf-8") as f:
         json.dump(index_data, f, indent=2)

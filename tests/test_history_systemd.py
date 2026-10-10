@@ -109,5 +109,70 @@ class TestHistorySystemd(unittest.TestCase):
         self.assertLessEqual(len(encoded), 500)
 
 
+class TestHistorySystemdIndexStateContract(unittest.TestCase):
+    """A fetch run must write the honest-state fields the catalog manifest enforces."""
+
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.test_dir)
+
+    def test_determine_status_matches_manifest_contract(self):
+        cases = [
+            ((0, "COMPLETE", None, 10, "1999-01-01"), ("OBSERVED_EMPTY", None, True)),
+            ((3, "COMPLETE", None, 10, "1999-01-01"), ("COMPLETE", None, True)),
+            ((0, "INCOMPLETE", {"next_start_date": "2007-06-22"}, 35, "1999-01-01"), ("CURSOR_PAUSED", "2007-06-22", False)),
+            ((0, "INCOMPLETE", {"next_start_date": "1999-01-01"}, 0, "1999-01-01"), ("NOT_FETCHED", None, False)),
+        ]
+        for args, expected in cases:
+            self.assertEqual(fetch_history_systemd.determine_status(*args), expected)
+
+    def test_fetch_writes_cursor_paused_index_without_network(self):
+        systemd_cve = {
+            "id": "CVE-2021-33910", "published": "2021-07-20T12:00:00.000",
+            "configurations": [{"nodes": [{"cpeMatch": [{"criteria": "cpe:2.3:a:systemd_project:systemd:*:*:*:*:*:*:*:*"}]}]}],
+            "weaknesses": [{"description": [{"lang": "en", "value": "CWE-789"}]}],
+            "references": [{"url": "https://github.com/systemd/systemd/commit/441e14d2f1403d0962edd23d38eabac40d461260"}],
+        }
+        calls = {"n": 0}
+
+        def fake_request(url, cumulative_bytes):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                return {"vulnerabilities": [{"cve": systemd_cve}], "totalResults": 1}
+            raise RuntimeError("simulated NVD outage")
+
+        class FakeClock:
+            """Advance a virtual clock instead of really sleeping between NVD calls."""
+
+            def __init__(self):
+                self.now = 1000.0
+
+            def time(self):
+                self.now += 1.0
+                return self.now
+
+            def sleep(self, _seconds):
+                return None
+
+        original_request, original_time = fetch_history_systemd.make_nvd_request, fetch_history_systemd.time
+        fetch_history_systemd.make_nvd_request = fake_request
+        fetch_history_systemd.time = FakeClock()
+        try:
+            fetch_history_systemd.fetch_nvd_data(self.test_dir, max_time_seconds=60)
+        finally:
+            fetch_history_systemd.make_nvd_request = original_request
+            fetch_history_systemd.time = original_time
+
+        with open(os.path.join(self.test_dir, "index.json"), encoding="utf-8") as f:
+            idx = json.load(f)
+        self.assertEqual(idx["coverage"], "INCOMPLETE")
+        self.assertEqual(idx["status"], "CURSOR_PAUSED")
+        self.assertFalse(idx["window_closed"])
+        self.assertIn("next_start_date", idx["resume"])
+        self.assertEqual(idx["entry_count"], 1)
+        self.assertIn("window remains open", idx["notes"])
+        self.assertTrue(fetch_history_systemd.validate_offline(self.test_dir))
+
+
 if __name__ == "__main__":
     unittest.main()
