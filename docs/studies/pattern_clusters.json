@@ -1,23 +1,29 @@
 {
   "schema_version": "pattern-clusters-v1",
-  "total_cves": 432,
-  "cluster_count": 26,
+  "total_cves": 18275,
+  "cluster_count": 102,
   "clusters": [
     {
       "cwe_id": "UNKNOWN",
       "title": "Unstated or Legacy Advisory Without CWE Classification",
-      "count": 299,
-      "with_fix_sha": 0,
+      "count": 17880,
+      "with_fix_sha": 17432,
       "preconditions": [],
       "projects_distribution": {
-        "curl": 2,
+        "git": 1,
         "glibc": 3,
         "linux": 273,
+        "linux-cna": 17337,
         "openssh": 2,
-        "openssl": 19
+        "openssl": 5,
+        "openssl-upstream": 223,
+        "postgresql": 30,
+        "qemu": 3,
+        "sqlite": 3
       },
       "sample_cves": [
         "CVE-1999-0804",
+        "CVE-1999-0862",
         "CVE-1999-1018",
         "CVE-1999-1166",
         "CVE-1999-1341",
@@ -25,21 +31,21 @@
         "CVE-2000-0274",
         "CVE-2000-0335",
         "CVE-2000-0344",
-        "CVE-2000-0506",
-        "CVE-2000-0525"
+        "CVE-2000-0506"
       ]
     },
     {
       "cwe_id": "CWE-399",
       "title": "Resource Management Errors",
-      "count": 38,
+      "count": 28,
       "with_fix_sha": 0,
       "preconditions": [
         "Resource exhaustion path without rate limit or quota"
       ],
       "projects_distribution": {
         "linux": 24,
-        "openssl": 14
+        "openssl": 3,
+        "postgresql": 1
       },
       "sample_cves": [
         "CVE-2005-0210",
@@ -55,39 +61,301 @@
       ]
     },
     {
-      "cwe_id": "CWE-310",
-      "title": "Cryptographic Issues",
-      "count": 14,
+      "cwe_id": "CWE-295",
+      "title": "Improper Certificate Validation",
+      "count": 19,
+      "with_fix_sha": 17,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 15,
+        "openssl": 2,
+        "openssl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2009-2409",
+        "CVE-2009-3767",
+        "CVE-2016-9952",
+        "CVE-2021-22924",
+        "CVE-2021-22926",
+        "CVE-2023-28321",
+        "CVE-2024-2379",
+        "CVE-2024-8096",
+        "CVE-2025-13034",
+        "CVE-2025-14819"
+      ]
+    },
+    {
+      "cwe_id": "CWE-305",
+      "title": "CWE Family CWE-305",
+      "count": 19,
+      "with_fix_sha": 12,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 19
+      },
+      "sample_cves": [
+        "CVE-2014-0015",
+        "CVE-2014-0138",
+        "CVE-2015-3143",
+        "CVE-2015-3148",
+        "CVE-2015-3236",
+        "CVE-2016-0755",
+        "CVE-2016-5419",
+        "CVE-2016-5420",
+        "CVE-2016-7141",
+        "CVE-2017-7468"
+      ]
+    },
+    {
+      "cwe_id": "CWE-264",
+      "title": "Permissions, Privileges, and Access Controls",
+      "count": 16,
       "with_fix_sha": 0,
       "preconditions": [],
       "projects_distribution": {
-        "linux": 1,
-        "openssl": 13
+        "linux": 8,
+        "openssl": 1,
+        "postgresql": 5,
+        "qemu": 2
       },
       "sample_cves": [
-        "CVE-2006-1056",
-        "CVE-2006-4339",
-        "CVE-2007-5502",
-        "CVE-2008-7270",
-        "CVE-2009-3765",
-        "CVE-2009-3766",
-        "CVE-2010-0742",
-        "CVE-2010-0928",
-        "CVE-2011-1945",
-        "CVE-2011-4108"
+        "CVE-2002-2254",
+        "CVE-2005-0244",
+        "CVE-2005-2492",
+        "CVE-2005-2555",
+        "CVE-2005-3179",
+        "CVE-2005-3257",
+        "CVE-2005-3273",
+        "CVE-2006-0553",
+        "CVE-2006-1524",
+        "CVE-2006-4572"
+      ]
+    },
+    {
+      "cwe_id": "CWE-416",
+      "title": "Use After Free",
+      "count": 16,
+      "with_fix_sha": 14,
+      "preconditions": [
+        "Asynchronous lifecycle, double free, or aliased pointer reuse"
+      ],
+      "projects_distribution": {
+        "curl-upstream": 11,
+        "linux": 1,
+        "openssl-upstream": 4
+      },
+      "sample_cves": [
+        "CVE-2006-4997",
+        "CVE-2016-5421",
+        "CVE-2016-8623",
+        "CVE-2018-16840",
+        "CVE-2021-22901",
+        "CVE-2022-43552",
+        "CVE-2023-28319",
+        "CVE-2024-4741",
+        "CVE-2026-10536",
+        "CVE-2026-18924"
+      ]
+    },
+    {
+      "cwe_id": "CWE-126",
+      "title": "CWE Family CWE-126",
+      "count": 15,
+      "with_fix_sha": 14,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 15
+      },
+      "sample_cves": [
+        "CVE-2013-2174",
+        "CVE-2014-3707",
+        "CVE-2015-3237",
+        "CVE-2016-8621",
+        "CVE-2016-9953",
+        "CVE-2017-1000100",
+        "CVE-2017-1000101",
+        "CVE-2017-1000254",
+        "CVE-2017-1000257",
+        "CVE-2017-7407"
+      ]
+    },
+    {
+      "cwe_id": "CWE-125",
+      "title": "Out-of-bounds Read",
+      "count": 15,
+      "with_fix_sha": 15,
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "projects_distribution": {
+        "curl-upstream": 6,
+        "openssl-upstream": 9
+      },
+      "sample_cves": [
+        "CVE-2017-8818",
+        "CVE-2018-16842",
+        "CVE-2018-16890",
+        "CVE-2019-3823",
+        "CVE-2024-5535",
+        "CVE-2024-7264",
+        "CVE-2024-9143",
+        "CVE-2025-9086",
+        "CVE-2025-9230",
+        "CVE-2025-9232"
+      ]
+    },
+    {
+      "cwe_id": "CWE-476",
+      "title": "NULL Pointer Dereference",
+      "count": 14,
+      "with_fix_sha": 13,
+      "preconditions": [
+        "Unchecked return value from allocator or lookup function"
+      ],
+      "projects_distribution": {
+        "curl-upstream": 1,
+        "linux": 1,
+        "openssl-upstream": 12
+      },
+      "sample_cves": [
+        "CVE-2005-2459",
+        "CVE-2018-1000121",
+        "CVE-2025-15468",
+        "CVE-2025-69421",
+        "CVE-2026-14457",
+        "CVE-2026-28388",
+        "CVE-2026-28389",
+        "CVE-2026-28390",
+        "CVE-2026-42764",
+        "CVE-2026-42765"
+      ]
+    },
+    {
+      "cwe_id": "CWE-770",
+      "title": "Allocation of Resources Without Limits or Throttling",
+      "count": 12,
+      "with_fix_sha": 12,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 5,
+        "openssl-upstream": 7
+      },
+      "sample_cves": [
+        "CVE-2022-32205",
+        "CVE-2022-32206",
+        "CVE-2023-23916",
+        "CVE-2023-38039",
+        "CVE-2026-11586",
+        "CVE-2026-14456",
+        "CVE-2026-35189",
+        "CVE-2026-54873",
+        "CVE-2026-63074",
+        "CVE-2026-63075"
+      ]
+    },
+    {
+      "cwe_id": "CWE-122",
+      "title": "CWE Family CWE-122",
+      "count": 11,
+      "with_fix_sha": 8,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 11
+      },
+      "sample_cves": [
+        "CVE-2005-4077",
+        "CVE-2006-1061",
+        "CVE-2016-8620",
+        "CVE-2016-8622",
+        "CVE-2017-9502",
+        "CVE-2018-0500",
+        "CVE-2018-1000120",
+        "CVE-2018-1000300",
+        "CVE-2019-5436",
+        "CVE-2019-5482"
+      ]
+    },
+    {
+      "cwe_id": "CWE-297",
+      "title": "CWE Family CWE-297",
+      "count": 11,
+      "with_fix_sha": 7,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 11
+      },
+      "sample_cves": [
+        "CVE-2013-4545",
+        "CVE-2013-6422",
+        "CVE-2014-0139",
+        "CVE-2014-1263",
+        "CVE-2014-2522",
+        "CVE-2014-8151",
+        "CVE-2016-3739",
+        "CVE-2024-2466",
+        "CVE-2025-15079",
+        "CVE-2026-12064"
+      ]
+    },
+    {
+      "cwe_id": "CWE-119",
+      "title": "Memory Corruption / Buffer Boundary Error",
+      "count": 10,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "projects_distribution": {
+        "linux": 6,
+        "postgresql": 2,
+        "qemu": 2
+      },
+      "sample_cves": [
+        "CVE-2002-1401",
+        "CVE-2005-0247",
+        "CVE-2006-1368",
+        "CVE-2006-1857",
+        "CVE-2006-6106",
+        "CVE-2007-0005",
+        "CVE-2007-1217",
+        "CVE-2007-1592",
+        "CVE-2007-5729",
+        "CVE-2007-6227"
+      ]
+    },
+    {
+      "cwe_id": "CWE-201",
+      "title": "CWE Family CWE-201",
+      "count": 10,
+      "with_fix_sha": 10,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 10
+      },
+      "sample_cves": [
+        "CVE-2003-1605",
+        "CVE-2013-1944",
+        "CVE-2014-3613",
+        "CVE-2014-3620",
+        "CVE-2015-3153",
+        "CVE-2022-27779",
+        "CVE-2023-46218",
+        "CVE-2026-80255",
+        "CVE-2026-82209",
+        "CVE-2026-8924"
       ]
     },
     {
       "cwe_id": "CWE-20",
       "title": "Improper Input Validation",
-      "count": 13,
-      "with_fix_sha": 0,
+      "count": 10,
+      "with_fix_sha": 1,
       "preconditions": [
         "Missing boundary / sanitize check on incoming payload"
       ],
       "projects_distribution": {
-        "linux": 9,
-        "openssl": 4
+        "curl-upstream": 1,
+        "linux": 9
       },
       "sample_cves": [
         "CVE-2005-0209",
@@ -99,184 +367,505 @@
         "CVE-2006-1858",
         "CVE-2007-2172",
         "CVE-2007-2764",
-        "CVE-2008-5077"
+        "CVE-2021-22922"
       ]
     },
     {
-      "cwe_id": "CWE-264",
-      "title": "Permissions, Privileges, and Access Controls",
-      "count": 11,
-      "with_fix_sha": 0,
-      "preconditions": [],
-      "projects_distribution": {
-        "linux": 8,
-        "openssl": 3
-      },
-      "sample_cves": [
-        "CVE-2002-2254",
-        "CVE-2005-2492",
-        "CVE-2005-2555",
-        "CVE-2005-3179",
-        "CVE-2005-3257",
-        "CVE-2005-3273",
-        "CVE-2006-1524",
-        "CVE-2006-4572",
-        "CVE-2010-1633",
-        "CVE-2011-1473"
-      ]
-    },
-    {
-      "cwe_id": "CWE-119",
-      "title": "Memory Corruption / Buffer Boundary Error",
-      "count": 11,
-      "with_fix_sha": 0,
+      "cwe_id": "CWE-787",
+      "title": "Out-of-bounds Write",
+      "count": 10,
+      "with_fix_sha": 8,
       "preconditions": [
         "Untrusted buffer length or unbounded string processing"
       ],
       "projects_distribution": {
-        "curl": 1,
-        "linux": 6,
-        "openssl": 4
+        "openssl-upstream": 8,
+        "qemu": 2
       },
       "sample_cves": [
+        "CVE-2007-1320",
+        "CVE-2007-5730",
+        "CVE-2025-11187",
+        "CVE-2025-15467",
+        "CVE-2025-68160",
+        "CVE-2025-69419",
+        "CVE-2026-31789",
+        "CVE-2026-63072",
+        "CVE-2026-72897",
+        "CVE-2026-7383"
+      ]
+    },
+    {
+      "cwe_id": "CWE-200",
+      "title": "Exposure of Sensitive Information",
+      "count": 9,
+      "with_fix_sha": 8,
+      "preconditions": [
+        "Missing boundary / sanitize check on incoming payload"
+      ],
+      "projects_distribution": {
+        "curl-upstream": 8,
+        "qemu": 1
+      },
+      "sample_cves": [
+        "CVE-2008-2004",
+        "CVE-2020-8169",
+        "CVE-2020-8284",
+        "CVE-2022-27775",
+        "CVE-2024-11053",
+        "CVE-2025-0167",
+        "CVE-2026-6429",
+        "CVE-2026-9545",
+        "CVE-2026-9546"
+      ]
+    },
+    {
+      "cwe_id": "CWE-415",
+      "title": "CWE Family CWE-415",
+      "count": 9,
+      "with_fix_sha": 9,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 7,
+        "openssl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2016-8618",
+        "CVE-2016-8619",
+        "CVE-2019-5481",
+        "CVE-2021-22945",
+        "CVE-2022-42915",
+        "CVE-2023-27537",
+        "CVE-2026-18798",
+        "CVE-2026-35188",
+        "CVE-2026-8925"
+      ]
+    },
+    {
+      "cwe_id": "CWE-522",
+      "title": "CWE Family CWE-522",
+      "count": 9,
+      "with_fix_sha": 9,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 9
+      },
+      "sample_cves": [
+        "CVE-2018-1000007",
+        "CVE-2021-22923",
+        "CVE-2022-27774",
+        "CVE-2022-27776",
+        "CVE-2025-14524",
+        "CVE-2026-3783",
+        "CVE-2026-6253",
+        "CVE-2026-8926",
+        "CVE-2026-9079"
+      ]
+    },
+    {
+      "cwe_id": "CWE-310",
+      "title": "Cryptographic Issues",
+      "count": 8,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "linux": 1,
+        "openssl": 7
+      },
+      "sample_cves": [
+        "CVE-2006-1056",
+        "CVE-2008-7270",
+        "CVE-2009-3765",
+        "CVE-2009-3766",
+        "CVE-2010-0928",
+        "CVE-2011-1945",
+        "CVE-2011-4354",
+        "CVE-2011-5095"
+      ]
+    },
+    {
+      "cwe_id": "CWE-121",
+      "title": "CWE Family CWE-121",
+      "count": 7,
+      "with_fix_sha": 6,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 7
+      },
+      "sample_cves": [
+        "CVE-2000-0973",
+        "CVE-2005-0490",
         "CVE-2005-3185",
-        "CVE-2006-1368",
-        "CVE-2006-1857",
-        "CVE-2006-3738",
-        "CVE-2006-6106",
-        "CVE-2007-0005",
-        "CVE-2007-1217",
-        "CVE-2007-1592",
-        "CVE-2009-0590",
-        "CVE-2009-1377"
+        "CVE-2013-0249",
+        "CVE-2016-9586",
+        "CVE-2019-3822",
+        "CVE-2022-35260"
+      ]
+    },
+    {
+      "cwe_id": "CWE-131",
+      "title": "CWE Family CWE-131",
+      "count": 6,
+      "with_fix_sha": 5,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 6
+      },
+      "sample_cves": [
+        "CVE-2016-7167",
+        "CVE-2016-8617",
+        "CVE-2017-8816",
+        "CVE-2018-14618",
+        "CVE-2018-16839",
+        "CVE-2019-5435"
+      ]
+    },
+    {
+      "cwe_id": "CWE-319",
+      "title": "CWE Family CWE-319",
+      "count": 6,
+      "with_fix_sha": 6,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 6
+      },
+      "sample_cves": [
+        "CVE-2022-30115",
+        "CVE-2022-42916",
+        "CVE-2022-43551",
+        "CVE-2023-23914",
+        "CVE-2023-23915",
+        "CVE-2026-4873"
       ]
     },
     {
       "cwe_id": "CWE-189",
       "title": "CWE Family CWE-189",
-      "count": 10,
+      "count": 5,
       "with_fix_sha": 0,
       "preconditions": [],
       "projects_distribution": {
-        "curl": 1,
         "linux": 3,
-        "openssl": 6
+        "postgresql": 2
       },
       "sample_cves": [
         "CVE-2004-2731",
-        "CVE-2005-4077",
         "CVE-2006-6058",
         "CVE-2007-2875",
-        "CVE-2007-4995",
-        "CVE-2007-5135",
-        "CVE-2008-0891",
-        "CVE-2009-0789",
-        "CVE-2012-2131",
-        "CVE-2012-2333"
+        "CVE-2007-4769",
+        "CVE-2007-6067"
       ]
     },
     {
-      "cwe_id": "CWE-476",
-      "title": "NULL Pointer Dereference",
-      "count": 6,
-      "with_fix_sha": 0,
-      "preconditions": [
-        "Unchecked return value from allocator or lookup function"
-      ],
+      "cwe_id": "CWE-667",
+      "title": "CWE Family CWE-667",
+      "count": 5,
+      "with_fix_sha": 1,
+      "preconditions": [],
       "projects_distribution": {
-        "linux": 1,
-        "openssl": 5
+        "linux": 4,
+        "openssl-upstream": 1
       },
       "sample_cves": [
-        "CVE-2004-0079",
-        "CVE-2005-2459",
-        "CVE-2006-4343",
-        "CVE-2008-1672",
-        "CVE-2009-1386",
-        "CVE-2009-1387"
+        "CVE-2005-2456",
+        "CVE-2005-3847",
+        "CVE-2006-4342",
+        "CVE-2006-5158",
+        "CVE-2022-3996"
       ]
     },
     {
       "cwe_id": "CWE-287",
       "title": "Improper Authentication",
       "count": 5,
-      "with_fix_sha": 0,
+      "with_fix_sha": 1,
       "preconditions": [],
       "projects_distribution": {
-        "openssl": 5
+        "curl-upstream": 1,
+        "openssl": 3,
+        "postgresql": 1
       },
       "sample_cves": [
+        "CVE-2007-6601",
         "CVE-2009-0129",
-        "CVE-2009-0591",
         "CVE-2009-0653",
         "CVE-2009-1390",
-        "CVE-2010-4252"
+        "CVE-2025-15224"
       ]
     },
     {
-      "cwe_id": "CWE-667",
-      "title": "CWE Family CWE-667",
+      "cwe_id": "CWE-488",
+      "title": "CWE Family CWE-488",
+      "count": 5,
+      "with_fix_sha": 5,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 5
+      },
+      "sample_cves": [
+        "CVE-2021-22897",
+        "CVE-2026-19931",
+        "CVE-2026-5773",
+        "CVE-2026-80231",
+        "CVE-2026-8458"
+      ]
+    },
+    {
+      "cwe_id": "CWE-325",
+      "title": "CWE Family CWE-325",
+      "count": 5,
+      "with_fix_sha": 5,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1,
+        "openssl-upstream": 4
+      },
+      "sample_cves": [
+        "CVE-2021-22946",
+        "CVE-2025-69418",
+        "CVE-2026-42770",
+        "CVE-2026-45445",
+        "CVE-2026-45446"
+      ]
+    },
+    {
+      "cwe_id": "CWE-94",
+      "title": "CWE Family CWE-94",
       "count": 4,
       "with_fix_sha": 0,
       "preconditions": [],
       "projects_distribution": {
-        "linux": 4
+        "curl-upstream": 2,
+        "postgresql": 1,
+        "sqlite": 1
       },
       "sample_cves": [
-        "CVE-2005-2456",
-        "CVE-2005-3847",
-        "CVE-2006-4342",
-        "CVE-2006-5158"
+        "CVE-2005-0227",
+        "CVE-2008-0516",
+        "CVE-2016-4802",
+        "CVE-2019-5443"
+      ]
+    },
+    {
+      "cwe_id": "CWE-754",
+      "title": "CWE Family CWE-754",
+      "count": 4,
+      "with_fix_sha": 4,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 4
+      },
+      "sample_cves": [
+        "CVE-2025-69420",
+        "CVE-2026-22795",
+        "CVE-2026-22796",
+        "CVE-2026-31790"
       ]
     },
     {
       "cwe_id": "CWE-401",
       "title": "Missing Release of Memory after Effective Lifetime (Memory Leak)",
       "count": 3,
-      "with_fix_sha": 0,
+      "with_fix_sha": 1,
       "preconditions": [
         "Resource exhaustion path without rate limit or quota"
       ],
       "projects_distribution": {
         "linux": 2,
-        "openssl": 1
+        "openssl-upstream": 1
       },
       "sample_cves": [
         "CVE-2005-3119",
         "CVE-2005-3181",
-        "CVE-2009-1378"
+        "CVE-2026-54876"
       ]
     },
     {
-      "cwe_id": "CWE-295",
-      "title": "Improper Certificate Validation",
+      "cwe_id": "CWE-835",
+      "title": "CWE Family CWE-835",
       "count": 3,
-      "with_fix_sha": 0,
+      "with_fix_sha": 3,
       "preconditions": [],
       "projects_distribution": {
-        "openssl": 3
+        "curl-upstream": 3
       },
       "sample_cves": [
-        "CVE-2009-2409",
-        "CVE-2009-3555",
-        "CVE-2009-3767"
+        "CVE-2022-27781",
+        "CVE-2025-5399",
+        "CVE-2026-11352"
       ]
     },
     {
-      "cwe_id": "CWE-362",
-      "title": "Concurrent Execution using Shared Resource (Race Condition)",
-      "count": 2,
-      "with_fix_sha": 0,
-      "preconditions": [
-        "Multithreaded / interrupt context without adequate lock barrier"
-      ],
+      "cwe_id": "CWE-440",
+      "title": "CWE Family CWE-440",
+      "count": 3,
+      "with_fix_sha": 3,
+      "preconditions": [],
       "projects_distribution": {
-        "linux": 1,
-        "openssl": 1
+        "curl-upstream": 2,
+        "openssl-upstream": 1
       },
       "sample_cves": [
-        "CVE-2006-0039",
-        "CVE-2010-3864"
+        "CVE-2022-32221",
+        "CVE-2023-28322",
+        "CVE-2026-35191"
+      ]
+    },
+    {
+      "cwe_id": "CWE-294",
+      "title": "CWE Family CWE-294",
+      "count": 3,
+      "with_fix_sha": 3,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 3
+      },
+      "sample_cves": [
+        "CVE-2026-11856",
+        "CVE-2026-7168",
+        "CVE-2026-8927"
+      ]
+    },
+    {
+      "cwe_id": "CWE-354",
+      "title": "CWE Family CWE-354",
+      "count": 3,
+      "with_fix_sha": 3,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 3
+      },
+      "sample_cves": [
+        "CVE-2026-34181",
+        "CVE-2026-34182",
+        "CVE-2026-75803"
+      ]
+    },
+    {
+      "cwe_id": "CWE-208",
+      "title": "CWE Family CWE-208",
+      "count": 3,
+      "with_fix_sha": 3,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 3
+      },
+      "sample_cves": [
+        "CVE-2026-54872",
+        "CVE-2026-54875",
+        "CVE-2026-77696"
+      ]
+    },
+    {
+      "cwe_id": "CWE-170",
+      "title": "CWE Family CWE-170",
+      "count": 2,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2009-2417",
+        "CVE-2017-1000099"
+      ]
+    },
+    {
+      "cwe_id": "CWE-281",
+      "title": "CWE Family CWE-281",
+      "count": 2,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2011-2192",
+        "CVE-2022-32207"
+      ]
+    },
+    {
+      "cwe_id": "CWE-924",
+      "title": "CWE Family CWE-924",
+      "count": 2,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2011-3389",
+        "CVE-2022-32208"
+      ]
+    },
+    {
+      "cwe_id": "CWE-124",
+      "title": "CWE Family CWE-124",
+      "count": 2,
+      "with_fix_sha": 2,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2015-3144",
+        "CVE-2015-3145"
+      ]
+    },
+    {
+      "cwe_id": "CWE-22",
+      "title": "CWE Family CWE-22",
+      "count": 2,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2016-0754",
+        "CVE-2023-27534"
+      ]
+    },
+    {
+      "cwe_id": "CWE-299",
+      "title": "CWE Family CWE-299",
+      "count": 2,
+      "with_fix_sha": 2,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2020-8286",
+        "CVE-2024-0853"
+      ]
+    },
+    {
+      "cwe_id": "CWE-457",
+      "title": "CWE Family CWE-457",
+      "count": 2,
+      "with_fix_sha": 2,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2021-22898",
+        "CVE-2021-22925"
+      ]
+    },
+    {
+      "cwe_id": "CWE-385",
+      "title": "CWE Family CWE-385",
+      "count": 2,
+      "with_fix_sha": 2,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 2
+      },
+      "sample_cves": [
+        "CVE-2024-13176",
+        "CVE-2025-9231"
       ]
     },
     {
@@ -306,44 +895,16 @@
       ]
     },
     {
-      "cwe_id": "CWE-203",
-      "title": "CWE Family CWE-203",
+      "cwe_id": "CWE-916",
+      "title": "CWE Family CWE-916",
       "count": 1,
       "with_fix_sha": 0,
       "preconditions": [],
       "projects_distribution": {
-        "openssl": 1
+        "postgresql": 1
       },
       "sample_cves": [
-        "CVE-2003-0078"
-      ]
-    },
-    {
-      "cwe_id": "CWE-415",
-      "title": "CWE Family CWE-415",
-      "count": 1,
-      "with_fix_sha": 0,
-      "preconditions": [],
-      "projects_distribution": {
-        "openssl": 1
-      },
-      "sample_cves": [
-        "CVE-2003-0545"
-      ]
-    },
-    {
-      "cwe_id": "CWE-125",
-      "title": "Out-of-bounds Read",
-      "count": 1,
-      "with_fix_sha": 0,
-      "preconditions": [
-        "Untrusted buffer length or unbounded string processing"
-      ],
-      "projects_distribution": {
-        "openssl": 1
-      },
-      "sample_cves": [
-        "CVE-2004-0112"
+        "CVE-2002-1657"
       ]
     },
     {
@@ -357,19 +918,6 @@
       },
       "sample_cves": [
         "CVE-2004-2013"
-      ]
-    },
-    {
-      "cwe_id": "CWE-131",
-      "title": "CWE Family CWE-131",
-      "count": 1,
-      "with_fix_sha": 0,
-      "preconditions": [],
-      "projects_distribution": {
-        "curl": 1
-      },
-      "sample_cves": [
-        "CVE-2005-0490"
       ]
     },
     {
@@ -412,6 +960,21 @@
       ]
     },
     {
+      "cwe_id": "CWE-362",
+      "title": "Concurrent Execution using Shared Resource (Race Condition)",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [
+        "Multithreaded / interrupt context without adequate lock barrier"
+      ],
+      "projects_distribution": {
+        "linux": 1
+      },
+      "sample_cves": [
+        "CVE-2006-0039"
+      ]
+    },
+    {
       "cwe_id": "CWE-120",
       "title": "Classic Buffer Overflow",
       "count": 1,
@@ -427,18 +990,29 @@
       ]
     },
     {
-      "cwe_id": "CWE-416",
-      "title": "Use After Free",
+      "cwe_id": "CWE-79",
+      "title": "CWE Family CWE-79",
       "count": 1,
       "with_fix_sha": 0,
-      "preconditions": [
-        "Asynchronous lifecycle, double free, or aliased pointer reuse"
-      ],
+      "preconditions": [],
       "projects_distribution": {
-        "linux": 1
+        "sqlite": 1
       },
       "sample_cves": [
-        "CVE-2006-4997"
+        "CVE-2007-1231"
+      ]
+    },
+    {
+      "cwe_id": "CWE-298",
+      "title": "CWE Family CWE-298",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2007-3564"
       ]
     },
     {
@@ -452,6 +1026,604 @@
       },
       "sample_cves": [
         "CVE-2008-0166"
+      ]
+    },
+    {
+      "cwe_id": "CWE-142",
+      "title": "CWE Family CWE-142",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2009-0037"
+      ]
+    },
+    {
+      "cwe_id": "CWE-628",
+      "title": "CWE Family CWE-628",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2010-0734"
+      ]
+    },
+    {
+      "cwe_id": "CWE-30",
+      "title": "CWE Family CWE-30",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2010-3842"
+      ]
+    },
+    {
+      "cwe_id": "CWE-93",
+      "title": "CWE Family CWE-93",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2012-0036"
+      ]
+    },
+    {
+      "cwe_id": "CWE-444",
+      "title": "CWE Family CWE-444",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2014-8150"
+      ]
+    },
+    {
+      "cwe_id": "CWE-187",
+      "title": "CWE Family CWE-187",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2016-8615"
+      ]
+    },
+    {
+      "cwe_id": "CWE-178",
+      "title": "CWE Family CWE-178",
+      "count": 1,
+      "with_fix_sha": 0,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2016-8616"
+      ]
+    },
+    {
+      "cwe_id": "CWE-172",
+      "title": "CWE Family CWE-172",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2016-8624"
+      ]
+    },
+    {
+      "cwe_id": "CWE-838",
+      "title": "CWE Family CWE-838",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2016-8625"
+      ]
+    },
+    {
+      "cwe_id": "CWE-330",
+      "title": "CWE Family CWE-330",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2016-9594"
+      ]
+    },
+    {
+      "cwe_id": "CWE-304",
+      "title": "CWE Family CWE-304",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2017-2629"
+      ]
+    },
+    {
+      "cwe_id": "CWE-641",
+      "title": "CWE Family CWE-641",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2020-8177"
+      ]
+    },
+    {
+      "cwe_id": "CWE-825",
+      "title": "CWE Family CWE-825",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2020-8231"
+      ]
+    },
+    {
+      "cwe_id": "CWE-674",
+      "title": "CWE Family CWE-674",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2020-8285"
+      ]
+    },
+    {
+      "cwe_id": "CWE-359",
+      "title": "CWE Family CWE-359",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2021-22876"
+      ]
+    },
+    {
+      "cwe_id": "CWE-290",
+      "title": "CWE Family CWE-290",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2021-22890"
+      ]
+    },
+    {
+      "cwe_id": "CWE-349",
+      "title": "CWE Family CWE-349",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2021-22947"
+      ]
+    },
+    {
+      "cwe_id": "CWE-706",
+      "title": "CWE Family CWE-706",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2022-27778"
+      ]
+    },
+    {
+      "cwe_id": "CWE-177",
+      "title": "CWE Family CWE-177",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2022-27780"
+      ]
+    },
+    {
+      "cwe_id": "CWE-1286",
+      "title": "CWE Family CWE-1286",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2022-35252"
+      ]
+    },
+    {
+      "cwe_id": "CWE-75",
+      "title": "CWE Family CWE-75",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2023-27533"
+      ]
+    },
+    {
+      "cwe_id": "CWE-662",
+      "title": "CWE Family CWE-662",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2023-28320"
+      ]
+    },
+    {
+      "cwe_id": "CWE-73",
+      "title": "CWE Family CWE-73",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2023-38546"
+      ]
+    },
+    {
+      "cwe_id": "CWE-311",
+      "title": "CWE Family CWE-311",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2023-46219"
+      ]
+    },
+    {
+      "cwe_id": "CWE-392",
+      "title": "CWE Family CWE-392",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2024-12797"
+      ]
+    },
+    {
+      "cwe_id": "CWE-115",
+      "title": "CWE Family CWE-115",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2024-2004"
+      ]
+    },
+    {
+      "cwe_id": "CWE-772",
+      "title": "CWE Family CWE-772",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2024-2398"
+      ]
+    },
+    {
+      "cwe_id": "CWE-843",
+      "title": "CWE Family CWE-843",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2024-6119"
+      ]
+    },
+    {
+      "cwe_id": "CWE-590",
+      "title": "CWE Family CWE-590",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2024-6197"
+      ]
+    },
+    {
+      "cwe_id": "CWE-1025",
+      "title": "CWE Family CWE-1025",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2024-9681"
+      ]
+    },
+    {
+      "cwe_id": "CWE-1341",
+      "title": "CWE Family CWE-1341",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2025-0665"
+      ]
+    },
+    {
+      "cwe_id": "CWE-680",
+      "title": "CWE Family CWE-680",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2025-0725"
+      ]
+    },
+    {
+      "cwe_id": "CWE-340",
+      "title": "CWE Family CWE-340",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2025-10148"
+      ]
+    },
+    {
+      "cwe_id": "CWE-322",
+      "title": "CWE Family CWE-322",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2025-10966"
+      ]
+    },
+    {
+      "cwe_id": "CWE-567",
+      "title": "CWE Family CWE-567",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2025-14017"
+      ]
+    },
+    {
+      "cwe_id": "CWE-347",
+      "title": "CWE Family CWE-347",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2025-15469"
+      ]
+    },
+    {
+      "cwe_id": "CWE-789",
+      "title": "CWE Family CWE-789",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2025-66199"
+      ]
+    },
+    {
+      "cwe_id": "CWE-923",
+      "title": "CWE Family CWE-923",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-13608"
+      ]
+    },
+    {
+      "cwe_id": "CWE-757",
+      "title": "CWE Family CWE-757",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-2673"
+      ]
+    },
+    {
+      "cwe_id": "CWE-1325",
+      "title": "CWE Family CWE-1325",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-34183"
+      ]
+    },
+    {
+      "cwe_id": "CWE-514",
+      "title": "CWE Family CWE-514",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-42768"
+      ]
+    },
+    {
+      "cwe_id": "CWE-407",
+      "title": "CWE Family CWE-407",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-42772"
+      ]
+    },
+    {
+      "cwe_id": "CWE-405",
+      "title": "CWE Family CWE-405",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-54874"
+      ]
+    },
+    {
+      "cwe_id": "CWE-346",
+      "title": "CWE Family CWE-346",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "curl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-6276"
+      ]
+    },
+    {
+      "cwe_id": "CWE-134",
+      "title": "CWE Family CWE-134",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-63073"
+      ]
+    },
+    {
+      "cwe_id": "CWE-1284",
+      "title": "CWE Family CWE-1284",
+      "count": 1,
+      "with_fix_sha": 1,
+      "preconditions": [],
+      "projects_distribution": {
+        "openssl-upstream": 1
+      },
+      "sample_cves": [
+        "CVE-2026-75806"
       ]
     }
   ]

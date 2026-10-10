@@ -33,6 +33,8 @@ def determine_status(index_data: dict, entries: int, catalog_bytes: int) -> tupl
           - "OBSERVED_EMPTY": window fully queried yielding genuinely 0 entries (COMPLETE coverage)
           - "CURSOR_PAUSED": partial fetch paused at cursor date; window remains OPEN (not closed)
           - "COMPLETE": window fully queried with entries > 0
+          - "SNAPSHOT_COMPLETE": catalog built from a complete upstream snapshot
+            (index status FETCHED, coverage COMPLETE_AT_COMMIT / COMPLETE_AT_SNAPSHOT)
     """
     coverage = index_data.get("coverage", "INCOMPLETE")
     resume = index_data.get("resume")
@@ -57,6 +59,8 @@ def determine_status(index_data: dict, entries: int, catalog_bytes: int) -> tupl
         return "CURSOR_PAUSED", cursor_date, False
     if explicit_status == "COMPLETE":
         return "COMPLETE", None, True
+    if explicit_status == "FETCHED" and str(coverage).startswith("COMPLETE_AT_"):
+        return "SNAPSHOT_COMPLETE", None, True
 
     # Evaluated logic
     if coverage == "COMPLETE":
@@ -136,6 +140,7 @@ def generate_manifest() -> dict:
             "NOT_FETCHED": sum(1 for p in projects if p["status"] == "NOT_FETCHED"),
             "OBSERVED_EMPTY": sum(1 for p in projects if p["status"] == "OBSERVED_EMPTY"),
             "COMPLETE": sum(1 for p in projects if p["status"] == "COMPLETE"),
+            "SNAPSHOT_COMPLETE": sum(1 for p in projects if p["status"] == "SNAPSHOT_COMPLETE"),
         },
         "projects": projects,
     }

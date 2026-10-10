@@ -413,7 +413,9 @@ def validate_offline(out_dir=DEFAULT_OUT_DIR):
             required_rec_keys = {
                 "advisory_id", "published", "cwe", "cwe_state", "patch_urls", "fix_shas", "subsystem"
             }
-            if set(rec.keys()) != required_rec_keys:
+            # Optional provenance keys written by the enrichers (enrich_from_osv.py).
+            optional_rec_keys = {"fix_sha_source", "cwe_source", "fix_repo"}
+            if not required_rec_keys <= set(rec.keys()) <= required_rec_keys | optional_rec_keys:
                 print(f"Error: catalog line {idx} has invalid keys: {rec.keys()}", file=sys.stderr)
                 return False
 

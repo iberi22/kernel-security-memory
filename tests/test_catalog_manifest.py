@@ -17,8 +17,10 @@ class TestCatalogManifest(unittest.TestCase):
         self.assertGreaterEqual(manifest["total_entries"], 400)
         self.assertIn("projects", manifest)
         self.assertIn("status_summary", manifest)
-        self.assertEqual(manifest["status_summary"]["CURSOR_PAUSED"], 5)
-        self.assertEqual(manifest["status_summary"]["NOT_FETCHED"], 7)
+        # Status counts must account for every project; the snapshot catalogs
+        # (linux-cna, curl-upstream, openssl-upstream) are SNAPSHOT_COMPLETE.
+        self.assertEqual(sum(manifest["status_summary"].values()), manifest["project_count"])
+        self.assertGreaterEqual(manifest["status_summary"]["SNAPSHOT_COMPLETE"], 3)
 
         for proj in manifest["projects"]:
             self.assertIn("name", proj)
@@ -51,19 +53,25 @@ class TestCatalogManifest(unittest.TestCase):
             self.assertFalse(proj["window_closed"], f"{name} window must NOT be closed")
             self.assertGreater(proj["entry_count"], 0)
 
-    def test_not_fetched_projects(self):
-        """Verify un-fetched scaffolds are NOT_FETCHED with null cursor."""
+    def test_nvd_keyword_projects_are_paused_not_complete(self):
+        """The 7 NVD keyword catalogs fetched on 2026-10-09 stay honestly CURSOR_PAUSED."""
         manifest = generate_manifest()
         projects_by_name = {p["name"]: p for p in manifest["projects"]}
-
-        unfetched_names = ["git", "postgresql", "qemu", "sqlite", "systemd", "unbound", "nginx"]
-        for name in unfetched_names:
+        for name in ["git", "postgresql", "qemu", "sqlite", "systemd", "unbound", "nginx"]:
             self.assertIn(name, projects_by_name)
             proj = projects_by_name[name]
-            self.assertEqual(proj["status"], "NOT_FETCHED", f"{name} must be NOT_FETCHED")
-            self.assertIsNone(proj["cursor_date"])
+            self.assertEqual(proj["status"], "CURSOR_PAUSED", f"{name} must be CURSOR_PAUSED")
+            self.assertIsNotNone(proj["cursor_date"])
             self.assertFalse(proj["window_closed"])
-            self.assertEqual(proj["entry_count"], 0)
+
+    def test_snapshot_catalogs_are_closed(self):
+        manifest = generate_manifest()
+        projects_by_name = {p["name"]: p for p in manifest["projects"]}
+        for name in ["linux-cna", "curl-upstream", "openssl-upstream"]:
+            proj = projects_by_name[name]
+            self.assertEqual(proj["status"], "SNAPSHOT_COMPLETE")
+            self.assertTrue(proj["window_closed"])
+            self.assertGreater(proj["entry_count"], 0)
 
     def test_determine_status_logic(self):
         """Test distinction between NOT_FETCHED, OBSERVED_EMPTY, CURSOR_PAUSED, and COMPLETE."""
@@ -114,6 +122,15 @@ class TestCatalogManifest(unittest.TestCase):
         self.assertEqual(status, "COMPLETE")
         self.assertIsNone(cursor)
         self.assertTrue(closed)
+
+        # 5. Upstream snapshot catalog
+        idx_snapshot = {"coverage": "COMPLETE_AT_COMMIT", "status": "FETCHED"}
+        status, cursor, closed = determine_status(idx_snapshot, entries=10, catalog_bytes=100)
+        self.assertEqual(status, "SNAPSHOT_COMPLETE")
+        self.assertTrue(closed)
+        # FETCHED without a complete-snapshot coverage must not be promoted
+        status, _, _ = determine_status({"coverage": "INCOMPLETE", "status": "FETCHED"}, 0, 0)
+        self.assertNotEqual(status, "SNAPSHOT_COMPLETE")
 
     def test_verify_manifest_offline(self):
         """Verify on-disk manifest passes self-check."""
