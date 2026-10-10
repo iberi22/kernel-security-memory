@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Unit tests for build_catalog_manifest."""
+"""Unit tests for build_catalog_manifest and catalog status classification."""
 
 from pathlib import Path
 import unittest
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts/studies"))
-from build_catalog_manifest import generate_manifest
+from build_catalog_manifest import determine_status, generate_manifest, verify_manifest
 
 
 class TestCatalogManifest(unittest.TestCase):
@@ -16,13 +16,108 @@ class TestCatalogManifest(unittest.TestCase):
         self.assertGreaterEqual(manifest["project_count"], 12)
         self.assertGreaterEqual(manifest["total_entries"], 400)
         self.assertIn("projects", manifest)
+        self.assertIn("status_summary", manifest)
+        self.assertEqual(manifest["status_summary"]["CURSOR_PAUSED"], 5)
+        self.assertEqual(manifest["status_summary"]["NOT_FETCHED"], 7)
+
         for proj in manifest["projects"]:
             self.assertIn("name", proj)
             self.assertIn("entry_count", proj)
+            self.assertIn("status", proj)
+            self.assertIn("window_closed", proj)
             self.assertIn("files", proj)
             self.assertIn("index_json", proj["files"])
             self.assertIn("catalog_jsonl", proj["files"])
             self.assertEqual(len(proj["files"]["catalog_jsonl"]["sha256"]), 64)
+
+    def test_cursor_paused_five_projects(self):
+        """Verify the 5 projects with partial cursors have CURSOR_PAUSED and valid cursor dates."""
+        manifest = generate_manifest()
+        projects_by_name = {p["name"]: p for p in manifest["projects"]}
+
+        expected_paused = {
+            "linux": "2007-06-22",
+            "openssl": "2012-10-19",
+            "curl": "2006-08-22",
+            "glibc": "2000-12-21",
+            "openssh": "2001-06-19",
+        }
+
+        for name, expected_cursor in expected_paused.items():
+            self.assertIn(name, projects_by_name)
+            proj = projects_by_name[name]
+            self.assertEqual(proj["status"], "CURSOR_PAUSED", f"{name} must be CURSOR_PAUSED")
+            self.assertEqual(proj["cursor_date"], expected_cursor, f"{name} cursor mismatch")
+            self.assertFalse(proj["window_closed"], f"{name} window must NOT be closed")
+            self.assertGreater(proj["entry_count"], 0)
+
+    def test_not_fetched_projects(self):
+        """Verify un-fetched scaffolds are NOT_FETCHED with null cursor."""
+        manifest = generate_manifest()
+        projects_by_name = {p["name"]: p for p in manifest["projects"]}
+
+        unfetched_names = ["git", "postgresql", "qemu", "sqlite", "systemd", "unbound", "nginx"]
+        for name in unfetched_names:
+            self.assertIn(name, projects_by_name)
+            proj = projects_by_name[name]
+            self.assertEqual(proj["status"], "NOT_FETCHED", f"{name} must be NOT_FETCHED")
+            self.assertIsNone(proj["cursor_date"])
+            self.assertFalse(proj["window_closed"])
+            self.assertEqual(proj["entry_count"], 0)
+
+    def test_determine_status_logic(self):
+        """Test distinction between NOT_FETCHED, OBSERVED_EMPTY, CURSOR_PAUSED, and COMPLETE."""
+        # 1. Un-fetched scaffold (0 entries, 0 bytes, requests 0, cursor at start)
+        idx_scaffold = {
+            "coverage": "INCOMPLETE",
+            "window": {"start": "1999-01-01", "end": "2026-10-08"},
+            "requests": 0,
+            "resume": {"next_start_date": "1999-01-01"},
+        }
+        status, cursor, closed = determine_status(idx_scaffold, entries=0, catalog_bytes=0)
+        self.assertEqual(status, "NOT_FETCHED")
+        self.assertIsNone(cursor)
+        self.assertFalse(closed)
+
+        # 2. Observed genuinely empty (COMPLETE coverage, 0 entries)
+        idx_observed_empty = {
+            "coverage": "COMPLETE",
+            "window": {"start": "1999-01-01", "end": "2026-10-08"},
+            "requests": 150,
+            "resume": None,
+        }
+        status, cursor, closed = determine_status(idx_observed_empty, entries=0, catalog_bytes=0)
+        self.assertEqual(status, "OBSERVED_EMPTY")
+        self.assertIsNone(cursor)
+        self.assertTrue(closed)
+
+        # 3. Cursor paused (INCOMPLETE coverage, cursor advanced)
+        idx_paused = {
+            "coverage": "INCOMPLETE",
+            "window": {"start": "1999-01-01", "end": "2026-10-08"},
+            "requests": 35,
+            "resume": {"next_start_date": "2007-06-22"},
+        }
+        status, cursor, closed = determine_status(idx_paused, entries=338, catalog_bytes=89305)
+        self.assertEqual(status, "CURSOR_PAUSED")
+        self.assertEqual(cursor, "2007-06-22")
+        self.assertFalse(closed)
+
+        # 4. Truly complete with entries
+        idx_complete = {
+            "coverage": "COMPLETE",
+            "window": {"start": "1999-01-01", "end": "2026-10-08"},
+            "requests": 150,
+            "resume": None,
+        }
+        status, cursor, closed = determine_status(idx_complete, entries=120, catalog_bytes=15000)
+        self.assertEqual(status, "COMPLETE")
+        self.assertIsNone(cursor)
+        self.assertTrue(closed)
+
+    def test_verify_manifest_offline(self):
+        """Verify on-disk manifest passes self-check."""
+        self.assertTrue(verify_manifest())
 
 
 if __name__ == "__main__":
