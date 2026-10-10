@@ -10,10 +10,12 @@ import copy
 import hashlib
 import json
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -489,6 +491,106 @@ class ConverterTests(unittest.TestCase):
             record, skip = cfr.build_record(row, 1, root=Path(td))
             self.assertIsNone(record)
             self.assertEqual(skip, 'recorded digest does not match the declared URL-string scope')
+
+    def test_gh_api_timeout_becomes_clean_systemexit(self):
+        """Finding: a stalled or auth-prompting gh must not hang --fetch-commit-meta;
+        the timeout surfaces as a clean SystemExit and the cache is left unchanged."""
+        with tempfile.TemporaryDirectory() as td:
+            cache = Path(td) / 'commit-meta.jsonl'
+            seen = {}
+
+            def fake_run(cmd, **kwargs):
+                seen['timeout'] = kwargs.get('timeout')
+                raise subprocess.TimeoutExpired(cmd=cmd, timeout=kwargs.get('timeout'))
+
+            with mock.patch.object(cfr.shutil, 'which', return_value='/usr/bin/gh'), \
+                 mock.patch.object(cfr.subprocess, 'run', side_effect=fake_run):
+                with self.assertRaises(SystemExit) as ctx:
+                    cfr.fetch_commit_meta(path=cache)
+            message = str(ctx.exception)
+            self.assertIn('timed out', message)
+            self.assertIn('cache left unchanged', message)
+            # The timeout must actually be passed to the subprocess call.
+            self.assertEqual(seen['timeout'], cfr.GH_API_TIMEOUT)
+            self.assertFalse(cache.exists())
+
+    def _run_main(self, argv_extra, converted, skipped, records):
+        """Invoke cfr.main() against a temp records dir with patched expectations."""
+        argv = sys.argv
+        try:
+            sys.argv = ['convert_fable_records.py'] + argv_extra
+            with mock.patch.object(cfr, 'RECORDS_DIR', records), \
+                 mock.patch.object(cfr, 'expected_records', return_value=(converted, skipped)):
+                return cfr.main()
+        finally:
+            sys.argv = argv
+
+    @staticmethod
+    def _converter_body(record_id, source_record):
+        record = {'id': record_id, 'validation': {'source_record': source_record}}
+        return (json.dumps(record, indent=2) + '\n').encode()
+
+    def test_check_fails_when_a_previously_converted_row_now_skips(self):
+        """Finding: --check must fail if a row that used to convert now hits a skip
+        reason, instead of exiting 0 while its stale record stays on disk."""
+        rid = 'git-CVE-2016-2315'
+        body = self._converter_body(rid, 'docs/studies/fable-2026-06/git/records/cve-2016-2315.json')
+        skipped = [('CVE-2020-5260', 'recorded digest does not match the declared URL-string scope')]
+        with tempfile.TemporaryDirectory() as td:
+            records = Path(td)
+            (records / f'{rid}.json').write_bytes(body)
+            with self.assertRaises(SystemExit) as ctx:
+                self._run_main(['--check'], {rid: body}, skipped, records)
+        self.assertIn('skipped', str(ctx.exception))
+
+    def test_check_fails_on_orphaned_converter_record(self):
+        """Finding: --check must fail when an on-disk converter record's vetted row was
+        removed, so build_pack cannot export a record the converter can no longer make."""
+        rid = 'git-CVE-2016-2315'
+        body = self._converter_body(rid, 'docs/studies/fable-2026-06/git/records/cve-2016-2315.json')
+        orphan = {'id': 'git-CVE-9999-0001',
+                  'validation': {'source_record': 'docs/studies/fable-2026-06/git/records/cve-9999-0001.json'}}
+        with tempfile.TemporaryDirectory() as td:
+            records = Path(td)
+            (records / f'{rid}.json').write_bytes(body)
+            (records / 'git-CVE-9999-0001.json').write_text(json.dumps(orphan, indent=2) + '\n')
+            with self.assertRaises(SystemExit) as ctx:
+                self._run_main(['--check'], {rid: body}, [], records)
+            message = str(ctx.exception)
+        self.assertIn('orphan', message)
+        self.assertIn('git-CVE-9999-0001.json', message)
+
+    def test_check_ignores_hand_authored_record_without_source_record(self):
+        """Guard: a hand-authored record (no validation.source_record) is never orphaned,
+        so --check does not flag records the converter was never responsible for."""
+        rid = 'git-CVE-2016-2315'
+        body = self._converter_body(rid, 'docs/studies/fable-2026-06/git/records/cve-2016-2315.json')
+        with tempfile.TemporaryDirectory() as td:
+            records = Path(td)
+            (records / f'{rid}.json').write_bytes(body)
+            (records / 'linux-CVE-2024-26581-mainline.json').write_text(json.dumps(
+                {'id': 'linux-CVE-2024-26581-mainline', 'validation': {'method': 'manual'}}) + '\n')
+            # No exception: the hand-authored record is not a converter orphan.
+            self.assertIsNone(self._run_main(['--check'], {rid: body}, [], records))
+
+    def test_write_mode_removes_orphan_but_keeps_hand_authored(self):
+        """Finding: write mode drops converter orphans the converter cannot rebuild;
+        hand-authored records (no source_record) must survive untouched."""
+        rid = 'git-CVE-2016-2315'
+        body = self._converter_body(rid, 'docs/studies/fable-2026-06/git/records/cve-2016-2315.json')
+        with tempfile.TemporaryDirectory() as td:
+            records = Path(td)
+            (records / f'{rid}.json').write_bytes(b'stale bytes to be rewritten')
+            orphan = records / 'git-CVE-9999-0001.json'
+            orphan.write_text(json.dumps({'id': 'git-CVE-9999-0001', 'validation': {
+                'source_record': 'docs/studies/fable-2026-06/git/records/cve-9999-0001.json'}}) + '\n')
+            hand = records / 'linux-CVE-2024-26581-mainline.json'
+            hand.write_text(json.dumps({'id': 'linux-CVE-2024-26581-mainline',
+                                        'validation': {'method': 'manual'}}) + '\n')
+            self._run_main([], {rid: body}, [], records)  # write mode
+            self.assertFalse(orphan.exists(), 'orphan must be removed in write mode')
+            self.assertEqual((records / f'{rid}.json').read_bytes(), body)
+            self.assertTrue(hand.exists(), 'hand-authored record must be preserved')
 
     def test_qrels_abstention_probes_are_not_degraded(self):
         """Guard the text choices: qrels-v1 baseline must be unchanged by the new records."""
