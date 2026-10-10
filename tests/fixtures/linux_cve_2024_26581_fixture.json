@@ -21,8 +21,8 @@
     "role": "before",
     "function_body": "nft_rbtree_gc_elem(const struct nft_set *__set, struct nft_rbtree *priv,\n\t\t   struct nft_rbtree_elem *rbe, u8 genmask)\n{\n\tstruct nft_set *set = (struct nft_set *)__set;\n\tstruct rb_node *prev = rb_prev(&rbe->node);\n\tstruct net *net = read_pnet(&set->net);\n\tstruct nft_rbtree_elem *rbe_prev;\n\tstruct nft_trans_gc *gc;\n\n\tgc = nft_trans_gc_alloc(set, 0, GFP_ATOMIC);\n\tif (!gc)\n\t\treturn ERR_PTR(-ENOMEM);\n\n\t/* search for end interval coming before this element.\n\t * end intervals don't carry a timeout extension, they\n\t * are coupled with the interval start element.\n\t */\n\twhile (prev) {\n\t\trbe_prev = rb_entry(prev, struct nft_rbtree_elem, node);\n\t\tif (nft_rbtree_interval_end(rbe_prev) &&\n\t\t    nft_set_elem_active(&rbe_prev->ext, genmask))\n\t\t\tbreak;\n\n\t\tprev = rb_prev(prev);\n\t}\n\n\trbe_prev = NULL;\n\tif (prev) {\n\t\trbe_prev = rb_entry(prev, struct nft_rbtree_elem, node);\n\t\tnft_rbtree_gc_elem_remove(net, set, priv, rbe_prev);\n\n\t\t/* There is always room in this trans gc for this element,\n\t\t * memory allocation never actually happens, hence, the warning\n\t\t * splat in such case. No need to set NFT_SET_ELEM_DEAD_BIT,\n\t\t * this is synchronous gc which never fails.\n\t\t */\n\t\tgc = nft_trans_gc_queue_sync(gc, GFP_ATOMIC);\n\t\tif (WARN_ON_ONCE(!gc))\n\t\t\treturn ERR_PTR(-ENOMEM);\n\n\t\tnft_trans_gc_elem_add(gc, rbe_prev);\n\t}\n\n\tnft_rbtree_gc_elem_remove(net, set, priv, rbe);\n\tgc = nft_trans_gc_queue_sync(gc, GFP_ATOMIC);\n\tif (WARN_ON_ONCE(!gc))\n\t\treturn ERR_PTR(-ENOMEM);\n\n\tnft_trans_gc_elem_add(gc, rbe);\n\n\tnft_trans_gc_queue_sync_done(gc);\n\n\treturn rbe_prev;\n}\n",
     "lines_range": [
-      17,
-      70
+      22,
+      75
     ],
     "truncated": false,
     "ast_indexed": true,
@@ -37,8 +37,8 @@
     "role": "after",
     "function_body": "nft_rbtree_gc_elem(const struct nft_set *__set, struct nft_rbtree *priv,\n\t\t   struct nft_rbtree_elem *rbe)\n{\n\tstruct nft_set *set = (struct nft_set *)__set;\n\tstruct rb_node *prev = rb_prev(&rbe->node);\n\tstruct net *net = read_pnet(&set->net);\n\tstruct nft_rbtree_elem *rbe_prev;\n\tstruct nft_trans_gc *gc;\n\n\tgc = nft_trans_gc_alloc(set, 0, GFP_ATOMIC);\n\tif (!gc)\n\t\treturn ERR_PTR(-ENOMEM);\n\n\t/* search for end interval coming before this element.\n\t * end intervals don't carry a timeout extension, they\n\t * are coupled with the interval start element.\n\t */\n\twhile (prev) {\n\t\trbe_prev = rb_entry(prev, struct nft_rbtree_elem, node);\n\t\tif (nft_rbtree_interval_end(rbe_prev) &&\n\t\t    nft_set_elem_active(&rbe_prev->ext, NFT_GENMASK_ANY))\n\t\t\tbreak;\n\n\t\tprev = rb_prev(prev);\n\t}\n\n\trbe_prev = NULL;\n\tif (prev) {\n\t\trbe_prev = rb_entry(prev, struct nft_rbtree_elem, node);\n\t\tnft_rbtree_gc_elem_remove(net, set, priv, rbe_prev);\n\n\t\t/* There is always room in this trans gc for this element,\n\t\t * memory allocation never actually happens, hence, the warning\n\t\t * splat in such case. No need to set NFT_SET_ELEM_DEAD_BIT,\n\t\t * this is synchronous gc which never fails.\n\t\t */\n\t\tgc = nft_trans_gc_queue_sync(gc, GFP_ATOMIC);\n\t\tif (WARN_ON_ONCE(!gc))\n\t\t\treturn ERR_PTR(-ENOMEM);\n\n\t\tnft_trans_gc_elem_add(gc, rbe_prev);\n\t}\n\n\tnft_rbtree_gc_elem_remove(net, set, priv, rbe);\n\tgc = nft_trans_gc_queue_sync(gc, GFP_ATOMIC);\n\tif (WARN_ON_ONCE(!gc))\n\t\treturn ERR_PTR(-ENOMEM);\n\n\tnft_trans_gc_elem_add(gc, rbe);\n\n\tnft_trans_gc_queue_sync_done(gc);\n\n\treturn rbe_prev;\n}\n",
     "lines_range": [
-      17,
-      70
+      22,
+      75
     ],
     "truncated": false,
     "ast_indexed": true,

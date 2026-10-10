@@ -1,0 +1,17 @@
+{
+  "schema_version": "0.1.0",
+  "id": "synthetic-pack-fragments-seed",
+  "project": "synthetic",
+  "nodes": [
+    {
+      "id": "commit:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "type": "commit",
+      "label": "Synthetic fix commit for offline tests",
+      "attributes": {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "repository": "example/app",
+        "url": "https://github.com/example/app/commit/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  ]
+}

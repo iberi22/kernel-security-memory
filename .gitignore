@@ -25,3 +25,8 @@ docs/studies/cve-history/*-upstream/source.*
 # commit SHA for cisa-adp rows). CWE ids are facts; descriptions are not stored.
 docs/studies/nvd-cache/
 docs/studies/cisa-cache/
+
+# mine_pack_fragments.py cache: raw upstream patches + file contents fetched from
+# the fix commits (third-party terms, docs/DATA-POLICY.md). Only derived,
+# code-free features are committed under docs/studies/fragments/.
+docs/studies/fragments-cache/

@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// Verbatim excerpt from torvalds/linux (net/netfilter/nft_set_rbtree.c).
+// Provenance: BEFORE state at commit f82777e8ce6c039cdcacbcf1eb8619b99a20c06d (parent of fix 60c0c230c6f046da536d3df8b39a20b9a9fd6af0).
+// Upstream code retains its GPL-2.0-only license; this header and surrounding
+// annotations are original MIT contributions (see docs/DATA-POLICY.md).
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/module.h>

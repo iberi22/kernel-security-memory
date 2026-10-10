@@ -494,7 +494,7 @@ class TestCVE202426581Fixture(unittest.TestCase):
         self.assertIn("+		    nft_set_elem_active(&rbe_prev->ext, NFT_GENMASK_ANY)", diff)
 
     def test_mainline_memory_record_has_ast_indexed_true(self):
-        record_path = Path("docs/memory/records/linux-CVE-2024-26581-mainline.json")
+        record_path = Path(__file__).resolve().parents[1] / "docs" / "memory" / "records" / "linux-CVE-2024-26581-mainline.json"
         self.assertTrue(record_path.exists())
         with open(record_path, "r", encoding="utf-8") as f:
             record = json.load(f)
