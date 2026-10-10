@@ -33,6 +33,7 @@ from pathlib import Path
 
 # Ensure scripts directory is in sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+KSM_CLUSTERS = Path(__file__).resolve().parents[1] / "docs" / "studies" / "pattern_clusters.json"
 from defensive_auditor import (
     SECURITY_RULES,
     audit_path,
@@ -262,7 +263,9 @@ def evaluate_quality_gate(
         target = (Path(raw_target) if Path(raw_target).is_absolute()
                   else repo_root / raw_target)
         if clusters_path is None:
-            clusters_path = str(repo_root / "docs" / "studies" / "pattern_clusters.json")
+            # The clusters are KSM data: use this repository's copy, not the audited
+            # repository's (an agent gating its own project has no pattern_clusters.json).
+            clusters_path = str(KSM_CLUSTERS)
         elif not Path(clusters_path).is_absolute():
             clusters_path = str(repo_root / clusters_path)
 

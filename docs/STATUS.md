@@ -13,7 +13,7 @@ Date: 2026-10-10 UTC.
 | CWE coverage | 9,617 of 18,424 clustered CVEs (52.2%) are `UNKNOWN` (was 97.6%): 468 CWEs stated by catalogs, 8,339 from the deterministic overlay (NVD 2.0 primary 7,920, CISA vulnrichment ADP 376, NVD secondary 43). The remainder are NVD/CISA `noinfo` or pre-2002 ids. 65 ids present in two catalogs are counted once | `docs/studies/cwe-overlay.jsonl`, `docs/studies/pattern_clusters.json` |
 | Fix fragments | 35 pack records: 90 files, 97 functions (94 parsed, 3 `PARSER_SKIPPED`); line ranges and body hashes only, no code | `docs/studies/fragments/` |
 | Agent guardrails | 6 CWE families, 16 citations, every fix commit verified upstream | `docs/skills/defensive-security-auditor/references/guardrails.md` |
-| Tests | 634 run, 1 skipped (live-network smoke test) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| Tests | 635 run, 1 skipped (live-network smoke test) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 

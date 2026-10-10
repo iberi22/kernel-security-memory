@@ -17,6 +17,18 @@ The **Defensive Security Specialist Auditor** acts as an automated, non-repudiab
 
 It grounds vulnerability detection directly in empirical evidence from the **Kernel Security Memory (KSM)** corpus and Top-30 open-source catalog studies (`pattern_clusters.json`).
 
+## Where the tools live
+
+All paths below are relative to a checkout of https://github.com/iberi22/kernel-security-memory. Set `KSM_REPO` to that checkout and run the auditor against the code you changed:
+
+```bash
+python3 "$KSM_REPO/scripts/defensive_auditor.py" --target <changed paths> \
+  --clusters "$KSM_REPO/docs/studies/pattern_clusters.json" --output audit-evidence.json --strict
+python3 "$KSM_REPO/scripts/quality_gate.py" --target <changed paths> --evidence audit-evidence.json
+```
+
+Per-family triggers, checks and verified fix citations: `references/guardrails.md` (machine-readable: `references/guardrails.json`).
+
 ---
 
 ## Explicit Language Triggers

@@ -216,5 +216,29 @@ class TestQualityGateEvidenceFreshness(TestCase):
             self.assertEqual(r.returncode, 0)
 
 
+class TestQualityGateOutsideKsm(TestCase):
+    """An agent gates its own repository, which has no docs/studies/pattern_clusters.json."""
+
+    def test_gate_works_from_a_foreign_repository(self):
+        root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "proj"
+            proj.mkdir()
+            subprocess.run(["git", "init", "-q"], cwd=proj, check=True)
+            (proj / "a.c").write_text("int f(int a){return a+1;}\n")
+            audit = subprocess.run(
+                [sys.executable, str(root / "scripts/defensive_auditor.py"), "--target", "a.c",
+                 "--clusters", str(root / "docs/studies/pattern_clusters.json"),
+                 "--output", "audit-evidence.json", "--strict"],
+                cwd=proj, capture_output=True, text=True)
+            self.assertEqual(audit.returncode, 0, audit.stdout + audit.stderr)
+            gate = subprocess.run(
+                [sys.executable, str(root / "scripts/quality_gate.py"), "--target", "a.c",
+                 "--evidence", "audit-evidence.json"],
+                cwd=proj, capture_output=True, text=True)
+            self.assertEqual(gate.returncode, 0, gate.stdout + gate.stderr)
+            self.assertNotIn("Pattern clusters file not found", gate.stdout + gate.stderr)
+
+
 if __name__ == "__main__":
     main()

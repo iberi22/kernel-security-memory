@@ -1,9 +1,9 @@
 {
-  "evidence_chain_hash": "fb5473299b5efd94dccb91d4fb99e607061777642d9751db4ff8886f34fff2f2",
+  "evidence_chain_hash": "c64e72e6ece2ac539e1776343fc5b7adacbbcc260e83d538ac26c48164600585",
   "audit": {
     "schema_version": "defensive-evidence-chain-v1",
     "target": "scripts",
-    "timestamp": "2026-10-10T06:37:33.636182+00:00",
+    "timestamp": "2026-10-10T13:51:32.280868+00:00",
     "files_audited_count": 53,
     "files_audited": [
       "scripts/build_guardrails.py",
@@ -73,7 +73,7 @@
       "scripts/mine_pack_fragments.py": "b13817827fe89c3f53005dfe6067857df40e3c668aab2b052c0ee523dd147d1c",
       "scripts/open_pack.py": "1ba0a4f87f3ce33f4ae242160ba0fcb8926569c3d423a03abc22ab17ca8f194b",
       "scripts/pack_to_xavier.py": "91c6500b7b10320988ff3c227e5c77d1ddab7d2ef3a3f22e8bc37f8dc3203de4",
-      "scripts/quality_gate.py": "1d6663eb0652c7b6f8665a6964cf13ea364df706df91109c63ab2dfe12df7a64",
+      "scripts/quality_gate.py": "533c0d485c2f3cc023f35af580d68c7b7912f630039d9638d10218ee782a7344",
       "scripts/query_graph.py": "82fdb1c7a5ed116e72ff99b99ab8532e0cf8ef5108786bedebe41389404a7e18",
       "scripts/query_pack.py": "954f8c0571fe802eec5bea65290a1d2e3e1e64feec5ce91bcaaa3857d97d90a0",
       "scripts/render_review.py": "560b94c960adc48225062cfe0d7a9a9e612fa42a08ee37e55cab05ea705dd3e2",
@@ -241,7 +241,7 @@
         ],
         [
           "scripts/quality_gate.py",
-          "1d6663eb0652c7b6f8665a6964cf13ea364df706df91109c63ab2dfe12df7a64"
+          "533c0d485c2f3cc023f35af580d68c7b7912f630039d9638d10218ee782a7344"
         ],
         [
           "scripts/query_graph.py",
