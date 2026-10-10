@@ -12,3 +12,8 @@ __pycache__/
 build/
 .venv/
 node_modules/
+
+# Raw upstream advisory snapshots carry third-party descriptions (docs/DATA-POLICY.md):
+# kept as a local cache only; index.json records the source URL and sha256.
+docs/studies/cve-history/osv-cache/
+docs/studies/cve-history/*-upstream/source.*
