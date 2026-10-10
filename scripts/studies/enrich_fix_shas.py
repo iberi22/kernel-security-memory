@@ -168,7 +168,7 @@ def _warn_over_limit(report: dict) -> None:
     if report.get("over_limit"):
         print(
             f"  warning: {report['project']}: {report['over_limit']} entries exceed "
-            f"{MAX_LINE_BYTES} bytes; derived status fields omitted",
+            f"{MAX_LINE_BYTES} bytes; original lines kept unchanged",
             file=sys.stderr,
         )
 
