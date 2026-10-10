@@ -190,42 +190,36 @@ class BaseHistoryFetcher:
         self.cursor_date = determined_cursor
         self.window_closed = window_closed
 
+    def _read_bounded_response(self, resp: Any) -> Dict[str, Any]:
+        """Read one response body, enforcing the per-response and cumulative byte caps."""
+        body = bytearray()
+        while True:
+            chunk = resp.read(8192)
+            if not chunk:
+                break
+            body.extend(chunk)
+            self.cumulative_bytes += len(chunk)
+            if len(body) > self.per_response_limit:
+                raise RuntimeError(f"Response limit {self.per_response_limit} bytes exceeded")
+            if self.cumulative_bytes > self.cumulative_limit:
+                raise RuntimeError(f"Cumulative limit {self.cumulative_limit} bytes exceeded")
+        self.requests_count += 1
+        return json.loads(body.decode("utf-8"))
+
     def make_nvd_request(self, url: str) -> Optional[Dict[str, Any]]:
         """Perform a single HTTP request to NVD with timeout, limits, and error preservation."""
         req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
-        body = bytearray()
 
         try:
             with urllib.request.urlopen(req, timeout=self.request_timeout) as resp:
-                while True:
-                    chunk = resp.read(8192)
-                    if not chunk:
-                        break
-                    body.extend(chunk)
-                    self.cumulative_bytes += len(chunk)
-                    if len(body) > self.per_response_limit:
-                        raise RuntimeError(f"Response limit {self.per_response_limit} bytes exceeded")
-                    if self.cumulative_bytes > self.cumulative_limit:
-                        raise RuntimeError(f"Cumulative limit {self.cumulative_limit} bytes exceeded")
-                self.requests_count += 1
-                return json.loads(body.decode("utf-8"))
+                return self._read_bounded_response(resp)
 
         except urllib.error.HTTPError as e:
             if e.code in (403, 429):
                 time.sleep(self.retry_sleep)
                 try:
                     with urllib.request.urlopen(req, timeout=self.request_timeout) as retry_resp:
-                        body = bytearray()
-                        while True:
-                            chunk = retry_resp.read(8192)
-                            if not chunk:
-                                break
-                            body.extend(chunk)
-                            self.cumulative_bytes += len(chunk)
-                            if len(body) > self.per_response_limit:
-                                raise RuntimeError("Response limit exceeded")
-                        self.requests_count += 1
-                        return json.loads(body.decode("utf-8"))
+                        return self._read_bounded_response(retry_resp)
                 except Exception as retry_err:
                     err_msg = f"HTTP {e.code} on {url}: retry failed after {self.retry_sleep}s: {retry_err}"
                     self.errors.append(err_msg)
@@ -340,7 +334,10 @@ class BaseHistoryFetcher:
                 self.save_state("INCOMPLETE", {"next_start_date": curr_start.isoformat()})
                 return False
 
-            if calls_this_run >= call_limit or self.requests_count >= self.max_calls:
+            # Only calls_this_run bounds the run: self.requests_count is a lifetime
+            # counter persisted across runs, so comparing it against max_calls would
+            # pause every later run before it issues a single request.
+            if calls_this_run >= call_limit:
                 print(f"Request cap reached. Pausing at {curr_start.isoformat()}...")
                 self.save_state("INCOMPLETE", {"next_start_date": curr_start.isoformat()})
                 return False

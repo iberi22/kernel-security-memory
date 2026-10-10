@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """Unit tests for build_catalog_manifest and catalog status classification."""
 
+import json
 from pathlib import Path
 import unittest
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts/studies"))
-from build_catalog_manifest import determine_status, generate_manifest, verify_manifest
+from build_catalog_manifest import (
+    CatalogStatusError,
+    determine_status,
+    generate_manifest,
+    verify_manifest,
+)
 
 
 class TestCatalogManifest(unittest.TestCase):
@@ -131,6 +137,88 @@ class TestCatalogManifest(unittest.TestCase):
         # FETCHED without a complete-snapshot coverage must not be promoted
         status, _, _ = determine_status({"coverage": "INCOMPLETE", "status": "FETCHED"}, 0, 0)
         self.assertNotEqual(status, "SNAPSHOT_COMPLETE")
+
+    def test_explicit_status_agreeing_with_evidence_is_preserved(self):
+        """An explicit status that matches the derived status still wins."""
+        status, cursor, closed = determine_status(
+            {"coverage": "COMPLETE", "status": "COMPLETE", "resume": None,
+             "window": {"start": "1999-01-01"}, "requests": 150},
+            entries=120, catalog_bytes=15000,
+        )
+        self.assertEqual((status, cursor, closed), ("COMPLETE", None, True))
+
+        status, cursor, closed = determine_status(
+            {"coverage": "INCOMPLETE", "status": "CURSOR_PAUSED",
+             "window": {"start": "1999-01-01"}, "requests": 35,
+             "resume": {"next_start_date": "2007-06-22"}},
+            entries=338, catalog_bytes=89305,
+        )
+        self.assertEqual((status, cursor, closed), ("CURSOR_PAUSED", "2007-06-22", False))
+
+        # Snapshot catalogs keep the SNAPSHOT_COMPLETE rule added for FETCHED +
+        # COMPLETE_AT_* coverage.
+        status, cursor, closed = determine_status(
+            {"coverage": "COMPLETE_AT_COMMIT", "status": "FETCHED"}, entries=10, catalog_bytes=100
+        )
+        self.assertEqual((status, cursor, closed), ("SNAPSHOT_COMPLETE", None, True))
+
+    def test_explicit_status_contradicting_evidence_is_rejected(self):
+        """An explicit status may not override the evidence; verification must fail."""
+        window = {"start": "1999-01-01", "end": "2026-10-08"}
+
+        # COMPLETE claimed while coverage is INCOMPLETE and nothing was fetched
+        with self.assertRaises(CatalogStatusError):
+            determine_status({"coverage": "INCOMPLETE", "status": "COMPLETE", "window": window}, 0, 0)
+
+        # OBSERVED_EMPTY claimed while entries exist
+        with self.assertRaises(CatalogStatusError):
+            determine_status({"coverage": "INCOMPLETE", "status": "OBSERVED_EMPTY", "window": window}, 12, 500)
+
+        # CURSOR_PAUSED claimed without any cursor to pause at
+        with self.assertRaises(CatalogStatusError):
+            determine_status(
+                {"coverage": "INCOMPLETE", "status": "CURSOR_PAUSED", "window": window, "requests": 9}, 0, 0
+            )
+
+        # NOT_FETCHED claimed for a window with 338 fetched entries
+        with self.assertRaises(CatalogStatusError):
+            determine_status(
+                {"coverage": "INCOMPLETE", "status": "NOT_FETCHED", "window": window,
+                 "requests": 34, "resume": {"next_start_date": "2007-06-22"}}, 338, 89305
+            )
+
+    def test_verify_manifest_fails_on_status_evidence_mismatch(self):
+        """--check reports a contradictory index instead of trusting its explicit status."""
+        import build_catalog_manifest as bcm
+        import io
+        import tempfile
+        from contextlib import redirect_stderr, redirect_stdout
+
+        with tempfile.TemporaryDirectory() as tmp:
+            project_dir = Path(tmp) / "liar"
+            project_dir.mkdir()
+            (project_dir / "index.json").write_text(json.dumps({
+                "schema_version": "cve-history-v1",
+                "project": "liar",
+                "coverage": "INCOMPLETE",
+                "status": "COMPLETE",
+                "window": {"start": "1999-01-01", "end": "2026-10-08"},
+                "requests": 0,
+                "resume": None,
+                "entry_count": 0,
+                "with_fix_sha": 0,
+            }), encoding="utf-8")
+            (project_dir / "catalog.jsonl").write_text("", encoding="utf-8")
+
+            original_dir = bcm.CVE_HISTORY_DIR
+            bcm.CVE_HISTORY_DIR = Path(tmp)
+            try:
+                with redirect_stderr(io.StringIO()) as err, redirect_stdout(io.StringIO()):
+                    self.assertFalse(bcm.verify_manifest())
+                self.assertIn("contradicts the evidence", err.getvalue())
+            finally:
+                bcm.CVE_HISTORY_DIR = original_dir
+
 
     def test_verify_manifest_offline(self):
         """Verify on-disk manifest passes self-check."""
