@@ -15,6 +15,8 @@ import threading
 import time
 import urllib.error
 import urllib.request
+
+from ksm import net as _net
 from pathlib import Path
 from typing import Any, Callable, Iterable, NamedTuple, Optional, Sequence, Union
 
@@ -336,7 +338,7 @@ def _default_post_json(url: str, payload: dict, timeout: int = 60, retries: int 
                 headers={"Content-Type": "application/json", "User-Agent": "ksm-cli"},
                 method="POST",
             )
-            with urllib.request.urlopen(request, timeout=timeout) as response:
+            with _net.urlopen(request, timeout=timeout) as response:
                 return json.loads(response.read().decode("utf-8"))
         except (urllib.error.URLError, OSError, http.client.HTTPException):
             if attempt == retries - 1:
@@ -348,7 +350,7 @@ def _default_get_json(url: str, timeout: int = 60, retries: int = 4) -> dict:
     for attempt in range(retries):
         try:
             request = urllib.request.Request(url, headers={"User-Agent": "ksm-cli"})
-            with urllib.request.urlopen(request, timeout=timeout) as response:
+            with _net.urlopen(request, timeout=timeout) as response:
                 return json.loads(response.read().decode("utf-8"))
         except (urllib.error.URLError, OSError, http.client.HTTPException):
             if attempt == retries - 1:

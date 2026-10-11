@@ -9,6 +9,8 @@ import tarfile
 import tempfile
 import urllib.parse
 import urllib.request
+
+from ksm import net as _net
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -104,7 +106,7 @@ def update(
     # 1. Fetch expected sha256
     try:
         req_sha = urllib.request.Request(sha_url, headers={"User-Agent": "ksm-cli"})
-        with urllib.request.urlopen(req_sha, timeout=30) as resp:
+        with _net.urlopen(req_sha, timeout=30) as resp:
             sha_content = resp.read().decode("utf-8").strip()
     except Exception as exc:
         raise RuntimeError(f"Failed to fetch checksum from {sha_url}: {exc}") from exc
@@ -126,7 +128,7 @@ def update(
     try:
         try:
             req_tar = urllib.request.Request(tar_url, headers={"User-Agent": "ksm-cli"})
-            with urllib.request.urlopen(req_tar, timeout=60) as resp:
+            with _net.urlopen(req_tar, timeout=60) as resp:
                 while True:
                     chunk = resp.read(65536)
                     if not chunk:
