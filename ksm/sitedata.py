@@ -40,13 +40,13 @@ def project_from_catalog(cat_name: str) -> str:
     return name
 
 
-def fix_url_for_commit(project: str, sha: str) -> Optional[str]:
+def fix_url_for_commit(project: str, sha: str, repo: Optional[str] = None) -> Optional[str]:
     """Return the commit URL for a fix SHA."""
     if project == "linux":
         return f"https://git.kernel.org/linus/{sha}"
-    repo = REPO_MAP.get(project)
-    if repo:
-        return f"https://github.com/{repo}/commit/{sha}"
+    repo_used = repo or REPO_MAP.get(project)
+    if repo_used:
+        return f"https://github.com/{repo_used}/commit/{sha}"
     return None
 
 
@@ -294,6 +294,8 @@ def build_site_data(
                         "fix_shas": list(row.get("fix_shas") or []),
                         "patch_urls": list(row.get("patch_urls") or []),
                         "catalogs": [cat_name],
+                        "repo": row.get("repo"),
+                        "aliases": list(row.get("aliases") or []),
                     }
                 else:
                     entry = merged_cves[key]
@@ -307,6 +309,12 @@ def build_site_data(
                     for u in (row.get("patch_urls") or []):
                         if u not in entry["patch_urls"]:
                             entry["patch_urls"].append(u)
+                    # Union aliases preserving order
+                    for a in (row.get("aliases") or []):
+                        if a not in entry.setdefault("aliases", []):
+                            entry["aliases"].append(a)
+                    if row.get("repo") and not entry.get("repo"):
+                        entry["repo"] = row["repo"]
                     # cwe/published from -upstream/-cna row when present
                     if is_upstream_or_cna:
                         if row.get("cwe") is not None:
@@ -343,6 +351,8 @@ def build_site_data(
             "fix_shas": [sha] if sha else [],
             "patch_urls": [],
             "catalogs": ["pack" if key in fragments_map else "fingerprints"],
+            "repo": ev.get("repo"),
+            "aliases": list(ev.get("aliases") or []),
         }
         catalogs_per_project[proj_name].add(merged_cves[key]["catalogs"][0])
 
@@ -445,7 +455,7 @@ def build_site_data(
             has_fingerprint,
         ])
 
-        # Function names for search.json
+        # Function names and aliases for search.json
         fn_set = set()
         if frag_obj:
             for f in frag_obj["files"]:
@@ -456,7 +466,11 @@ def build_site_data(
             for fn in fp_obj["functions"]:
                 if fn["name"]:
                     fn_set.add(fn["name"])
-        fn_str = " ".join(sorted(fn_set))
+        text_tokens = sorted(fn_set)
+        aliases = sorted(entry.get("aliases") or [])
+        if aliases:
+            text_tokens.extend(aliases)
+        fn_str = " ".join(text_tokens)
 
         search_rows.append([
             adv_id,
@@ -468,14 +482,16 @@ def build_site_data(
 
         # cve/<project>/<CVE>.json
         cve_name = cluster_titles.get(cwe_id) if cwe_id else None
+        repo_used = entry.get("repo") or REPO_MAP.get(proj)
         fixes = []
         for sha in entry["fix_shas"]:
             fixes.append({
                 "sha": sha,
-                "url": fix_url_for_commit(proj, sha),
+                "url": fix_url_for_commit(proj, sha, repo=repo_used),
             })
 
         cve_doc = {
+            "aliases": sorted(entry.get("aliases") or []),
             "catalogs": sorted(entry["catalogs"]),
             "cwe": cwe_id,
             "cwe_name": cve_name,
@@ -489,7 +505,7 @@ def build_site_data(
             "project": proj,
             "published": pub,
             "related": related_map.get(key, []),
-            "repo": REPO_MAP.get(proj),
+            "repo": repo_used,
             "subsystem": entry["subsystem"],
         }
         write_json(out_dir / "cve" / proj / f"{adv_id}.json", cve_doc)

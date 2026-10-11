@@ -411,6 +411,16 @@ class TestIndexResume(unittest.TestCase):
                   fetch_blob=fb, run_fingerprint=run_fp)
         self.assertEqual(ranges_seen, [])
 
+    def test_advisory_commit_link_is_a_labelled_candidate(self):
+        write_catalog(self.cat, "rustsec", [
+            {"advisory_id": "RUSTSEC-2030-0001", "fix_shas": [], "repo": "o/crate",
+             "reference_commit_shas": ["d" * 40], "cwe": None, "published": "2030-01-01"},
+            {"advisory_id": "RUSTSEC-2030-0002", "fix_shas": [], "repo": None,
+             "reference_commit_shas": [], "cwe": None, "published": "2030-01-01"}])
+        cands = [c for c in load_candidates(self.cat) if c["project"] == "rustsec"]
+        self.assertEqual([(c["advisory_id"], c["fix_sha"], c["repo"], c["fix_evidence"]) for c in cands],
+                         [("RUSTSEC-2030-0001", "d" * 40, "o/crate", "advisory-commit-link")])
+
     def test_save_index_sorted(self):
         save_index(self.out, {"done": [
             {"project": "curl", "advisory_id": "CVE-2030-0002", "fix_sha": "b" * 40},

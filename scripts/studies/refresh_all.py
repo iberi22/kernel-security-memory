@@ -90,6 +90,7 @@ OPTIONAL_ENRICHERS: Tuple[str, ...] = (ENRICH_FROM_OSV, FETCH_KERNEL_CNA)
 
 # Snapshot catalog builders (also run only once the script is in the tree).
 FETCH_UPSTREAM = "fetch_upstream_advisories.py"
+FETCH_RUSTSEC = "fetch_rustsec.py"
 
 # Projects whose fetch_history_*.py validator accepts the provenance keys
 # enrich_from_osv.py writes ("fix_sha_source", "cwe_source") and the cwe_state
@@ -128,6 +129,8 @@ OFFLINE_TIMEOUT_SECONDS = 120
 # Snapshot catalogs: no fetch_history_*.py fetcher builds them, so the refresh
 # rebuilds them explicitly before the manifest.
 KERNEL_CNA_CATALOG = CATALOGS_SUBDIR / "linux-cna"
+RUSTSEC_CATALOG = CATALOGS_SUBDIR / "rustsec"
+RUSTSEC_SNAPSHOT = Path(".cache") / "all.zip"
 # (project, catalog directory) pairs built by fetch_upstream_advisories.py.
 # curl/openSSL come from the projects' own feeds; git/systemd/sqlite/postgres
 # come from the OSV.dev API (ecosystem GIT), which exposes their GitHub
@@ -290,6 +293,19 @@ def snapshot_steps(studies: Path, root: Path, offline_only: bool) -> List[Step]:
                 steps.append(Step(label, [*base, "--offline", "--check"], STEP))
             else:
                 steps.append(Step(label, base, NETWORK))
+    script = studies / FETCH_RUSTSEC
+    if script.is_file():
+        out_dir = root / RUSTSEC_CATALOG
+        base = [py, str(script), "--out-dir", str(out_dir)]
+        label = "snapshot:rustsec"
+        if offline_only:
+            snapshot = out_dir / RUSTSEC_SNAPSHOT
+            if not snapshot.is_file():
+                print(f"skipping offline check of rustsec (no snapshot at {snapshot})")
+            else:
+                steps.append(Step(label, [*base, "--offline", "--check"], STEP))
+        else:
+            steps.append(Step(label, base, NETWORK))
     return steps
 
 

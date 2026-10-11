@@ -17,6 +17,7 @@ node_modules/
 # kept as a local cache only; index.json records the source URL and sha256.
 docs/studies/cve-history/osv-cache/
 docs/studies/cve-history/*-upstream/source.*
+docs/studies/cve-history/rustsec/.cache/
 
 # Raw NVD 2.0 JSON data feeds and CISA vulnrichment files (third-party, may
 # carry weak-type text): local cache only, never committed. The deterministic

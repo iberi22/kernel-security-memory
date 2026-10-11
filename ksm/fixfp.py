@@ -39,6 +39,7 @@ CANDIDATE_SOURCES = [
     ("sqlite", ["sqlite-upstream", "sqlite"]),
     ("systemd", ["systemd-upstream", "systemd"]),
     ("postgres", ["postgres-upstream", "postgresql", "postgres"]),
+    ("rustsec", ["rustsec"]),
     ("linux-cna", ["linux-cna"]),
 ]
 
@@ -261,15 +262,25 @@ def load_candidates(catalog_dir, only_project=None):
             rows = sorted(rows, key=lambda r: str(r.get("advisory_id", "")), reverse=True)
         for r in rows:
             shas = r.get("fix_shas", []) or []
+            evidence = "fix-reference"
+            if not shas:
+                # Advisory databases that never type links as FIX (RustSec):
+                # a commit linked from the advisory is a fix candidate.
+                shas = r.get("reference_commit_shas", []) or []
+                evidence = "advisory-commit-link"
             if not shas:
                 continue
-            out.append({
+            cand = {
                 "project": project,
                 "advisory_id": r.get("advisory_id", ""),
                 "fix_sha": shas[0],
+                "fix_evidence": evidence,
                 "cwe": r.get("cwe"),
                 "published": r.get("published"),
-            })
+            }
+            if r.get("repo"):
+                cand["repo"] = r["repo"]
+            out.append(cand)
     return out
 
 
@@ -400,7 +411,7 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
 
     project = candidate["project"]
     fix_sha = candidate["fix_sha"]
-    repo = REPO_MAP.get(project, project)
+    repo = candidate.get("repo") or REPO_MAP.get(project, project)
 
     try:
         commit = fetch_commit(repo, fix_sha)
@@ -527,6 +538,7 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
         "project": project,
         "repo": repo_used,
         "fix_sha": fix_sha,
+        "fix_evidence": candidate.get("fix_evidence", "fix-reference"),
         "parent_sha": parent_sha,
         "cwe": candidate.get("cwe"),
         "tool": tool,
