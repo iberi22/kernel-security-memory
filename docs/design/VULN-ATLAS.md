@@ -208,6 +208,46 @@ Output directory (gitignored, built in CI) `site/data/`:
 - `vectors.jsonl`, `bundle.tar.gz` (+ `bundle.sha256`): everything above plus the
   fingerprint corpus, pattern clusters and guardrails, for the CLI.
 
+### 5.1 Exact shapes
+
+`index.json`:
+```json
+{"schema": "ksm-site/1", "ksm_commit": "<sha>", "generated": "<ISO-8601>",
+ "totals": {"cves": 0, "with_fix": 0, "with_fragments": 0, "with_fingerprint": 0, "projects": 0},
+ "projects": [{"name": "curl", "repo": "curl/curl", "catalogs": ["curl", "curl-upstream"],
+               "cves": 0, "with_fix": 0, "with_fragments": 0, "with_fingerprint": 0,
+               "years": {"2023": 4}}],
+ "groups": [{"name": "Memory safety", "cves": 0,
+             "cwes": [{"id": "CWE-787", "name": "Out-of-bounds Write", "cves": 0,
+                       "projects": {"curl": 3, "linux": 120}}]}]}
+```
+Group names: Memory safety, Resource management, Concurrency, Injection, Input
+validation and paths, Access control and crypto, Information exposure, Logic and
+numeric errors, Other, Unknown. CWE `UNKNOWN` lives in group Unknown.
+
+`cwe/<CWE-ID>.json`: `{"id", "name", "group", "rows": [[advisory_id, project, published|null, has_fix, has_fragments, has_fingerprint], ...]}` sorted by published desc then id.
+
+`cve/<project>/<CVE>.json`:
+```json
+{"id": "CVE-2023-38545", "project": "curl", "repo": "curl/curl",
+ "published": "2023-10-11", "cwe": "CWE-787", "cwe_name": "Out-of-bounds Write",
+ "cwe_source": "catalog|nvd-primary|cisa-vulnrichment|nvd-secondary|null", "group": "Memory safety",
+ "subsystem": null, "catalogs": ["curl-upstream"], "patch_urls": ["https://..."],
+ "fixes": [{"sha": "<40 hex>", "url": "https://github.com/curl/curl/commit/<sha>"}],
+ "fragments": {"coverage": "OK", "files": [{"path": "lib/socks.c", "language": "c",
+               "before_blob_sha": "..", "after_blob_sha": "..", "status": "modified",
+               "functions": [{"name": "do_SOCKS5", "before_range": [1, 2], "after_range": [1, 3],
+                              "lines_added": 3, "lines_removed": 1}]}]} ,
+ "fingerprint": {"fix_sha": "..", "parent_sha": "..", "functions": [{"path": "lib/socks.c",
+                 "name": "do_SOCKS5", "added_calls": [], "removed_calls": [],
+                 "added_guards": [{"kind": "if", "vars": ["len"]}]}]},
+ "related": [{"id": "CVE-..", "project": "..", "score": 0.42, "shared": ["cwe:CWE-787", "fn:do_socks5"]}]}
+```
+`fragments` and `fingerprint` are `null` when absent. Fixes from linux use
+`https://git.kernel.org/linus/<sha>` as `url` and repo `torvalds/linux` for the API.
+
+`search.json`: `[[advisory_id, project, cwe|null, subsystem|null, "fn1 fn2"], ...]`.
+
 ## 6. UI (`site/`, static, no build step)
 
 Vanilla HTML/CSS/ES modules. Hash router: `#/`, `#/cwe/<id>`, `#/project/<name>`,
