@@ -38,8 +38,12 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/site/build_site_data.py --out site/data
-          rm -rf site/data-sample
-          du -sh site/data
+          # Paths the legacy /docs Pages site served keep working:
+          # /memory/manifest.json (PORTABLE-MEMORY.md, open_pack.py) and /schemas/ ($id URLs).
+          cp -r docs/memory site/memory
+          cp -r docs/schemas site/schemas
+          cp docs/review.html site/review.html
+          du -sh site
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

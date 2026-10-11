@@ -2,7 +2,27 @@
 
 Public, portable, evidence-linked memory of Linux security fixes: what changed, why, and what later evidence says about the fix.
 
-**Bootstrap stage.** One real, source-linked seed case exercises JSON/SQL packaging. It is not a complete kernel scan or a validated vulnerability detector. The seven-method comparison is research; empirical ranking is pending a remote experiment.
+It holds 18,434 CVEs from 12 projects, 17,744 with the fix commit, from official sources (Linux kernel CNA, curl and OpenSSL advisories, OSV, NVD, CISA Vulnrichment); see [status](docs/STATUS.md). No language model is used anywhere in the data.
+
+## Vulnerability Atlas
+
+A static UI (GitHub Pages) to browse vulnerabilities by CWE group, CWE, project and CVE: what the fix changed, related CVEs, and the before/after code of each changed function fetched live from GitHub (KSM stores no source code). Design: [VULN-ATLAS.md](docs/design/VULN-ATLAS.md).
+
+The `ksm` CLI uses the same data locally:
+
+```sh
+pipx install git+https://github.com/iberi22/kernel-security-memory   # or: uv tool install git+...
+ksm update                      # download the data bundle published with the site
+ksm stats
+ksm show CVE-2016-8619          # metadata, fix commits, what the fix changed, related CVEs
+ksm search read_data
+ksm audit path/to/code          # regex rules of the defensive auditor
+ksm scan path/to/code           # structural match against fix fingerprints
+```
+
+`ksm scan` needs Xavier's `code-graph` with the `fingerprint` subcommand (`KSM_CODE_GRAPH` or `PATH`). It reports functions that look more like the vulnerable version of a known fix than the fixed one, and calls missing a check that the fix added, with file, line and variable. Findings are hypotheses to review. On curl 7.50.0, 11 of 12 findings with score >= 0.9 matched fixes released after that version; matching across different projects is not measured yet.
+
+The weekly `fingerprints` workflow fingerprints fix commits with `code-graph` and proposes them as a pull request; the `pages` workflow rebuilds the site and the bundle on every push to `main`.
 
 ## Read first
 

@@ -35,3 +35,12 @@ docs/studies/fragments-cache/
 # data, docs/DATA-POLICY.md). Only the derived osv_git_supported boolean is
 # committed in docs/studies/selection/oss-scanner-projects.json.
 docs/studies/selection/.osv-cache/
+
+site/data/
+
+# MITRE CWE CSV download (names are extracted into docs/studies/cwe-names.json).
+docs/studies/cwe-cache/
+
+# Python packaging artefacts.
+*.egg-info/
+build/

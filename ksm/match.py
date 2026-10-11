@@ -300,13 +300,23 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
     return findings
 
 
+# Score at or above which a finding is reported as strong. Measured on curl
+# 7.50.0 against 60 curl fix fingerprints: 11 of 12 findings >= 0.9 matched a
+# fix released after that version; 5 of 14 below 0.7 did.
+STRONG_SCORE = 0.9
+
+
 def render_markdown(findings):
     if not findings:
         return "# KSM scan findings\n\nNo findings.\n"
-    parts = ["# KSM scan findings", ""]
+    strong = sum(1 for f in findings if f["score"] >= STRONG_SCORE)
+    parts = ["# KSM scan findings", "",
+             f"{len(findings)} functions to review: {strong} strong (score >= {STRONG_SCORE}), "
+             f"{len(findings) - strong} weak. Findings are hypotheses, not verdicts.", ""]
     for f in findings:
+        label = "strong" if f["score"] >= STRONG_SCORE else "weak"
         parts.append(f"## `{f['file']}` — `{f['function']}` "
-                     f"(lines {f['start_line']}–{f['end_line']}) — score {f['score']:.2f}")
+                     f"(lines {f['start_line']}–{f['end_line']}) — score {f['score']:.2f} ({label})")
         parts.append("")
         for r in f.get("reasons", []):
             parts.append(f"- {r}")

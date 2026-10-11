@@ -537,6 +537,10 @@ def build_all(catalog_dir, out_dir, max_commits=300, code_graph_bin="code-graph"
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     candidates = load_candidates(catalog_dir, only_project=only_project)
+    # Evidence-pack CVEs (curated fragments) go first; the sort is stable.
+    frag_dir = Path(catalog_dir).parent / "fragments"
+    pack_ids = {p.stem.split("-", 1)[1] for p in frag_dir.glob("*-CVE-*.json")} if frag_dir.is_dir() else set()
+    candidates.sort(key=lambda c: c["advisory_id"] not in pack_ids)
     index = load_index(out_dir)
     done_keys = {(e.get("project"), e.get("advisory_id"), e.get("fix_sha")) for e in index["done"]}
     failed = {(e.get("project"), e.get("advisory_id"), e.get("fix_sha")): e for e in index["failed"]}
