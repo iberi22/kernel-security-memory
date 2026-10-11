@@ -153,16 +153,29 @@ class TestDefensiveAuditor(TestCase):
         self.assertEqual(findings[0]["cwe_id"], "CWE-416")
         self.assertEqual(findings[0]["severity"], "HIGH")
 
-    def test_detects_drop_after_free_rust(self):
+    def test_detects_drop_in_place_after_free_rust(self):
         code = """
-        fn access_dropped(resource: Resource) {
-            drop(resource);
-            resource.process();
+        fn access_dropped(resource: *mut Resource) {
+            unsafe {
+                std::ptr::drop_in_place(resource);
+                (*resource).process();
+            }
         }
         """
         findings = scan_content(code, "main.rs")
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0]["cwe_id"], "CWE-416")
+
+    def test_safe_rust_drop_is_not_use_after_free(self):
+        """In safe Rust the borrow checker forbids use after drop(): no finding."""
+        code = """
+        fn release(docs: Vec<Doc>) {
+            let n = docs.len();
+            drop(docs);
+            log(n);
+        }
+        """
+        self.assertEqual(scan_content(code, "writer.rs"), [])
 
     # -------------------------------------------------------------------------
     # CWE-78: Command Injection (C, Python, and Shell)
@@ -289,15 +302,34 @@ class TestDefensiveAuditor(TestCase):
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0]["cwe_id"], "CWE-190")
 
-    def test_detects_integer_overflow_rust_capacity(self):
+    def test_detects_integer_overflow_rust_capacity_in_unsafe(self):
         code = """
-        fn allocate_buffer(count: usize, elem_size: usize) -> Vec<u8> {
-            Vec::with_capacity(count * elem_size)
+        unsafe fn allocate_buffer(count: usize, elem_size: usize) -> Vec<u8> {
+            let mut v = Vec::with_capacity(count * elem_size);
+            v.set_len(count * elem_size);
+            v
         }
         """
         findings = scan_content(code, "alloc.rs")
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0]["cwe_id"], "CWE-190")
+
+    def test_safe_rust_capacity_arithmetic_is_not_reported(self):
+        """Safe Vec::with_capacity cannot corrupt memory; constant operands are never overflow."""
+        code = """
+        fn frame(ct: &[u8]) -> Vec<u8> {
+            let mut out = Vec::with_capacity(4 + ct.len());
+            let mut hdr = Vec::with_capacity(4 + 32);
+            out
+        }
+        """
+        self.assertEqual(scan_content(code, "frame.rs"), [])
+
+    def test_constant_capacity_in_unsafe_is_not_reported(self):
+        code = """
+        unsafe fn hdr() -> Vec<u8> { Vec::with_capacity(4 + 32) }
+        """
+        self.assertEqual(scan_content(code, "hdr.rs"), [])
 
     # -------------------------------------------------------------------------
     # CWE-476: NULL Pointer Dereference (C and Rust)
