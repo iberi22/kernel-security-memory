@@ -237,6 +237,22 @@ class TestReviewRegressions(unittest.TestCase):
         self.assertEqual(len(got), 1)  # the unchecked memcpy is still reported
         self.assertLess(got[0]["score"], 0.9)
 
+    def test_tests_never_match_and_deleted_functions_need_near_identity(self):
+        corpus = [pair_doc(before=fn("test_parse", {"aa": 5}, mh=[7] * 64), after=fn("test_parse", {"zz": 5}, mh=[7] * 64)),
+                  pair_doc(adv="CVE-2030-0009", before=fn("gone", {"bb": 5}, mh=[8] * 64), after=None)]
+        corpus[1]["files"][0]["functions"][0]["after"] = None
+        loose = [fn("test_parse", {"aa": 5}, mh=[7] * 64), fn("other", {"bb": 5, "cc": 5}, mh=[8] * 64)]
+        self.assertEqual(match_documents([tdoc("t.rs", loose)], corpus), [])  # test fn; cos 0.71 < 0.9
+        same = match_documents([tdoc("t.c", [fn("other", {"bb": 5}, mh=[8] * 64)])], corpus)
+        self.assertEqual([f["matches"][0]["advisory_id"] for f in same], ["CVE-2030-0009"])
+        self.assertGreaterEqual(same[0]["score"], 0.9)
+
+    def test_capitalized_names_never_form_or_trigger_rules(self):
+        before = fn("f", {"aa": 1}, calls=[{"callee": "Ok", "line": 3, "args": ["Self"]}])
+        after = fn("f", {"aa": 1}, calls=[{"callee": "Ok", "line": 5, "args": ["Self"]}],
+                   guards=[{"kind": "if", "line": 4, "vars": ["Self"]}])
+        self.assertEqual(guard_rules(before, after, {"added_guards": [{"kind": "if", "vars": ["Self"]}]}), set())
+
     def test_non_object_corpus_file_is_ignored(self):
         import json
         import tempfile

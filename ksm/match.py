@@ -18,8 +18,19 @@ MIN_NODES_DEFAULT = 40
 # distinct callees are treated as context handles and never form a rule.
 GUARD_WINDOW = 8
 HANDLE_CALLEES = 3
-# ALL_CAPS names are macro constants (SSL3_RANDOM_SIZE): nothing to check.
-CONSTANT_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+# Names starting with a capital are macro constants (SSL3_RANDOM_SIZE) in C and
+# types, enum variants or `Self` in Rust (Ok, Some, Self): nothing to check.
+CONSTANT_RE = re.compile(r"^[A-Z]")
+
+
+# Similarity required to a function the fix deleted (see match_documents).
+DELETED_MIN_BEFORE = 0.9
+
+
+def is_test_function(name):
+    """Unit tests: fix commits add them and every project has them, so they
+    only ever match each other."""
+    return name.startswith("test_") or name.endswith("_test") or name.startswith("check_")
 
 
 def load_corpus(fingerprints_dir):
@@ -207,7 +218,7 @@ def build_index(corpus, lsh_bands=LSH_BANDS_DEFAULT, lsh_rows=LSH_ROWS_DEFAULT):
         for f in doc.get("files", []) or []:
             for fn in f.get("functions", []) or []:
                 before, after = fn.get("before"), fn.get("after")
-                if before is None:
+                if before is None or is_test_function(fn.get("name", "")):
                     continue
                 pairs.append((doc, f, fn, before, after))
     pairs.sort(key=lambda p: (str(p[0].get("project", "")), str(p[0].get("advisory_id", "")),
@@ -254,6 +265,8 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
         tfile = tdoc.get("file", "")
         for tfn in tdoc.get("functions", []) or []:
             tname = tfn.get("name", "")
+            if is_test_function(tname):
+                continue
             t_kg = tfn.get("kgrams", {}) or {}
             matches = []
             for i in candidates(tfn):
@@ -264,11 +277,17 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
                 s_a = cosine(t_kg, (after or {}).get("kgrams", {}) or {}) if after else 0.0
                 sized = (int(tfn.get("node_count", min_nodes)) >= min_nodes
                          and int(before.get("node_count", min_nodes)) >= min_nodes)
-                structural = sized and s_b >= min_before and s_b >= s_a + margin
+                # A function the fix deleted (vulnerable code removed) has no
+                # fixed version to compare with: only near-identical code counts.
+                if after is None:
+                    structural = sized and s_b >= DELETED_MIN_BEFORE
+                else:
+                    structural = sized and s_b >= min_before and s_b >= s_a + margin
                 missing = find_missing_guards(tfn, rules[i])
                 if not structural and not missing:
                     continue
-                score = _pair_score(s_b, s_a, len(missing), sized)
+                score = _pair_score(s_b, s_a, len(missing),
+                                    sized and (after is not None or s_b >= DELETED_MIN_BEFORE))
                 matches.append({
                     "advisory_id": doc.get("advisory_id", ""),
                     "project": doc.get("project", ""),
