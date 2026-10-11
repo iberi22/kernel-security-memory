@@ -24,12 +24,18 @@
           "source_kind": "catalog"
         }
       ],
-      "cluster_count": 4,
+      "cluster_count": 13,
       "cluster_sample_cves": [
         "CVE-2017-14867",
         "CVE-2019-19604",
         "CVE-2022-1292",
-        "CVE-2022-2068"
+        "CVE-2022-2068",
+        "GHSA-29hf-rm4x-xxph",
+        "GHSA-4c96-w8v2-p28j",
+        "GHSA-5c5j-jmhx-q2gr",
+        "GHSA-7xh3-mhg9-jcw8",
+        "GHSA-hhjv-jq77-cmvx",
+        "GHSA-hmh4-3xvx-q5hr"
       ],
       "cluster_title": "CWE Family CWE-78",
       "cluster_with_fix_sha": 2,
@@ -108,7 +114,7 @@
           "source_kind": "catalog"
         }
       ],
-      "cluster_count": 59,
+      "cluster_count": 72,
       "cluster_sample_cves": [
         "CVE-2006-2935",
         "CVE-2014-0195",
@@ -176,7 +182,7 @@
           "source_kind": "catalog"
         }
       ],
-      "cluster_count": 135,
+      "cluster_count": 164,
       "cluster_sample_cves": [
         "CVE-2004-2013",
         "CVE-2016-2105",
@@ -244,7 +250,7 @@
           "source_kind": "catalog"
         }
       ],
-      "cluster_count": 405,
+      "cluster_count": 459,
       "cluster_sample_cves": [
         "CVE-2006-0039",
         "CVE-2010-3864",
@@ -336,7 +342,7 @@
           "source_kind": "catalog"
         }
       ],
-      "cluster_count": 1380,
+      "cluster_count": 1430,
       "cluster_sample_cves": [
         "CVE-2006-4997",
         "CVE-2016-5421",
@@ -416,7 +422,7 @@
           "source_kind": "catalog"
         }
       ],
-      "cluster_count": 2078,
+      "cluster_count": 2097,
       "cluster_sample_cves": [
         "CVE-2004-0079",
         "CVE-2005-2459",
