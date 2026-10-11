@@ -376,7 +376,7 @@
             "rust"
           ],
           "lesson": "Enforce Rust ownership invariants or invalidate raw pointers immediately upon manual deallocation.",
-          "pattern": "\\b(?:libc::free|dealloc|drop_in_place|ManuallyDrop::drop)\\s*\\(\\s*([a-zA-Z0-9_]+)[^)]*\\);\\s*(?!\\s*\\1\\s*=\\s*(?:ptr::null|std::ptr::null|null_mut)\\s*;)[^;]*(?:\\*+\\s*\\1|\\b\\1\\s*\\.)",
+          "pattern": "\\b(?:libc::free|dealloc|drop_in_place|ManuallyDrop::drop)\\s*\\(\\s*(?:&\\s*(?:mut\\s+)?)?([a-zA-Z0-9_]+)[^)]*\\);\\s*(?!\\s*\\1\\s*=\\s*(?:ptr::null|std::ptr::null|null_mut)\\s*;)[^;]*(?:\\*+\\s*\\1|\\b\\1\\s*\\.)",
           "rule_id": "SEC-CWE-416-USE-AFTER-FREE-RUST",
           "severity": "HIGH",
           "title": "Use After Free / Dereference After Drop or Deallocation (Rust)"

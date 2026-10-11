@@ -49,7 +49,7 @@ SECURITY_RULES = [
         "severity": "HIGH",
         "language": "Rust",
         "languages": ["rust"],
-        "pattern": r"\b(?:libc::free|dealloc|drop_in_place|ManuallyDrop::drop)\s*\(\s*([a-zA-Z0-9_]+)[^)]*\);\s*(?!\s*\1\s*=\s*(?:ptr::null|std::ptr::null|null_mut)\s*;)[^;]*(?:\*+\s*\1|\b\1\s*\.)",
+        "pattern": r"\b(?:libc::free|dealloc|drop_in_place|ManuallyDrop::drop)\s*\(\s*(?:&\s*(?:mut\s+)?)?([a-zA-Z0-9_]+)[^)]*\);\s*(?!\s*\1\s*=\s*(?:ptr::null|std::ptr::null|null_mut)\s*;)[^;]*(?:\*+\s*\1|\b\1\s*\.)",
         "explanation": "Raw pointer or resource accessed after deallocation or drop in Rust.",
         # Safe Rust cannot use a value after drop (borrow checker); only unsafe code can.
         "requires_unsafe": True,
@@ -217,14 +217,37 @@ def load_pattern_clusters(clusters_path):
     return {c.get("cwe_id"): c for c in clusters if isinstance(c, dict) and "cwe_id" in c}
 
 
-_UNSAFE_OPEN = re.compile(r"\bunsafe\b(?:\s+(?:extern\s+\"[^\"]*\"\s+)?fn\b[^{;]*|\s+impl\b[^{;]*)?\s*\{")
+def _raw_open(content, i):
+    """If content[i:] starts a raw string (r"..." / r#"..."#), return its hash count."""
+    j, n = i + 1, len(content)
+    hashes = 0
+    while j < n and content[j] == "#":
+        hashes += 1
+        j += 1
+    if content[i] == "r" and j < n and content[j] == '"':
+        return hashes
+    return None
+
+
+def _char_len(content, i):
+    """If content[i:] starts a char literal ('x' / '}' / '\\''), return its length."""
+    m = re.match(r"'(?:[^'\\]|\\.)'", content[i:i + 5])
+    return len(m.group(0)) if m else None
+
+
+_UNSAFE_OPEN = re.compile(r"\bunsafe\b(?:\s+(?:extern\s+\"[^\"]*\"\s+)?fn\b[^{;]*)?\s*\{")
 
 
 def _unsafe_spans(content):
-    """Return (start, end) offsets of `unsafe { }`, `unsafe fn ... { }` and `unsafe impl` bodies.
+    """Return (start, end) offsets of `unsafe { }` and `unsafe fn ... { }` bodies.
 
-    Brace matching skips string literals and // comments; good enough for rule gating, and
-    a body we fail to close extends to the end of the file (fail open towards reporting).
+    An `unsafe impl` header does NOT make its safe methods unsafe (it only
+    establishes a trait obligation), so it opens no span. Brace matching
+    skips string literals, raw strings (r#"..."#), character literals
+    ('x', including braces like '}' and escapes like '\\''), // line
+    comments and /* block comments */; good enough for rule gating, and
+    a body we fail to close extends to the end of the file (fail open
+    towards reporting).
     """
     spans = []
     for opening in _UNSAFE_OPEN.finditer(content):
@@ -235,9 +258,21 @@ def _unsafe_spans(content):
                 i += 1
                 while i < n and content[i] != '"':
                     i += 2 if content[i] == "\\" else 1
+            elif ch == 'r' and _raw_open(content, i) is not None:
+                hashes = _raw_open(content, i)
+                closer = '"' + '#' * hashes
+                end = content.find(closer, i + 1 + hashes + 1)
+                i = n if end == -1 else end + len(closer)
+                continue
+            elif ch == "'" and _char_len(content, i) is not None:
+                i += _char_len(content, i)
             elif content.startswith("//", i):
                 nl = content.find("\n", i)
                 i = n if nl == -1 else nl
+                continue
+            elif content.startswith("/*", i):
+                end = content.find("*/", i + 2)
+                i = n if end == -1 else end + 2
                 continue
             elif ch == "{":
                 depth += 1

@@ -73,6 +73,35 @@ class EnrollTest(unittest.TestCase):
         self.assertTrue(any("evil_key" in p for p in upstream_problems),
                         upstream_problems)
 
+    def test_existing_enrollment_refused_without_force(self):
+        project_dir = self.out / "projects" / "testproj"
+        project_dir.mkdir(parents=True)
+        sentinel = project_dir / "project.yaml"
+        sentinel.write_text(
+            "repo: https://github.com/example/testproj\n"
+            "primary_contact: sec@example.org\n"
+            "auto_ccs: [keep@example.org]\n", encoding="utf-8")
+        before = sentinel.read_bytes()
+        result = run_enroll(*self._valid_args())
+        self.assertEqual(result.returncode, 2,
+                         result.stdout + result.stderr)
+        self.assertIn("--force", result.stderr)
+        self.assertEqual(sentinel.read_bytes(), before)
+
+    def test_force_replaces_existing_enrollment(self):
+        env = {k: v for k, v in os.environ.items()
+               if k != "OSS_SCANNER_CLONE"}
+        project_dir = self.out / "projects" / "testproj"
+        project_dir.mkdir(parents=True)
+        (project_dir / "project.yaml").write_text(
+            "stale: true\n", encoding="utf-8")
+        result = run_enroll(*self._valid_args(), "--force", env=env)
+        self.assertNotEqual(result.returncode, 2,
+                            result.stdout + result.stderr)
+        text = (project_dir / "project.yaml").read_text(encoding="utf-8")
+        self.assertNotIn("stale", text)
+        self.assertIn("sec@example.org", text)
+
     def test_without_clone_never_reports_pass(self):
         env = {k: v for k, v in os.environ.items() if k != "OSS_SCANNER_CLONE"}
         result = run_enroll(*self._valid_args(), env=env)

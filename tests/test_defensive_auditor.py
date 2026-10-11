@@ -166,6 +166,32 @@ class TestDefensiveAuditor(TestCase):
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0]["cwe_id"], "CWE-416")
 
+    def test_detects_manually_drop_ref_mut_use_after_free(self):
+        """ManuallyDrop::drop takes &mut: the reference argument must match."""
+        code = """
+        unsafe {
+            ManuallyDrop::drop(&mut resource);
+            resource.rebuild();
+        }
+        """
+        findings = scan_content(code, "handle.rs")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]["cwe_id"], "CWE-416")
+
+    def test_unsafe_block_char_literal_brace_keeps_span(self):
+        """A '}' inside a char literal must not close the unsafe span."""
+        code = """unsafe { let marker = '}'; dealloc(raw, layout); *raw = 1; }"""
+        findings = scan_content(code, "raw.rs")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]["cwe_id"], "CWE-416")
+
+    def test_unsafe_block_comment_brace_keeps_span(self):
+        """A } inside a /* */ comment must not close the unsafe span."""
+        code = """unsafe { /* } */ dealloc(raw, layout); *raw = 1; }"""
+        findings = scan_content(code, "raw.rs")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]["cwe_id"], "CWE-416")
+
     def test_safe_rust_drop_is_not_use_after_free(self):
         """In safe Rust the borrow checker forbids use after drop(): no finding."""
         code = """
@@ -330,6 +356,17 @@ class TestDefensiveAuditor(TestCase):
         unsafe fn hdr() -> Vec<u8> { Vec::with_capacity(4 + 32) }
         """
         self.assertEqual(scan_content(code, "hdr.rs"), [])
+
+    def test_safe_method_in_unsafe_impl_is_not_unsafe_context(self):
+        """An unsafe impl header must not mark its safe methods as unsafe."""
+        code = """
+        unsafe impl Marker for Widget {
+            fn reserve(&self, count: usize, elem_size: usize) -> Vec<u8> {
+                Vec::with_capacity(count * elem_size)
+            }
+        }
+        """
+        self.assertEqual(scan_content(code, "widget.rs"), [])
 
     # -------------------------------------------------------------------------
     # CWE-476: NULL Pointer Dereference (C and Rust)

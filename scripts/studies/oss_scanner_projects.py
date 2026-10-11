@@ -14,7 +14,10 @@ OSV: ``osv_git_supported`` is true/false only when a single cached
 (``{"package": {"name": <repo>, "ecosystem": "GIT"}}`` has a non-empty
 ``vulns`` list or not). Responses live in a gitignored cache; without a
 cached or fetchable answer the field is null. ``--no-osv`` forces null
-(offline/tests).
+(offline/tests). OSV input is pinned: builds use only the cache unless
+``--refresh-osv`` explicitly allows live queries to fill misses, and the
+manifest records ``osv_cache_digest`` (sha256 over the cache entries read)
+so a ``--check`` compares the same input bytes, never a fresh network answer.
 """
 
 import argparse
@@ -33,6 +36,26 @@ DEFAULT_CATALOGS = ROOT / "docs" / "studies" / "cve-history"
 DEFAULT_CACHE = ROOT / "docs" / "studies" / "selection" / ".osv-cache"
 UPSTREAM = "https://github.com/anthropics/oss-scanner"
 OSV_URL = "https://api.osv.dev/v1/query"
+
+
+def _strip_inline_comment(value):
+    """Cut a trailing ` # comment` that sits outside quoted scalars."""
+    in_single = in_double = False
+    i = 0
+    while i < len(value):
+        ch = value[i]
+        if ch == "\\" and (in_single or in_double):
+            i += 2
+            continue
+        if ch == "'" and not in_double:
+            in_single = not in_single
+        elif ch == '"' and not in_single:
+            in_double = not in_double
+        elif ch == "#" and not in_single and not in_double and (
+                i == 0 or value[i - 1] in (" ", "\t")):
+            return value[:i].rstrip()
+        i += 1
+    return value.strip()
 
 
 def _tiny_parse(text):
@@ -65,6 +88,7 @@ def _tiny_parse(text):
         if not m:
             continue
         key, val = m.group(1), m.group(2)
+        val = _strip_inline_comment(val)
         if val == "|":
             in_block = True
             continue
@@ -129,6 +153,11 @@ def _http_json(url, data=None, headers=None, timeout=30):
 
 
 def _read_source_projects(source):
+    dirty = _git(["status", "--porcelain", "--", "projects"], source)
+    if dirty:
+        raise RuntimeError(
+            f"refusing to build: uncommitted changes under {source}/projects "
+            f"would be attributed to HEAD (commit or stash them first):\n{dirty}")
     projects = []
     for child in sorted(Path(source, "projects").iterdir()):
         spec = child / "project.yaml"
@@ -189,34 +218,61 @@ def _read_ref_projects(ref):
     return projects, ref, fetched_at
 
 
-def _osv_supported(repo, cache_dir, no_osv):
-    if no_osv:
-        return None
+def _osv_supported(repo, cache_dir, no_osv, offline=False):
+    if no_osv or offline:
+        return _osv_from_cache(repo, cache_dir)
     cache_dir = Path(cache_dir)
     key = hashlib.sha1(repo.encode()).hexdigest() + ".json"
     cached = cache_dir / key
     if cached.is_file():
-        try:
-            payload = json.loads(cached.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            return None
-    else:
-        try:
-            payload = _http_json(
-                OSV_URL, {"package": {"name": repo, "ecosystem": "GIT"}}, timeout=15
-            )
-        except Exception:
-            return None
-        try:
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            cached.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
-        except OSError:
-            pass
+        return _osv_from_cache(repo, cache_dir)
+    try:
+        payload = _http_json(
+            OSV_URL, {"package": {"name": repo, "ecosystem": "GIT"}}, timeout=15
+        )
+    except Exception:
+        return None
+    try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        cached.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+    except OSError:
+        pass
     vulns = payload.get("vulns") if isinstance(payload, dict) else None
     return bool(vulns) if isinstance(vulns, list) else bool(vulns)
 
 
-def build_manifest(*, source=None, ref=None, catalogs_dir, cache_dir, no_osv):
+def _osv_from_cache(repo, cache_dir):
+    cached = Path(cache_dir) / (hashlib.sha1(repo.encode()).hexdigest() + ".json")
+    if not cached.is_file():
+        return None
+    try:
+        payload = json.loads(cached.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    vulns = payload.get("vulns") if isinstance(payload, dict) else None
+    return bool(vulns) if isinstance(vulns, list) else bool(vulns)
+
+
+def _cache_digest(cache_dir):
+    """sha256 over the sorted (name, bytes) cache entries; pins the OSV input."""
+    digest = hashlib.sha256()
+    try:
+        entries = sorted(p for p in Path(cache_dir).iterdir() if p.is_file())
+    except FileNotFoundError:
+        entries = []
+    for entry in entries:
+        try:
+            blob = entry.read_bytes()
+        except OSError:
+            continue
+        digest.update(entry.name.encode())
+        digest.update(b"\x00")
+        digest.update(blob)
+    return digest.hexdigest()
+
+
+def build_manifest(*, source=None, ref=None, catalogs_dir, cache_dir, no_osv,
+                   offline_osv=True):
     if (source is None) == (ref is None):
         raise SystemExit("pass exactly one of --source or --ref")
     if source is not None:
@@ -235,7 +291,8 @@ def build_manifest(*, source=None, ref=None, catalogs_dir, cache_dir, no_osv):
                 "has_threat_model": entry["has_threat_model"],
                 "has_dockerfile_here": entry["has_dockerfile_here"],
                 "ksm_catalogs": _match_catalogs(entry["name"], repo, catalogs),
-                "osv_git_supported": _osv_supported(repo, cache_dir, no_osv),
+                "osv_git_supported": _osv_supported(repo, cache_dir, no_osv,
+                                                     offline=offline_osv),
             }
         )
     projects.sort(key=lambda p: p["name"])
@@ -243,6 +300,7 @@ def build_manifest(*, source=None, ref=None, catalogs_dir, cache_dir, no_osv):
         "source_repo": UPSTREAM,
         "source_commit": commit,
         "fetched_at": fetched_at,
+        "osv_cache_digest": (None if no_osv else _cache_digest(cache_dir)),
         "project_count": len(projects),
         "projects": projects,
     }
@@ -256,16 +314,24 @@ def main(argv=None):
     ap.add_argument("--catalogs-dir", default=str(DEFAULT_CATALOGS))
     ap.add_argument("--cache-dir", default=str(DEFAULT_CACHE))
     ap.add_argument("--no-osv", action="store_true", help="skip OSV queries (null fields)")
+    ap.add_argument("--refresh-osv", action="store_true",
+                    help="allow live OSV queries to fill cache misses "
+                         "(default: cache only, so checks are reproducible)")
     ap.add_argument("--check", action="store_true", help="fail on drift")
     args = ap.parse_args(argv)
 
-    manifest = build_manifest(
-        source=args.source,
-        ref=args.ref,
-        catalogs_dir=args.catalogs_dir,
-        cache_dir=args.cache_dir,
-        no_osv=args.no_osv,
-    )
+    try:
+        manifest = build_manifest(
+            source=args.source,
+            ref=args.ref,
+            catalogs_dir=args.catalogs_dir,
+            cache_dir=args.cache_dir,
+            no_osv=args.no_osv,
+            offline_osv=not args.refresh_osv,
+        )
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     text = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     output = Path(args.output)
     if args.check:

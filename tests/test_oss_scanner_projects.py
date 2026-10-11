@@ -104,6 +104,61 @@ class SelectionManifestTest(unittest.TestCase):
             )
             self.assertEqual(osp.main(base + ["--check"]), 1)
 
+    def test_fallback_strips_inline_comments(self):
+        import unittest.mock
+        text = ("repo: https://example.com/x#main # pinned\n"
+                "disabled: true # reason\n"
+                "note: \"a # b\" # trailing\n")
+        with unittest.mock.patch.dict(sys.modules, {"yaml": None}):
+            fields = osp._tiny_parse(text)
+        self.assertEqual(fields["repo"], "https://example.com/x#main")
+        self.assertTrue(osp._is_disabled(fields))
+        self.assertEqual(fields["note"], "a # b")
+
+    def test_dirty_source_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = make_source(tmp)
+            cats = str(make_catalogs(tmp))
+            (src / "projects" / "beta" / "project.yaml").write_text(
+                "repo: https://example.com/beta2\n", encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "uncommitted changes"):
+                osp.build_manifest(
+                    source=str(src), ref=None,
+                    catalogs_dir=cats,
+                    cache_dir=str(Path(tmp) / "cache"), no_osv=True)
+            out = str(Path(tmp) / "manifest.json")
+            rc = osp.main(["--source", str(src),
+                           "--catalogs-dir", cats,
+                           "--cache-dir", str(Path(tmp) / "cache"),
+                           "--no-osv", "--output", out])
+            self.assertEqual(rc, 1)
+
+    def test_offline_osv_uses_cache_only_and_records_digest(self):
+        import hashlib
+        import unittest.mock
+        with tempfile.TemporaryDirectory() as tmp:
+            src = make_source(tmp)
+            cache = Path(tmp) / "cache"
+            cache.mkdir()
+            key = hashlib.sha1(
+                "https://github.com/example/alpha".encode()).hexdigest()
+            (cache / (key + ".json")).write_text(
+                json.dumps({"vulns": [{"id": "GHSA-test"}]}),
+                encoding="utf-8")
+            blocked = unittest.mock.patch.object(
+                osp, "_http_json",
+                side_effect=AssertionError("network in offline mode"))
+            with blocked:
+                manifest = osp.build_manifest(
+                    source=str(src), ref=None,
+                    catalogs_dir=str(make_catalogs(tmp)),
+                    cache_dir=str(cache), no_osv=False)
+            by_name = {p["name"]: p for p in manifest["projects"]}
+            self.assertTrue(by_name["alpha"]["osv_git_supported"])
+            self.assertIsNone(by_name["beta"]["osv_git_supported"])
+            self.assertEqual(manifest["osv_cache_digest"],
+                             osp._cache_digest(str(cache)))
+
     def test_exactly_one_of_source_and_ref(self):
         with self.assertRaises(SystemExit):
             osp.build_manifest(source=None, ref=None, catalogs_dir=".", cache_dir=".", no_osv=True)

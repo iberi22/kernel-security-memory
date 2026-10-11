@@ -131,6 +131,69 @@ class ThreatModelTest(unittest.TestCase):
         self.assertIn("src/api (HTTP surface: search, graph)",
                         out.read_text(encoding="utf-8"))
 
+    def test_missing_output_dir_created(self):
+        out = Path(self.tmp.name) / "newdir" / "sub" / "tm.md"
+        result = self._generate(out)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(out.is_file())
+
+    def test_repo_not_a_directory_rejected(self):
+        missing = Path(self.tmp.name) / "nope"
+        result = run_script("--repo", str(missing), "--name", "synth",
+                            "--context", str(self.ctx),
+                            "--out", str(self.out))
+        self.assertEqual(result.returncode, 2,
+                         result.stdout + result.stderr)
+        afile = Path(self.tmp.name) / "afile"
+        afile.write_text("x = 1\n", encoding="utf-8")
+        result = run_script("--repo", str(afile), "--name", "synth",
+                            "--context", str(self.ctx),
+                            "--out", str(self.out))
+        self.assertEqual(result.returncode, 2,
+                         result.stdout + result.stderr)
+
+    def test_missing_untrusted_inputs_rejected(self):
+        self.ctx.write_text("description: x\n", encoding="utf-8")
+        result = self._generate(self.out)
+        self.assertEqual(result.returncode, 2,
+                         result.stdout + result.stderr)
+        self.assertIn("untrusted_inputs", result.stderr)
+
+    def test_empty_untrusted_inputs_rejected(self):
+        self.ctx.write_text("description: x\nuntrusted_inputs: []\n",
+                            encoding="utf-8")
+        result = self._generate(self.out)
+        self.assertEqual(result.returncode, 2,
+                         result.stdout + result.stderr)
+        self.assertIn("untrusted_inputs", result.stderr)
+
+    def test_fallback_parser_accepts_inline_empty_list(self):
+        import unittest.mock
+        sys.path.insert(0, str(REPO_ROOT / "scripts" / "oss_scanner"))
+        import threat_model
+        ctx = Path(self.tmp.name) / "ctx-fallback.yaml"
+        ctx.write_text("description: x\nuntrusted_inputs:\n"
+                       "  - cli\nleave_alone: []\n",
+                       encoding="utf-8")
+        with unittest.mock.patch.dict(sys.modules, {"yaml": None}):
+            data = threat_model.load_context(str(ctx))
+        self.assertEqual(data["leave_alone"], [])
+        self.assertEqual(data["untrusted_inputs"], ["cli"])
+
+    def test_check_ignores_ksm_commit_drift(self):
+        import re
+        self.assertEqual(self._generate(self.out).returncode, 0)
+        text = self.out.read_text(encoding="utf-8")
+        self.assertIn("KSM commit ", text)
+        doctored = re.sub(r"KSM commit \S+;", "KSM commit deadbee;",
+                          text)
+        self.assertNotEqual(doctored, text)
+        self.out.write_text(doctored, encoding="utf-8")
+        check = run_script("--repo", str(self.repo), "--name", "synth",
+                           "--context", str(self.ctx),
+                           "--out", str(self.out), "--check")
+        self.assertEqual(check.returncode, 0, check.stderr)
+
     def test_leave_alone_excluded(self):
         ctx = Path(self.tmp.name) / "ctx2.yaml"
         ctx.write_text(CONTEXT.replace("leave_alone: []",

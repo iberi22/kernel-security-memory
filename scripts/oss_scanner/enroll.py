@@ -154,6 +154,9 @@ def main(argv=None):
     parser.add_argument("--in-repo-threat-model",
                         default=".oss-scanner/threat_model.md")
     parser.add_argument("--out", required=True)
+    parser.add_argument("--force", action="store_true",
+                        help="Replace an existing DIR/projects/<name>/project.yaml "
+                             "(default: refuse to overwrite)")
     parser.add_argument("--oss-scanner-clone", default=os.environ.get(OSS_SCANNER_CLONE_ENV),
                         help="Path to a local anthropics/oss-scanner clone "
                              f"(default: ${OSS_SCANNER_CLONE_ENV})")
@@ -173,6 +176,11 @@ def main(argv=None):
         return 2
 
     project_dir = Path(args.out) / "projects" / args.name
+    existing = project_dir / "project.yaml"
+    if existing.is_file() and not args.force:
+        print(f"refusing to overwrite existing {existing} "
+              f"(pass --force to replace)", file=sys.stderr)
+        return 2
     project_dir.mkdir(parents=True, exist_ok=True)
     write_project_yaml(project_dir / "project.yaml", args.repo_url,
                        args.contact, args.homepage,

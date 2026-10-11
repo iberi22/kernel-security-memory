@@ -24,6 +24,7 @@ footer. Byte-identical on rerun. Stdlib only (PyYAML used if importable).
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -58,6 +59,14 @@ def _parse_scalar(text):
     return text
 
 
+def _parse_inline_list(text):
+    """Parse a bracketed inline list ([a, b]) into strings."""
+    inner = text.strip()[1:-1].strip()
+    if not inner:
+        return []
+    return [_parse_scalar(item) for item in inner.split(",")]
+
+
 def _mini_yaml(path):
     """Parse the restricted CONTEXT.yaml subset: top-level scalar keys,
     dash-list keys, and one inline {k: v} map (severity_overrides)."""
@@ -79,6 +88,9 @@ def _mini_yaml(path):
                         k, _, v = pair.partition(":")
                         mapping[_parse_scalar(k)] = _parse_scalar(v)
                 data[key] = mapping
+                current = None
+            elif rest.startswith("[") and rest.endswith("]"):
+                data[key] = _parse_inline_list(rest)
                 current = None
             elif rest:
                 data[key] = _parse_scalar(rest)
@@ -111,6 +123,8 @@ def load_context(path):
             raise ValueError(f"context key {key!r} must be a non-empty string")
     for key in ("untrusted_inputs", "trusted", "components_most",
                 "components_least", "exercise", "leave_alone"):
+        if key == "untrusted_inputs" and key not in data:
+            continue  # required: rejected below, never silently defaulted
         data.setdefault(key, [])
         items = data[key]
         if not isinstance(items, list):
@@ -130,6 +144,11 @@ def load_context(path):
     data.setdefault("severity_overrides", {})
     if not isinstance(data["severity_overrides"], dict):
         raise ValueError("context key 'severity_overrides' must be a mapping")
+    untrusted = data.get("untrusted_inputs")
+    if (not isinstance(untrusted, list) or not untrusted
+            or not all(isinstance(x, str) and x.strip() for x in untrusted)):
+        raise ValueError(
+            "context key 'untrusted_inputs' must be a non-empty list of strings")
     return data
 
 
@@ -277,6 +296,16 @@ def render(name, ctx, lang_counts, hotspots, families, digest, commit):
     return "\n".join(lines)
 
 
+def _without_volatile_commit(text):
+    """Blank the KSM commit in the provenance footer for drift comparison.
+
+    Committing a generated model advances HEAD, so a byte comparison that
+    includes the commit would fail on the next --check without any evidence
+    change. All other content is still compared exactly.
+    """
+    return re.sub(r"KSM commit \S+;", "KSM commit <commit>;", text)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", required=True)
@@ -294,6 +323,9 @@ def main(argv=None):
     except Exception as exc:  # noqa: BLE001 - PyYAML parse errors
         print(f"error: cannot parse context {args.context}: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
+    if not Path(args.repo).is_dir():
+        print(f"error: --repo {args.repo} is not a directory", file=sys.stderr)
+        return 2
     lang_counts, hotspots = audit_repo(args.repo, ctx["leave_alone"])
     families, digest = load_guardrails()
     text = render(args.name, ctx, lang_counts, hotspots, families,
@@ -308,7 +340,7 @@ def main(argv=None):
         except OSError as exc:
             print(f"--check: cannot read {args.out}: {exc}", file=sys.stderr)
             return 1
-        if current != text:
+        if _without_volatile_commit(current) != _without_volatile_commit(text):
             print(f"--check: {args.out} differs from generated output",
                   file=sys.stderr)
             return 1
@@ -316,6 +348,7 @@ def main(argv=None):
         return 0
 
     if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
         Path(args.out).write_text(text, encoding="utf-8")
         print(f"threat model written to {args.out}")
     else:

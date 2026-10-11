@@ -1,10 +1,10 @@
 {
-  "evidence_chain_hash": "8d92a795e5e933cd86da444fac96ae643cee812a8c6eb011e4845c8517e10a82",
+  "evidence_chain_hash": "21044f91305b1148a70be552cab3207ee35b2f02d89ad5ffcb16b8302f447530",
   "audit": {
     "schema_version": "defensive-evidence-chain-v1",
     "target": "scripts",
-    "timestamp": "2026-10-11T07:17:33.977037+00:00",
-    "files_audited_count": 53,
+    "timestamp": "2026-10-11T08:23:01.647006+00:00",
+    "files_audited_count": 57,
     "files_audited": [
       "scripts/build_guardrails.py",
       "scripts/build_pack.py",
@@ -17,6 +17,9 @@
       "scripts/mine_candidates.py",
       "scripts/mine_pack_fragments.py",
       "scripts/open_pack.py",
+      "scripts/oss_scanner/__init__.py",
+      "scripts/oss_scanner/enroll.py",
+      "scripts/oss_scanner/threat_model.py",
       "scripts/pack_to_xavier.py",
       "scripts/quality_gate.py",
       "scripts/query_graph.py",
@@ -58,13 +61,14 @@
       "scripts/studies/fetch_unbound.py",
       "scripts/studies/fetch_upstream_advisories.py",
       "scripts/studies/fetcher_io.py",
+      "scripts/studies/oss_scanner_projects.py",
       "scripts/studies/refresh_all.py"
     ],
     "file_digests": {
       "scripts/build_guardrails.py": "2d6e69c75e5133b5afe1c0ecc1504c61518d901c964a6b74bc4e68c6d9c5a936",
       "scripts/build_pack.py": "6e99f2400a44b05633259a447e91f9dafe39e1fa5111d7978309b2f6cc6d1f0c",
       "scripts/convert_fable_records.py": "c748c090d009a1e7f9283ec1cdf0eb43b9ef947119a87b5554b763377985dbd2",
-      "scripts/defensive_auditor.py": "15f89a3fedd63b680ef64691a3fd6dcb3be8d4607cef5a3fdafcf08094039aca",
+      "scripts/defensive_auditor.py": "c810110de73bb63543bc870be08332fbe3934d04c6726ae834526ff1d19a604d",
       "scripts/embed_vectors.py": "11d2c64821c2aa74ceae822b8a1430a4eb91399bd9fa7cd0b61952428a6e9fdf",
       "scripts/export_bundle.py": "77c5bb8304a6d5299c8aaa4d2de7093c15f8073cce222efb4230401047c99871",
       "scripts/measure_baseline.py": "9ed893e6a327574c4716e05fbd10ecc91765bfa5002bd9dc4a4df0b2e805daa3",
@@ -72,6 +76,9 @@
       "scripts/mine_candidates.py": "bdaa9b731122f41961c08e15a97a24d59990e863f38bc8ba42b3a0873a2e3e99",
       "scripts/mine_pack_fragments.py": "8adbf5c4abed9d4f0320e65647965f5392d00cf9af7692700ae19bb844f0e8a3",
       "scripts/open_pack.py": "1ba0a4f87f3ce33f4ae242160ba0fcb8926569c3d423a03abc22ab17ca8f194b",
+      "scripts/oss_scanner/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scripts/oss_scanner/enroll.py": "b2bf43e096071d3006ffced8a279c2cd34ac95effe3d8ea133d9b75d3e0a67b9",
+      "scripts/oss_scanner/threat_model.py": "927a5a2cc050ef87f5d1cfc4761d51e5cfc8c70bcdf351532bf7a5c4a8ad4e64",
       "scripts/pack_to_xavier.py": "91c6500b7b10320988ff3c227e5c77d1ddab7d2ef3a3f22e8bc37f8dc3203de4",
       "scripts/quality_gate.py": "802f7227f43310dd4d3b42e484230cd8210abffee2a4e1b3cf8c91a58ed7393f",
       "scripts/query_graph.py": "82fdb1c7a5ed116e72ff99b99ab8532e0cf8ef5108786bedebe41389404a7e18",
@@ -113,6 +120,7 @@
       "scripts/studies/fetch_unbound.py": "3fcc6771f79ac1171123c58e3f37d3f8758632701b323526e3d74eabb3d5a91d",
       "scripts/studies/fetch_upstream_advisories.py": "11926118e4008d564876cbd921aacb38f90c929c57431d8bae818b781f1b2aa4",
       "scripts/studies/fetcher_io.py": "cbe85e9841dcc48d8b26c3374e7043d8d50fbfc4a860a031edd55136e1c4ca16",
+      "scripts/studies/oss_scanner_projects.py": "746f8f661a168fffdf4598fcd678723c5e1c95e3faa3c9e3a3c1b3b730e384e8",
       "scripts/studies/refresh_all.py": "e9b079f4bb7990d63b887832ad085d76826bb97d08a3adc76db063c936718795"
     },
     "findings_count": 0,
@@ -147,6 +155,9 @@
         "scripts/mine_candidates.py",
         "scripts/mine_pack_fragments.py",
         "scripts/open_pack.py",
+        "scripts/oss_scanner/__init__.py",
+        "scripts/oss_scanner/enroll.py",
+        "scripts/oss_scanner/threat_model.py",
         "scripts/pack_to_xavier.py",
         "scripts/quality_gate.py",
         "scripts/query_graph.py",
@@ -188,6 +199,7 @@
         "scripts/studies/fetch_unbound.py",
         "scripts/studies/fetch_upstream_advisories.py",
         "scripts/studies/fetcher_io.py",
+        "scripts/studies/oss_scanner_projects.py",
         "scripts/studies/refresh_all.py"
       ],
       "file_digests": [
@@ -205,7 +217,7 @@
         ],
         [
           "scripts/defensive_auditor.py",
-          "15f89a3fedd63b680ef64691a3fd6dcb3be8d4607cef5a3fdafcf08094039aca"
+          "c810110de73bb63543bc870be08332fbe3934d04c6726ae834526ff1d19a604d"
         ],
         [
           "scripts/embed_vectors.py",
@@ -234,6 +246,18 @@
         [
           "scripts/open_pack.py",
           "1ba0a4f87f3ce33f4ae242160ba0fcb8926569c3d423a03abc22ab17ca8f194b"
+        ],
+        [
+          "scripts/oss_scanner/__init__.py",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        [
+          "scripts/oss_scanner/enroll.py",
+          "b2bf43e096071d3006ffced8a279c2cd34ac95effe3d8ea133d9b75d3e0a67b9"
+        ],
+        [
+          "scripts/oss_scanner/threat_model.py",
+          "927a5a2cc050ef87f5d1cfc4761d51e5cfc8c70bcdf351532bf7a5c4a8ad4e64"
         ],
         [
           "scripts/pack_to_xavier.py",
@@ -400,11 +424,15 @@
           "cbe85e9841dcc48d8b26c3374e7043d8d50fbfc4a860a031edd55136e1c4ca16"
         ],
         [
+          "scripts/studies/oss_scanner_projects.py",
+          "746f8f661a168fffdf4598fcd678723c5e1c95e3faa3c9e3a3c1b3b730e384e8"
+        ],
+        [
           "scripts/studies/refresh_all.py",
           "e9b079f4bb7990d63b887832ad085d76826bb97d08a3adc76db063c936718795"
         ]
       ],
-      "files_audited_count": 53,
+      "files_audited_count": 57,
       "findings": [],
       "findings_count": 0,
       "ksm_pack_reference": "kernel-security-memory-bootstrap-v0",

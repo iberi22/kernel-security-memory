@@ -20,7 +20,7 @@ then run:
 ```bash
 python3 scripts/oss_scanner/threat_model.py --repo PATH --name NAME \
   --context CONTEXT.yaml --out .oss-scanner/threat_model.md
-# rerun check (byte-identical output expected):
+# rerun check (output must match; the volatile KSM commit is ignored):
 python3 scripts/oss_scanner/threat_model.py --repo PATH --name NAME \
   --context CONTEXT.yaml --out .oss-scanner/threat_model.md --check
 ```
@@ -53,6 +53,10 @@ python3 scripts/oss_scanner/enroll.py --name NAME \
   --repo-url https://... --contact somebody@example.org \
   --out DIR   # writes DIR/projects/<name>/project.yaml
 ```
+
+Re-running enrollment for an existing name refuses to overwrite its
+`project.yaml` (reporting settings such as `auto_ccs`/`pgp` are never
+reset silently); pass `--force` to replace it explicitly.
 
 The script validates twice and prints both results: KSM stdlib checks and
 the real upstream `tools/validate.py` (`check_project`) from the pinned
