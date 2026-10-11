@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iberi22.github.io/kernel-security-memory/schemas/fragment.schema.json",
+  "title": "Kernel evidence code fragment v0.1",
+  "type": "object",
+  "required": [
+    "repo",
+    "commit_sha",
+    "blob_sha",
+    "symbol_name",
+    "language",
+    "role",
+    "function_body",
+    "lines_range",
+    "truncated",
+    "ast_indexed"
+  ],
+  "properties": {
+    "repo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commit_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "blob_sha": {
+      "type": "string",
+      "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "symbol_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "before",
+        "after"
+      ]
+    },
+    "function_body": {
+      "type": "string",
+      "maxLength": 1048576
+    },
+    "lines_range": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "ast_indexed": {
+      "type": "boolean"
+    },
+    "file": {
+      "type": "string"
+    },
+    "structural_diff": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

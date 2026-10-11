@@ -1,0 +1,158 @@
+name: Refresh CVE catalogs
+
+on:
+  schedule:
+    # Mondays at 05:17 UTC.
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# One refresh at a time; a run that is still going is never cancelled, because
+# half-applied NVD windows are resumed from the cursor by the next run.
+concurrency:
+  group: refresh-catalogs
+  cancel-in-progress: false
+
+env:
+  AUTOMATION_BRANCH: automation/refresh-catalogs
+
+jobs:
+  refresh:
+    name: Refresh catalogs and propose a pull request
+    runs-on: ubuntu-latest
+    # The fetch phase is capped at 35 minutes by refresh_all.py
+    # --deadline-seconds; the rest covers validation and the pull request.
+    timeout-minutes: 50
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credentials are left in .git/config: the token reaches git only
+          # through the push step's per-command header, and gh only through
+          # GH_TOKEN on the steps that need them.
+          persist-credentials: false
+          # Full history: the automation branch must be able to merge main.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      # runner.temp is not an allowed context in a job-level env map (only
+      # github, inputs, matrix, needs, secrets, strategy and vars are), so the
+      # path is exported here and read by refresh_all.py and the clone step
+      # below through the KSM_VULNS_DIR environment variable.
+      - name: Set the kernel vulns directory
+        run: echo "KSM_VULNS_DIR=$RUNNER_TEMP/vulns" >> "$GITHUB_ENV"
+
+      - name: Shallow clone kernel security vulns
+        run: git clone --depth 1 https://git.kernel.org/pub/scm/linux/security/vulns.git "$KSM_VULNS_DIR"
+
+      # Cursor progress lives on the automation branch. When it exists we
+      # resume from it and merge origin/main into it, so an unmerged week's
+      # progress is not lost and no human commit on the branch is replaced.
+      # This repository is public, so the read-only fetch needs no token.
+      - name: Resume the automation branch
+        run: |
+          set -euo pipefail
+          branch="$AUTOMATION_BRANCH"
+
+          git fetch --no-tags origin \
+            "+refs/heads/${branch}:refs/remotes/origin/${branch}" || true
+          if git rev-parse --verify --quiet "refs/remotes/origin/${branch}" >/dev/null; then
+            git checkout -B "$branch" "refs/remotes/origin/${branch}"
+            if git merge --no-edit origin/main; then
+              echo "Resumed $branch and merged origin/main into it."
+            else
+              echo "::error::origin/main conflicts with $branch; failing without any force push."
+              git merge --abort || true
+              exit 1
+            fi
+          else
+            git checkout -B "$branch"
+            echo "No $branch yet; starting from the default branch."
+          fi
+
+      # Single local entrypoint: fetchers with --fetch under a per-project
+      # wall clock inside a global 35 min deadline, optional enrichers,
+      # manifest/cluster rebuild, then every fetcher with --offline plus the
+      # unit tests and build_pack.py --check. Exit code 3 means every
+      # attempted project failed (e.g. a total NVD outage): the job fails
+      # here and no pull request is opened.
+      - name: Refresh catalogs incrementally
+        run: |
+          set -euo pipefail
+          python3 scripts/studies/refresh_all.py \
+            --budget-seconds 240 --deadline-seconds 2100 | tee "$RUNNER_TEMP/refresh.log"
+
+      # Never pushes to the default branch: the result is proposed as a PR from
+      # automation/refresh-catalogs. Only docs/studies/ is staged. The push is
+      # plain (fast-forward only): if someone committed directly to the branch
+      # meanwhile it is rejected and the job fails, and the next run merges and
+      # retries. Nothing is ever force-pushed.
+      - name: Propose refresh as a pull request
+        run: |
+          set -euo pipefail
+          branch="$AUTOMATION_BRANCH"
+
+          git add docs/studies
+          if git diff --cached --quiet; then
+            echo "No catalog changes; nothing to propose."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(studies): incremental CVE catalog refresh"
+
+          # GitHub's git endpoint only accepts Basic auth (same scheme as
+          # actions/checkout): base64("x-access-token:<token>").
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          echo "::add-mask::$basic"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic ${basic}" \
+            push origin "HEAD:refs/heads/$branch"
+
+          open_pr="$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$open_pr" ]; then
+            echo "Updated open pull request #$open_pr on $branch."
+            exit 0
+          fi
+
+          pr_body="$RUNNER_TEMP/pr_body.md"
+          {
+            # This heredoc inherits the step's YAML indentation; strip it so
+            # GitHub renders prose instead of an indented code block.
+            sed 's/^[[:space:]]*//' <<'EOF'
+          Automated incremental refresh of the CVE catalogs.
+
+          Note: this pull request was opened with `GITHUB_TOKEN`, so GitHub does
+          not run `verify.yml` on it automatically; approve the workflow run to
+          get that check. The refresh job already ran the same validation
+          (fetchers `--offline`, unit tests, `build_pack.py --check`).
+
+          Produced by `scripts/studies/refresh_all.py` (also runnable locally):
+          every fetcher with `--fetch` under a per-project wall clock inside a
+          global deadline, the optional enrichers when present, the
+          authoritative snapshot catalogs (linux-cna, curl-upstream,
+          openssl-upstream), the catalog manifest and pattern-cluster rebuild,
+          then every fetcher with `--offline`, the unit tests and
+          `build_pack.py --check`.
+
+          Per-project state from this run (PARTIAL = errors recorded but the
+          cursor advanced; TIMED_OUT/REVERTED = a fetcher exceeded its wall
+          clock and its partial state was kept or restored from git):
+          EOF
+            sed -n '/=== refresh summary ===/,$p' "$RUNNER_TEMP/refresh.log"
+            printf 'Run: %s/%s/actions/runs/%s\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+          } > "$pr_body"
+
+          gh pr create --base main --head "$branch" \
+            --title "chore(studies): incremental CVE catalog refresh" \
+            --body-file "$pr_body"
+        env:
+          GH_TOKEN: ${{ github.token }}

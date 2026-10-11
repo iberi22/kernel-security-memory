@@ -169,11 +169,32 @@ def build_sql(records):
         db.close()
 
 
+def pack_projects(records):
+    """Sorted distinct projects in the pack; a single-project pack keeps one name."""
+    projects = sorted({r['project'] for r in records})
+    return projects[0] if len(projects) == 1 else ','.join(projects)
+
+
+def source_scope(records):
+    """What the pack actually covers, derived from the records themselves.
+
+    The bootstrap seed was fetched reference by reference; the rest of the pack is
+    the vetted fable-2026-06 slice converted offline from cited study records, so
+    the manifest must not claim full upstream history.
+    """
+    seed = [r for r in records if not r['validation'].get('source_record')]
+    vetted = [r for r in records if r['validation'].get('source_record')]
+    return (f'fetched seed ({len(seed)} record) plus the vetted fable-2026-06 slice '
+            f'({len(vetted)} records converted offline from cited study records); '
+            'not the full history of any upstream project')
+
+
 def artifacts(records):
     files = {'kernel-security-memory.sql': build_sql(records).encode()}
     for r in records:
         files[f'records/{r["id"]}.json'] = (json.dumps(r, indent=2, ensure_ascii=False) + '\n').encode()
-    manifest = {'schema_version': '0.1.0', 'pack_id': 'kernel-security-memory-bootstrap-v0', 'project': 'linux', 'record_count': len(records), 'source_scope': 'source-linked seed; not full history', 'vectors': 'NOT_BUILT', 'files': [{'path': p, 'sha256': hashlib.sha256(b).hexdigest(), 'bytes': len(b)} for p, b in sorted(files.items())]}
+    projects = sorted({r['project'] for r in records})
+    manifest = {'schema_version': '0.1.0', 'pack_id': 'kernel-security-memory-bootstrap-v0', 'project': pack_projects(records), 'projects': projects, 'record_count': len(records), 'source_scope': source_scope(records), 'vectors': 'NOT_BUILT', 'files': [{'path': p, 'sha256': hashlib.sha256(b).hexdigest(), 'bytes': len(b)} for p, b in sorted(files.items())]}
     files['manifest.json'] = (json.dumps(manifest, indent=2) + '\n').encode()
     return files
 

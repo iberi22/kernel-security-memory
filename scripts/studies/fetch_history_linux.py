@@ -15,6 +15,11 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
+try:  # importable as a script, as scripts.studies.fetch_history_linux and top-level
+    from . import fetcher_io
+except ImportError:  # direct execution / sys.path import
+    import fetcher_io
+
 INDEX_PATH = "docs/studies/cve-history/linux/index.json"
 CATALOG_PATH = "docs/studies/cve-history/linux/catalog.jsonl"
 
@@ -148,8 +153,9 @@ def validate_offline():
     if idx.get("repo") != "https://github.com/torvalds/linux":
         print(f"Invalid repo in index.", file=sys.stderr)
         return False
-    if idx.get("window") != {"start": "1999-01-01", "end": "2026-10-08"}:
-        print(f"Invalid window in index.", file=sys.stderr)
+    window_ok, window_reason = fetcher_io.check_window(idx.get("window"))
+    if not window_ok:
+        print(f"Invalid window in index: {window_reason}", file=sys.stderr)
         return False
     if idx.get("keyword") != "linux kernel":
         print(f"Invalid keyword in index.", file=sys.stderr)
@@ -188,7 +194,9 @@ def validate_offline():
                 return False
 
             allowed_keys = {"advisory_id", "published", "cwe", "cwe_state", "patch_urls", "fix_shas", "subsystem"}
-            if set(rec.keys()) != allowed_keys:
+            # Optional provenance keys written by the enrichers.
+            optional_keys = {"fix_sha_source", "cwe_source", "fix_repo"}
+            if not allowed_keys <= set(rec.keys()) <= allowed_keys | optional_keys:
                 print(f"Line {line_num} keys do not match expected schema: {set(rec.keys())}", file=sys.stderr)
                 return False
 
@@ -244,14 +252,16 @@ def validate_offline():
     return True
 
 
-def save_state(catalog_records, total_requests, coverage, resume_obj, errors):
+def save_state(catalog_records, total_requests, coverage, resume_obj, errors, error_history=None):
+    """Persist catalog.jsonl and index.json atomically, index last.
+
+    ``fetcher_io`` writes both files through a temp file and ``os.replace``, so a
+    run killed mid-write keeps the previous committed pair instead of a
+    half-written catalog, and the index can never describe a catalog that does
+    not exist.
+    """
     os.makedirs(os.path.dirname(INDEX_PATH), exist_ok=True)
     sorted_records = sorted(catalog_records.values(), key=lambda x: (x["published"], x["advisory_id"]))
-
-    with open(CATALOG_PATH, "w", encoding="utf-8") as f:
-        for rec in sorted_records:
-            line = json.dumps(rec, separators=(",", ":"), ensure_ascii=False)
-            f.write(line + "\n")
 
     with_sha_count = sum(1 for r in sorted_records if r["fix_shas"])
 
@@ -259,20 +269,22 @@ def save_state(catalog_records, total_requests, coverage, resume_obj, errors):
         "schema_version": "cve-history-v1",
         "project": "linux",
         "repo": "https://github.com/torvalds/linux",
-        "window": {"start": "1999-01-01", "end": "2026-10-08"},
+        "window": fetcher_io.expected_window(),
         "keyword": "linux kernel",
         "coverage": coverage,
         "entry_count": len(sorted_records),
         "with_fix_sha": with_sha_count,
         "requests": total_requests,
         "resume": resume_obj if coverage == "INCOMPLETE" else None,
+        # errors holds this run's failures only; older ones are kept as capped
+        # history so they can neither block a later run nor disappear.
         "errors": errors,
+        "error_history": fetcher_io.merge_error_history(error_history or [], errors),
         "notes": "Descriptions were not stored."
     }
 
-    with open(INDEX_PATH, "w", encoding="utf-8") as f:
-        json.dump(index_data, f, indent=2, ensure_ascii=False)
-        f.write("\n")
+    fetcher_io.write_catalog_atomic(CATALOG_PATH, sorted_records)
+    fetcher_io.write_index_atomic(INDEX_PATH, index_data)
 
 
 def fetch_history(max_calls=None):
@@ -280,32 +292,34 @@ def fetch_history(max_calls=None):
     total_requests = 0
     cumulative_bytes = 0
     errors = []
+    error_history = []
+    already_complete = False
 
+    # window.end is the run date (UTC today, or KSM_TODAY), never the frozen
+    # 2026-10-08 literal that stopped the scan short of the newest CVEs.
     start_date_str = "1999-01-01"
-    end_date_str = "2026-10-08"
+    end_date_str = fetcher_io.window_end_iso()
 
     if os.path.exists(INDEX_PATH):
-        try:
-            with open(INDEX_PATH, "r", encoding="utf-8") as f:
-                old_idx = json.load(f)
-                total_requests = old_idx.get("requests", 0)
-                if old_idx.get("errors"):
-                    errors = old_idx.get("errors", [])
-                if old_idx.get("resume") and isinstance(old_idx["resume"], dict):
-                    start_date_str = old_idx["resume"].get("next_start_date", start_date_str)
-        except Exception:
-            pass
+        prev_index = fetcher_io.read_index(INDEX_PATH)
+        if prev_index is not None:
+            total_requests = prev_index.get("requests", 0)
+            # Errors from earlier runs must not gate this one.
+            errors, error_history = fetcher_io.load_error_history(prev_index)
+            if prev_index.get("resume") and isinstance(prev_index["resume"], dict):
+                start_date_str = prev_index["resume"].get("next_start_date", start_date_str)
+            elif prev_index.get("coverage") == "COMPLETE":
+                already_complete = True
 
     if os.path.exists(CATALOG_PATH):
-        try:
-            with open(CATALOG_PATH, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line:
-                        rec = json.loads(line)
-                        catalog_records[rec["advisory_id"]] = rec
-        except Exception:
-            pass
+        catalog_records = fetcher_io.read_catalog(CATALOG_PATH)
+
+    if already_complete:
+        # The window is closed: return instead of re-fetching the whole window,
+        # and above all never write an INCOMPLETE cursor that would rewind the
+        # state to 1999-01-01 and destroy the recorded status.
+        print("Catalog is already COMPLETE.")
+        return True
 
     start_dt = datetime.datetime.strptime(start_date_str, "%Y-%m-%d").date()
     end_dt = datetime.datetime.strptime(end_date_str, "%Y-%m-%d").date()
@@ -317,10 +331,13 @@ def fetch_history(max_calls=None):
     calls_this_run = 0
     call_limit = MAX_REQUESTS if max_calls is None else min(MAX_REQUESTS, max_calls)
 
-    save_state(catalog_records, total_requests, "INCOMPLETE", {"next_start_date": curr_start.strftime("%Y-%m-%d")}, errors)
+    # No unconditional pre-save here: writing an INCOMPLETE cursor before the
+    # first call rewound a COMPLETE catalog (or one whose resume is null) back to
+    # 1999-01-01 and destroyed its recorded status. The loop below persists the
+    # cursor after every page, so a crash still resumes where it should.
 
     while curr_start <= end_dt:
-        if total_requests >= MAX_REQUESTS or cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
+        if cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
             coverage = "INCOMPLETE"
             resume_obj = {"next_start_date": curr_start.strftime("%Y-%m-%d")}
             break
@@ -334,7 +351,7 @@ def fetch_history(max_calls=None):
         window_consumed = False
 
         while not window_consumed:
-            if total_requests >= MAX_REQUESTS or cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
+            if cumulative_bytes >= CUMULATIVE_LIMIT or calls_this_run >= call_limit:
                 coverage = "INCOMPLETE"
                 resume_obj = {"next_start_date": curr_start.strftime("%Y-%m-%d")}
                 break
@@ -420,20 +437,26 @@ def fetch_history(max_calls=None):
                 window_consumed = True
                 break
 
-            save_state(catalog_records, total_requests, "INCOMPLETE", {"next_start_date": curr_start.strftime("%Y-%m-%d")}, errors)
+            save_state(catalog_records, total_requests, "INCOMPLETE", {"next_start_date": curr_start.strftime("%Y-%m-%d")}, errors, error_history)
 
         if coverage == "INCOMPLETE":
             break
 
         curr_start = curr_end + datetime.timedelta(days=1)
-        if curr_start > end_dt and not errors and total_requests > 0:
+        if curr_start > end_dt:
+            # The window is exhausted: coverage is COMPLETE, the cursor closes and
+            # the loop returns instead of carrying on. `errors` holds only this
+            # run's failures (an older run's are error_history), so a single
+            # recorded timeout can no longer keep the catalog INCOMPLETE forever.
             coverage = "COMPLETE"
             resume_obj = None
+            break
 
-        save_state(catalog_records, total_requests, coverage, resume_obj, errors)
+        save_state(catalog_records, total_requests, coverage, resume_obj, errors, error_history)
 
-    save_state(catalog_records, total_requests, coverage, resume_obj, errors)
+    save_state(catalog_records, total_requests, coverage, resume_obj, errors, error_history)
     print(f"Fetch iteration finished. Coverage: {coverage}, Entries: {len(catalog_records)}, Requests: {total_requests}")
+    return coverage == "COMPLETE"
 
 
 def main():
@@ -453,7 +476,11 @@ def main():
             print("Offline validation FAILED.", file=sys.stderr)
             sys.exit(1)
     elif args.fetch:
-        fetch_history(max_calls=args.max_calls)
+        try:
+            fetch_history(max_calls=args.max_calls)
+        except fetcher_io.CorruptStateError as err:
+            print(f"Error: {err}", file=sys.stderr)
+            sys.exit(2)
 
 
 if __name__ == "__main__":

@@ -18,6 +18,7 @@ CVE_HISTORY_DIR = ROOT / "docs/studies/cve-history"
 FABLE_DIR = ROOT / "docs/studies/fable-2026-06"
 OUTPUT_JSON = ROOT / "docs/studies/pattern_clusters.json"
 OUTPUT_MD = ROOT / "docs/studies/pattern_clusters.md"
+OVERLAY_PATH = ROOT / "docs/studies/cwe-overlay.jsonl"
 GRAPH_DB_PATH = ROOT / "docs/studies/pattern_graph.sqlite3"
 
 CWE_FAMILY_TITLES = {
@@ -56,7 +57,21 @@ def load_corpus():
             entry = json.loads(line)
             cve_id = entry["advisory_id"]
             entry["project"] = project
-            cves[cve_id] = entry
+            entry["catalogs"] = [project]
+            prev = cves.get(cve_id)
+            if prev is None:
+                cves[cve_id] = entry
+                continue
+            # The same advisory can appear in an NVD keyword catalog and in an
+            # upstream snapshot (curl/curl-upstream, openssl/openssl-upstream).
+            # Keep one row, union the fix SHAs and keep any stated CWE.
+            prev["catalogs"].append(project)
+            for sha in entry.get("fix_shas") or []:
+                if sha not in prev.setdefault("fix_shas", []):
+                    prev["fix_shas"].append(sha)
+            if not prev.get("cwe") and entry.get("cwe"):
+                prev["cwe"] = entry["cwe"]
+                prev["cwe_state"] = entry.get("cwe_state")
 
     # Enrich from fable records
     if FABLE_DIR.exists():
@@ -74,6 +89,60 @@ def load_corpus():
     return cves
 
 
+OVERLAY_SOURCES = ("nvd-primary", "cisa-adp", "nvd-secondary")
+
+
+def load_overlay(path=OVERLAY_PATH):
+    """Return {advisory_id: {"cwe", "cwe_source"}} from the committed overlay."""
+    overlay = {}
+    if not path.exists():
+        return overlay
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        row = json.loads(line)
+        aid = row.get("advisory_id")
+        cwe = row.get("cwe")
+        if isinstance(aid, str) and isinstance(cwe, str) and cwe.strip():
+            overlay[aid] = {"cwe": cwe, "cwe_source": row.get("cwe_source")}
+    return overlay
+
+
+def effective_cwe(data):
+    """CWE used for clustering: overlay value if applied, else the catalog value."""
+    cwe = data.get("effective_cwe") or data.get("cwe")
+    return cwe if isinstance(cwe, str) and cwe.strip() else "UNKNOWN"
+
+
+def apply_overlay(cves, overlay):
+    """Fill a CWE from the overlay only where the merged catalog row has none.
+
+    A catalog-stated CWE always wins (precedence: CNA-stated > NVD Primary >
+    CISA ADP > NVD Secondary; the overlay already collapses the last three).
+    Never mutates catalog files: it only annotates the in-memory row and returns
+    a deterministic provenance summary.
+    """
+    by_source = {s: 0 for s in OVERLAY_SOURCES}
+    cwe_from_catalog = 0
+    for data in cves.values():
+        if isinstance(data.get("cwe"), str) and data["cwe"].strip():
+            data["effective_cwe_source"] = "catalog"
+            cwe_from_catalog += 1
+            continue
+        row = overlay.get(data["advisory_id"])
+        if row:
+            data["effective_cwe"] = row["cwe"]
+            data["effective_cwe_source"] = row["cwe_source"]
+            if row["cwe_source"] in by_source:
+                by_source[row["cwe_source"]] += 1
+    return {
+        "cwe_from_catalog": cwe_from_catalog,
+        "cwe_from_overlay_by_source": {k: v for k, v in sorted(by_source.items())},
+        "unknown": sum(1 for d in cves.values() if effective_cwe(d) == "UNKNOWN"),
+    }
+
+
 def cluster_families(cves):
     clusters = defaultdict(lambda: {
         "title": "",
@@ -85,7 +154,7 @@ def cluster_families(cves):
     })
 
     for cve_id, data in sorted(cves.items()):
-        cwe = data.get("cwe") or "UNKNOWN"
+        cwe = effective_cwe(data)
         cl = clusters[cwe]
         cl["title"] = CWE_FAMILY_TITLES.get(cwe, f"CWE Family {cwe}")
         cl["count"] += 1
@@ -169,10 +238,11 @@ def build_graph_db(cves, clusters, db_path: Path):
     edge_idx = 0
     for cve_id, data in cves.items():
         node_id = f"cve:{cve_id}"
+        cwe_id = effective_cwe(data)
         cur.execute("INSERT INTO nodes VALUES (?, ?, ?, ?)",
                     (node_id, "CVE", cve_id, json.dumps({
                         "published": data.get("published"),
-                        "cwe": data.get("cwe"),
+                        "cwe": cwe_id,
                         "patch_urls": data.get("patch_urls", []),
                     })))
 
@@ -182,7 +252,6 @@ def build_graph_db(cves, clusters, db_path: Path):
                     (f"e:{edge_idx}", node_id, f"comp:{data['project']}", "affects", "{}"))
 
         # Edge: CVE -> CWE (categorized_as)
-        cwe_id = data.get("cwe") or "UNKNOWN"
         edge_idx += 1
         cur.execute("INSERT INTO edges VALUES (?, ?, ?, ?, ?)",
                     (f"e:{edge_idx}", node_id, f"cwe:{cwe_id}", "categorized_as", "{}"))
@@ -200,17 +269,38 @@ def build_graph_db(cves, clusters, db_path: Path):
     conn.close()
 
 
-def generate_markdown(clusters, total_cves):
+def generate_markdown(clusters, total_cves, merged_duplicates=0, cwe_summary=None):
     md = [
         "# Vulnerability Pattern Clusters & Graph Taxonomy",
         "",
         f"Analysis across **{total_cves}** canonical CVE entries linking software components, CWE classes, preconditions, and fix commits.",
         "",
+        (f"{merged_duplicates} advisory ids appear in more than one catalog (an NVD keyword catalog and an "
+         "upstream snapshot); each is counted once, with fix SHAs unioned and any stated CWE kept."),
+        "",
+    ]
+    if cwe_summary:
+        bos = cwe_summary.get("cwe_from_overlay_by_source", {})
+        md.extend([
+            "## CWE Provenance",
+            "",
+            ("The deterministic overlay (docs/studies/cwe-overlay.jsonl) supplies a CWE only where the "
+             "merged catalog row has none. Precedence: CNA-stated in catalog > NVD Primary > CISA ADP > "
+             "NVD Secondary."),
+            "",
+            f"- From catalog (stated by CNA/upstream): {cwe_summary.get('cwe_from_catalog', 0)}",
+            f"- From overlay nvd-primary: {bos.get('nvd-primary', 0)}",
+            f"- From overlay cisa-adp: {bos.get('cisa-adp', 0)}",
+            f"- From overlay nvd-secondary: {bos.get('nvd-secondary', 0)}",
+            f"- Still UNKNOWN: {cwe_summary.get('unknown', 0)}",
+            "",
+        ])
+    md.extend([
         "## Summary by CWE Family",
         "",
         "| CWE | Title | Total CVEs | With Validated Fix SHA | Key Preconditions |",
         "| --- | --- | --- | --- | --- |",
-    ]
+    ])
     for cl in clusters:
         pre = "<br>".join(cl["preconditions"]) if cl["preconditions"] else "None recorded"
         md.append(f"| `{cl['cwe_id']}` | {cl['title']} | {cl['count']} | {cl['with_fix_sha']} | {pre} |")
@@ -240,24 +330,34 @@ def main():
     args = parser.parse_args()
 
     cves = load_corpus()
+    overlay = load_overlay()
+    cwe_summary = apply_overlay(cves, overlay)
     clusters = cluster_families(cves)
+    merged_duplicates = sum(1 for c in cves.values() if len(c.get("catalogs", [])) > 1)
+    json_content = json.dumps({
+        "schema_version": "pattern-clusters-v1",
+        "total_cves": len(cves),
+        "merged_duplicate_ids": merged_duplicates,
+        "cluster_count": len(clusters),
+        "clusters": clusters,
+        "cwe_summary": cwe_summary,
+    }, indent=2, ensure_ascii=False) + "\n"
+    md_content = generate_markdown(clusters, len(cves), merged_duplicates, cwe_summary) + "\n"
 
     if args.check:
         assert len(cves) > 0, "No CVEs loaded"
         assert len(clusters) > 0, "No clusters generated"
-        print(f"Validation OK: {len(cves)} CVEs categorized into {len(clusters)} CWE clusters.")
+        stale = [p.name for p, c in ((OUTPUT_JSON, json_content), (OUTPUT_MD, md_content))
+                 if not p.exists() or p.read_text() != c]
+        if stale:
+            print(f"Error: stale outputs {stale}; rerun cluster_patterns.py", file=sys.stderr)
+            sys.exit(1)
+        print(f"Validation OK: {len(cves)} CVEs categorized into {len(clusters)} CWE clusters "
+              f"({merged_duplicates} ids merged across catalogs).")
         return
 
-    # Write JSON and MD
-    OUTPUT_JSON.write_text(json.dumps({
-        "schema_version": "pattern-clusters-v1",
-        "total_cves": len(cves),
-        "cluster_count": len(clusters),
-        "clusters": clusters,
-    }, indent=2, ensure_ascii=False) + "\n")
-
-    md_content = generate_markdown(clusters, len(cves))
-    OUTPUT_MD.write_text(md_content + "\n")
+    OUTPUT_JSON.write_text(json_content)
+    OUTPUT_MD.write_text(md_content)
 
     # Build typed SQLite graph
     build_graph_db(cves, clusters, GRAPH_DB_PATH)
