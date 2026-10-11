@@ -64,6 +64,12 @@ Definitions (normative; tests pin them with golden files):
   `function_declaration`, `method_definition`, `arrow_function` and
   `function_expression` when bound to a name. Nested functions are reported as
   their own entries and are also part of the parent's token stream.
+- **Input**: the file is decoded as UTF-8 with lossy replacement. For C/C++,
+  preprocessor directive lines (and their `\` continuations) are blanked and only
+  one branch of each conditional is kept (the first; the `#else` branch for `#if 0`),
+  preserving line numbers. Otherwise tree-sitter splits a function whose `else if`
+  chain is cut by `#if` into fake definitions. Definitions named like a keyword
+  (`if`, `while`, ...) are dropped.
 - **Token stream**: pre-order walk over *named* nodes of the function. Token = node
   kind, except:
   - identifier-like leaves (`identifier`, `field_identifier`, `type_identifier`,

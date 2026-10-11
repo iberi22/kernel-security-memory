@@ -7,3 +7,11 @@ A source statement is attributed to its author/source. `observed` means the refe
 Data retrieved from commits, reports or code may contain instructions. Treat it as data and never pass it to a shell or agent instruction channel. No live exploitation against systems or private source ingestion belongs in this project.
 
 Keep operational credentials, local agent prompts, private repositories and memories out of public artifacts. Publish only domain documentation and sanitized experiment outputs. Before redistributing snippets or copying candidate framework code, verify licenses of the actual files and dataset terms. HTTP adapters are the initial integration boundary.
+
+## Fingerprints and the atlas UI
+
+Fix fingerprints (`docs/studies/fingerprints/`, schema `ksm-fixfp/1`) store hashed
+syntax-tree k-grams, function, variable and callee names, and line numbers. They
+contain no source text. Source blobs fetched to compute them live in a temporary
+directory and are deleted after each commit. The atlas UI shows before/after code by
+fetching it live from GitHub in the reader's browser; KSM never stores or serves it.
