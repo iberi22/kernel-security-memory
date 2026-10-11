@@ -18,7 +18,7 @@ The deterministic overlay (docs/studies/cwe-overlay.jsonl) supplies a CWE only w
 
 | CWE | Title | Total CVEs | With Validated Fix SHA | Key Preconditions |
 | --- | --- | --- | --- | --- |
-| `UNKNOWN` | Unstated or Legacy Advisory Without CWE Classification | 9617 | 9244 | None recorded |
+| `UNKNOWN` | Unstated or Legacy Advisory Without CWE Classification | 9617 | 9243 | None recorded |
 | `CWE-476` | NULL Pointer Dereference | 2078 | 2063 | Unchecked return value from allocator or lookup function |
 | `CWE-416` | Use After Free | 1380 | 1372 | Asynchronous lifecycle, double free, or aliased pointer reuse |
 | `CWE-401` | Missing Release of Memory after Effective Lifetime (Memory Leak) | 1114 | 1111 | Resource exhaustion path without rate limit or quota |
@@ -203,7 +203,7 @@ The deterministic overlay (docs/studies/cwe-overlay.jsonl) supplies a CWE only w
 
 ### UNKNOWN — Unstated or Legacy Advisory Without CWE Classification
 - **Count**: 9617
-- **With Fix SHA**: 9244
+- **With Fix SHA**: 9243
 - **Project Distribution**: `git`: 1, `git-upstream`: 4, `glibc`: 3, `linux`: 273, `linux-cna`: 9233, `openssh`: 2, `openssl`: 19, `openssl-upstream`: 20, `postgresql`: 30, `qemu`: 3, `sqlite`: 3, `sqlite-upstream`: 11, `systemd-upstream`: 15
 - **Sample CVEs**: CVE-1999-0804, CVE-1999-0862, CVE-1999-1018, CVE-1999-1166, CVE-1999-1341, CVE-2000-0227, CVE-2000-0274, CVE-2000-0335, CVE-2000-0344, CVE-2000-0506
 
