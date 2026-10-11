@@ -390,7 +390,9 @@ def _cmd_scan(args: argparse.Namespace) -> int:
         sys.stderr.write(
             "Error: 'code-graph' executable not found.\n"
             "Please install code-graph or set KSM_CODE_GRAPH to its location.\n"
-            "Install hint: https://github.com/iberi22/kernel-security-memory\n"
+            "Prebuilt Linux binary: https://github.com/iberi22/kernel-security-memory/releases "
+            "(asset code-graph-x86_64-linux.tar.gz)\n"
+            "Or build from source via the cargo command in README.\n"
         )
         return 2
 

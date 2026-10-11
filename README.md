@@ -22,6 +22,8 @@ ksm scan path/to/code           # structural match against fix fingerprints
 
 `ksm scan` needs Xavier's `code-graph` with the `fingerprint` subcommand (`KSM_CODE_GRAPH` or `PATH`): `cargo install --locked --git https://github.com/iberi22/xavier --rev <XAVIER_REV from .github/workflows/fingerprints.yml> code-graph`. It reports functions that look more like the vulnerable version of a known fix than the fixed one, and calls missing a check that the fix added, with file, line and variable. Findings are hypotheses to review. On curl 7.50.0, 11 of 12 findings with score >= 0.9 matched fixes released after that version; matching across different projects is not measured yet.
 
+Prebuilt Linux binary in the [releases page](https://github.com/iberi22/kernel-security-memory/releases) (`code-graph-<rev>` tags), verify with the .sha256 file.
+
 The weekly `fingerprints` workflow fingerprints fix commits with `code-graph` and proposes them as a pull request; the `pages` workflow rebuilds the site and the bundle on every push to `main`.
 
 ## Read first

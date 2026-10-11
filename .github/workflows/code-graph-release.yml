@@ -1,0 +1,113 @@
+name: Release code-graph binary
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/fingerprints.yml
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: code-graph-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build code-graph binary
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      xavier_rev: ${{ steps.rev.outputs.xavier_rev }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Extract pinned Xavier revision
+        id: rev
+        run: |
+          set -euo pipefail
+          XAVIER_REV="$(sed -n 's/^[[:space:]]*XAVIER_REV:[[:space:]]*//p' .github/workflows/fingerprints.yml)"
+          [[ "$XAVIER_REV" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::XAVIER_REV is not a full commit SHA"; exit 1; }
+          echo "xavier_rev=$XAVIER_REV" >> "$GITHUB_OUTPUT"
+
+      - name: Build, smoke test and package code-graph
+        env:
+          XAVIER_REV: ${{ steps.rev.outputs.xavier_rev }}
+        run: |
+          set -euo pipefail
+          cargo install --locked --git https://github.com/iberi22/xavier --rev "$XAVIER_REV" \
+            code-graph --root "$RUNNER_TEMP/cg"
+
+          cat << 'EOF_C' > "$RUNNER_TEMP/smoke.c"
+          int main(void) {
+              return 0;
+          }
+          EOF_C
+
+          "$RUNNER_TEMP/cg/bin/code-graph" fingerprint "$RUNNER_TEMP/smoke.c" > "$RUNNER_TEMP/smoke.json"
+          python3 -c '
+          import json, sys
+          with open(sys.argv[1], "r", encoding="utf-8") as f:
+              doc = json.load(f)
+          assert doc.get("schema") == "ksm-sfp/1", doc
+          ' "$RUNNER_TEMP/smoke.json"
+
+          tar -czf "$RUNNER_TEMP/code-graph-x86_64-linux.tar.gz" -C "$RUNNER_TEMP/cg/bin" code-graph
+          (cd "$RUNNER_TEMP" && sha256sum code-graph-x86_64-linux.tar.gz > code-graph-x86_64-linux.tar.gz.sha256)
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: code-graph-release
+          path: |
+            ${{ runner.temp }}/code-graph-x86_64-linux.tar.gz
+            ${{ runner.temp }}/code-graph-x86_64-linux.tar.gz.sha256
+          retention-days: 7
+
+  release:
+    name: Publish code-graph release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: code-graph-release
+          path: ${{ runner.temp }}/artifact
+
+      - name: Create or update GitHub release
+        env:
+          XAVIER_REV: ${{ needs.build.outputs.xavier_rev }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="code-graph-${XAVIER_REV:0:8}"
+          tarball="$RUNNER_TEMP/artifact/code-graph-x86_64-linux.tar.gz"
+          checksum="$RUNNER_TEMP/artifact/code-graph-x86_64-linux.tar.gz.sha256"
+          sha="$(cut -d' ' -f1 "$checksum")"
+
+          {
+            echo "Built from iberi22/xavier at $XAVIER_REV"
+            echo
+            echo "SHA-256:"
+            echo "$sha  code-graph-x86_64-linux.tar.gz"
+          } > "$RUNNER_TEMP/release_notes.md"
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$tarball" "$checksum" --clobber
+          else
+            gh release create "$tag" "$tarball" "$checksum" \
+              --title "$tag" \
+              --notes-file "$RUNNER_TEMP/release_notes.md"
+          fi
