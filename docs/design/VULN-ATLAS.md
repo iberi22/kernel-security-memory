@@ -301,8 +301,10 @@ ksm scan PATH [--json]     code-graph fingerprint on supported files + matcher r
 
 Data lookup order: `--data-dir`, `$KSM_DATA`, the bundle installed by `ksm update`
 (`$XDG_DATA_HOME/ksm`), the repo checkout's `site/data`. `bundle.sha256` is served
-next to the bundle, so it detects corrupted downloads, not a compromised site. `ksm scan` needs `code-graph` on `PATH` (or `$KSM_CODE_GRAPH`);
-the release workflow attaches a Linux build.
+next to the bundle, so it detects corrupted downloads, not a compromised site.
+`ksm scan` needs `code-graph` on `PATH` (or `$KSM_CODE_GRAPH`), built from the
+Xavier commit pinned in `fingerprints.yml`:
+`cargo install --locked --git https://github.com/iberi22/xavier --rev <XAVIER_REV> code-graph`.
 
 ## 8. Workflows
 
