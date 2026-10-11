@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2021-0137","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"5bb1dfd2578539b89ffb0cbea25f21f00cfb963e","parent_sha":"da9d8853243565327cd280831261de7881979a5a","project":"rustsec","repo":"sodiumoxide/sodiumoxide","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

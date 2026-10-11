@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0016","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"3350e3819adf151709047e93f25583a5df681091","parent_sha":"4d3e46872a333d2452008dc74ca95b87898cd894","project":"rustsec","repo":"deprecrated/net2-rs","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

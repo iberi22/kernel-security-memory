@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2021-0146","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"e99b3c718df1117ad7f54c33f6540c8f46cc17dd","parent_sha":"19fdadd2630540b88e716442fae4282f670b4aea","project":"rustsec","repo":"bluss/twoway","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

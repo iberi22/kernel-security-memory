@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0115","coverage":"PARTIAL","cwe":"CWE-119","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"b0d2bd20eb40b9cbc2958b981ba2dcd9e6f9396e","parent_sha":"0565f8ef459bd336eda8a6a63d1d50cdb581c2b3","project":"rustsec","repo":"RusPiRo/ruspiro-singleton","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

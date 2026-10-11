@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0162","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"56c720ea3c74efa8f39e36c24e609628222b16a1","parent_sha":"52b7b113e556c5d0e57c54abfbc1388aa2dbf987","project":"rustsec","repo":"tokio-rs/tokio-proto","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0117","coverage":"PARTIAL","cwe":"CWE-119","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"1e462c32e7933821ddb26dc49fd4ffa5aeca97b8","parent_sha":"442843346d3cb69cd54143450fef21bdd4c698f0","project":"rustsec","repo":"longshorej/conqueue","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

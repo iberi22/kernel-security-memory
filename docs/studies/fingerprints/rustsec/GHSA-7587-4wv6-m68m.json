@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-7587-4wv6-m68m","coverage":"PARTIAL","cwe":"CWE-703","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"38efa49ce18b3821649de9cd8dea88a959b833a5","parent_sha":"96d94e310feffaaf2ce65e8c7689f5ba259f4d6e","project":"rustsec","repo":"rpgp/rpgp","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

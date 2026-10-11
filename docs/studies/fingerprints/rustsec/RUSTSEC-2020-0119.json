@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0119","coverage":"PARTIAL","cwe":"CWE-119","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"a986a9335d591fa5c826157d1674d47aa525357f","parent_sha":"6d85af9eb5d8bb7cf142de8e832ce3af7e47e306","project":"rustsec","repo":"kvark/ticketed_lock","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

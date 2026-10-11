@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0142","coverage":"PARTIAL","cwe":"CWE-362","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"15b282877d1e576de2b337d8162bbf43ed1a0f2d","parent_sha":"79b1a5c23a4962cbcd1539af9aadbfc277981442","project":"rustsec","repo":"Chopinsky/byte_buffer","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0094","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"8a8814e7cc97d44f4d194586b3e9deb904c99488","parent_sha":"76a1b7fb3315ea488aabc68eb63629f368886cb4","project":"rustsec","repo":"maplibre/martin","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

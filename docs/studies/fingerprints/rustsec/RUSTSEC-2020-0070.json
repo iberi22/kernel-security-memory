@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0070","coverage":"PARTIAL","cwe":"CWE-362","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"7de94f95f519d8281cb48457964065b463d26736","parent_sha":"c8dfa97578ffb10ca541ff5d15f63276cef6fbe4","project":"rustsec","repo":"Amanieu/parking_lot","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

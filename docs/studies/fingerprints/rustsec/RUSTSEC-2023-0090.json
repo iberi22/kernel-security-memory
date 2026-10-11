@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0090","coverage":"PARTIAL","cwe":"CWE-125","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"63fb30e4b4415455d47b3da5a19d79c12f4f2d1f","parent_sha":"5dc2bbccbb363e474d2c9a1b8e38a89a43bbd5d1","project":"rustsec","repo":"bytecodealliance/wasmtime","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

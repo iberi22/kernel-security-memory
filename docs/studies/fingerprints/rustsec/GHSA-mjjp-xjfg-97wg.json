@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-mjjp-xjfg-97wg","coverage":"PARTIAL","cwe":"CWE-404","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"81bd5d7ea0c390563f1c4c017c9019d154802978","parent_sha":"cda7684767810370960003e4aa98b210f6fdf8b1","project":"rustsec","repo":"lief-project/LIEF","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

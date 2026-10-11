@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-fmj9-77q8-g6c4","coverage":"PARTIAL","cwe":"CWE-673","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"e309c9bb5a48c1304ff69c88b7eabdd08c26bf45","parent_sha":"7a9c020608a62dcaa306b72ed0f6980f15923b14","project":"rustsec","repo":"apollographql/router","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

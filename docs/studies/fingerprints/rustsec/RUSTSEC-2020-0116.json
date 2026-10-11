@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0116","coverage":"PARTIAL","cwe":"CWE-119","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"6a6c367a0c25f86f998fa315ea90c328f685b194","parent_sha":"c6a1e1601e8ddfb33d2846abca3c3ddc50e0493c","project":"rustsec","repo":"udoprog/unicycle","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

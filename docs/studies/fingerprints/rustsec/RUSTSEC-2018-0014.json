@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2018-0014","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"0a5c0d4ad4adc90a54ee04a427389acf2e157275","parent_sha":"8093a9cfa7d614a320a0f6ada48ca6b6eb298d4b","project":"rustsec","repo":"BurntSushi/chan","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

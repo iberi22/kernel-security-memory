@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-4mq4-7rw3-vm5j","coverage":"PARTIAL","cwe":"CWE-284","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"4d63febf9d8b257b0531963b85df48d45d0dbf3c","parent_sha":"b38aa5c776b0796ae5aabca98aa20b4a00538f02","project":"rustsec","repo":"wasmerio/wasmer","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

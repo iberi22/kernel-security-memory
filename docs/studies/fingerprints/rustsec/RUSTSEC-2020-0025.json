@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0025","coverage":"PARTIAL","cwe":"CWE-704","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"7e71521a61b009afc94c91135353102658550d42","parent_sha":"ae4bc3b51d3718abafa89837730e23bd718c6b02","project":"rustsec","repo":"paritytech/bigint","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-6mv3-wm7j-h4w5","coverage":"PARTIAL","cwe":"CWE-22","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"14d567f7ecb25a6d1024cf3d796f86aee89d0dd4","parent_sha":"72389b00d7b495ffd7750eb1e75a3b8537d07cf3","project":"rustsec","repo":"tauri-apps/tauri","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

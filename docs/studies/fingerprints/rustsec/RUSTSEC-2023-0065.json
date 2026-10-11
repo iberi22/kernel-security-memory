@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0065","coverage":"PARTIAL","cwe":"CWE-400","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"8b3ecd3cc0008145ab4bc8d0657c39d09db8c7e2","parent_sha":"722850d4738bfa245ee2397bf1b6af9fe158bc41","project":"rustsec","repo":"snapview/tungstenite-rs","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}
