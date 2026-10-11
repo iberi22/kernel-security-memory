@@ -1,0 +1,505 @@
+{
+ "done": [
+  {
+   "advisory_id": "CVE-2000-0973",
+   "fix_sha": "751d503f54596d6d86f969683fec2fe296d9d1f0",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2003-1605",
+   "fix_sha": "5c2df3e1a4da7b17ae053ee8c4ecef5eb2d30464",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2005-3185",
+   "fix_sha": "943aea62679fb9f2d6d7abe59b5edcba21490c52",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2009-0037",
+   "fix_sha": "042cc1f69ec0878f542667cb684378869f859911",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2010-0734",
+   "fix_sha": "06ae8ca5a6e452e5cb555c1a511a9df8dec6657c",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2010-3842",
+   "fix_sha": "81f151c912105ded480c3c88a1be53ca345298a1",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2012-0036",
+   "fix_sha": "75ca568fa1c19de4c5358fed246686de8467c238",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2013-0249",
+   "fix_sha": "f206d6c055d1008f0edb6d5d5920f0f300b9983a",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2013-1944",
+   "fix_sha": "2eb8dcf26cb37f09cffe26909a646e702dbcab66",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2014-0015",
+   "fix_sha": "8ae35102c43d8d06572c3a1292eb6e27e663c78d",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2014-1263",
+   "fix_sha": "afc6e5004fabee590e41ffe750a237e1187fbbbd",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2014-2522",
+   "fix_sha": "63fc8ee7be2b712e7af5029f4f8a86a0dfd71b38",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2014-3613",
+   "fix_sha": "8a75dbeb2305297640453029b7905ef51b87e8dd",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2014-3620",
+   "fix_sha": "a76825a5efa6b41d3a1d4f275dada2f017f6f566",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2014-3707",
+   "fix_sha": "b3875606925536f82fc61f3114ac42f29eaf6945",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2014-8150",
+   "fix_sha": "178bd7db34f77e020fb8562890c5625ccbd67093",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2015-3144",
+   "fix_sha": "0583e87ada7a3cfb10904ae4ab61b339582c5bd3",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2015-3145",
+   "fix_sha": "b5f947b8ac0e282c61c75b69cd5b9d37dafc6959",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2015-3153",
+   "fix_sha": "6ba2e88a642434bd0ffa95465e4a7d034d03ea10",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2015-3237",
+   "fix_sha": "50c7f17e503fbab5081b69c97f9d4645389b9270",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-3739",
+   "fix_sha": "6efd2fa529a189bf41736a610f6184cd8ad94b4d",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-5419",
+   "fix_sha": "247d890da88f9ee817079e246c59f3d7d12fde5f",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8615",
+   "fix_sha": "cff89bc088b7884098ea0c5378bbda3d49c437bc",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8617",
+   "fix_sha": "efd24d57426bd77c9b5860e6b297904703750412",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8618",
+   "fix_sha": "8732ec40db652c53fa58cd13e2acb8eab6e40874",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8619",
+   "fix_sha": "3d6460edeee21d7d790ec570d0887bed1f4366dd",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8621",
+   "fix_sha": "96a80b5a262fb6dd2ddcea7987296f3b9a405618",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8622",
+   "fix_sha": "53e71e47d6b81650d26ec33a58d0dca24c7ffb2c",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8623",
+   "fix_sha": "c5be3d7267c725dbd093ff3a883e07ee8cf2a1d5",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8624",
+   "fix_sha": "3bb273db7e40ebc284cff45f3ce3f0475c8339c2",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-8625",
+   "fix_sha": "9c91ec778104ae3b744b39444d544e82d5ee9ece",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-9586",
+   "fix_sha": "3ab3c16db6a5674f53cf23d56512a405fde0b2c9",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-9594",
+   "fix_sha": "f81b2277a8e7e9ce8809ccd30c25b8aa72101215",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-9952",
+   "fix_sha": "0354eed41085baa5ba8777019ebf5e9ef32c001d",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2016-9953",
+   "fix_sha": "0354eed41085baa5ba8777019ebf5e9ef32c001d",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-1000099",
+   "fix_sha": "c9332fa5e84f24da300b42b1a931ade929d3e27d",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-1000100",
+   "fix_sha": "358b2b131ad6c095696f20dcfa62b8305263f898",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-1000101",
+   "fix_sha": "453e7a7a03a2cec749abd3878a48e728c515cca7",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-1000254",
+   "fix_sha": "5ff2c5ff25750aba1a8f64fbcad8e5b891512584",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-1000257",
+   "fix_sha": "13c9a9ded3ae744a1e11cbc14e9146d9fa427040",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-2629",
+   "fix_sha": "ca6ea6d9be5102a2246dff6e17b3ee9ad4ec64d0",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-7407",
+   "fix_sha": "8e65877870c1fac920b65219adec720df810aab9",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-7468",
+   "fix_sha": "33cfcfd9f0378625d3bddbd2c8ac5aad4b646f26",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-8816",
+   "fix_sha": "7f2a1df6f5fc598750b2c6f34465c8d924db28cc",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-8817",
+   "fix_sha": "0b664ba968437715819bfe4c7ada5679d16ebbc3",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-8818",
+   "fix_sha": "9b5e12a5491d2e6b68e0c88ca56f3a9ef9fba400",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2017-9502",
+   "fix_sha": "5d7952f52e410e1d4a8ff1965e5cc6fc1bde86aa",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-0500",
+   "fix_sha": "ba1dbd78e5f1ed67c1b8d37ac89d90e5e330b628",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-1000005",
+   "fix_sha": "fa3dbb9a147488a2943bda809c66fc497efe06cb",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-1000007",
+   "fix_sha": "af32cd3859336ab963591ca0df9b1e33a7ee066b",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-1000120",
+   "fix_sha": "535432c0adb62fe167ec09621500470b6fa4eb0f",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-1000121",
+   "fix_sha": "9889db043393092e9d4b5a42720bba0b3d58deba",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-1000122",
+   "fix_sha": "d52dc4760f6d9ca1937eefa2093058a952465128",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-1000300",
+   "fix_sha": "583b42cb3b809b1bf597af160468ccba728c2248",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-1000301",
+   "fix_sha": "8c7b3737d29ed5c0575bf592063de8a51450812d",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-14618",
+   "fix_sha": "57d299a499155d4b327e341c6024e293b0418243",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-16839",
+   "fix_sha": "f3a24d7916b9173c69a3e0ee790102993833d6c5",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-16840",
+   "fix_sha": "81d135d67155c5295b1033679c606165d4e28f3f",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-16842",
+   "fix_sha": "d530e92f59ae9bb2d47066c3c460b25d2ffeb211",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2018-16890",
+   "fix_sha": "b780b30d1377adb10bbe774835f49e9b237fb9bb",
+   "project": "curl"
+  },
+  {
+   "advisory_id": "CVE-2002-1568",
+   "fix_sha": "517a0e7fa0f5453c860a3aec17b678bd55d5aad7",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2004-0975",
+   "fix_sha": "5fee606442a6738fd06a756d7076be53b7b7734c",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2009-1377",
+   "fix_sha": "88b48dc68024dcc437da4296c9fb04419b0ccbe1",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2009-1378",
+   "fix_sha": "abda7c114791fa7fe95672ec7a66fc4733c40dbc",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2009-1379",
+   "fix_sha": "561cbe567846a376153bea7f1f2d061e78029c2d",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2009-1386",
+   "fix_sha": "1cbf663a6c89dcf8f7706d30a8bae675e2e0199a",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2009-3245",
+   "fix_sha": "7e4cae1d2f555cbe9226b377aff4b56c9f7ddd4d",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2009-4355",
+   "fix_sha": "1b31b5ad560b16e2fe1cad54a755e3e6b5e778a3",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2010-0433",
+   "fix_sha": "cca1cd9a3447dd067503e4a85ebd1679ee78a48e",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2013-4353",
+   "fix_sha": "197e0ea817ad64820789d86711d55ff50d71f631",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2014-0076",
+   "fix_sha": "4b7a4ba29cafa432fc4266fe6e59e60bc1c96332",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-2107",
+   "fix_sha": "68595c0c2886e7942a14f98c17a55a88afb6c292",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-2179",
+   "fix_sha": "00a4c1421407b6ac796688871b0a49a179c694d9",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-2181",
+   "fix_sha": "b77ab018b79a00f789b0fb85596b446b08be4c9d",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6302",
+   "fix_sha": "1bbe48ab149893a78bf99c8eb8895c928900a16f",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6303",
+   "fix_sha": "2b4029e68fd7002d2307e6c3cde0f3784eef9c83",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6304",
+   "fix_sha": "2c0d295e26306e15a92eb23a84a1802005c1c137",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6305",
+   "fix_sha": "63658103d4441924f8dbfc517b99bb54758a98b9",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6306",
+   "fix_sha": "bb1a4866034255749ac578adb06a76335fc117b1",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6307",
+   "fix_sha": "4b390b6c3f8df925dc92a3dd6b022baa9a2f4650",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6308",
+   "fix_sha": "df6b5e29ffea2d5a3e08de92fb765fdb21c7a21e",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-6309",
+   "fix_sha": "acacbfa7565c78d2273c0b2a2e5e803f44afefeb",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-7052",
+   "fix_sha": "6e629b5be45face20b4ca71c4fcbfed78b864a2e",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-7053",
+   "fix_sha": "610b66267e41a32805ab54cbc580c5a6d5826cb4",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-7054",
+   "fix_sha": "99d97842ddb5fbbbfb5e9820a64ebd19afe569f6",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2016-7055",
+   "fix_sha": "2a7dd548a6f5d6f7f84a89c98323b70a2822406e",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3730",
+   "fix_sha": "efbe126e3ebb9123ac9d058aa2bb044261342aaa",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3731",
+   "fix_sha": "00d965474b22b54e4275232bc71ee0c699c5cd21",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3732",
+   "fix_sha": "a59b90bf491410f1f2bc4540cc21f1980fd14c5b",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3733",
+   "fix_sha": "4ad93618d26a3ea23d36ad5498ff4f59eff3a4d2",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3735",
+   "fix_sha": "31c8b265591a0aaa462a1f3eb5770661aaac67db",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3736",
+   "fix_sha": "38d600147331d36e74174ebbd4008b63188b321b",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3737",
+   "fix_sha": "898fb884b706aaeb283de4812340bb0bde8476dc",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2017-3738",
+   "fix_sha": "ca51bafc1a88d8b8348f5fd97adc5d6ca93f8e76",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2018-0732",
+   "fix_sha": "ea7abeeabf92b7aca160bdd0208636d4da69f4f4",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2018-0733",
+   "fix_sha": "56d5a4bfcaf37fa420aef2bb881aa55e61cf5f2f",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2018-0734",
+   "fix_sha": "8abfe72e8c1de1b95f50aa0d9134803b4d00070f",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2018-0735",
+   "fix_sha": "56fb454d281a023b3f950d969693553d3f3ceea1",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2018-0737",
+   "fix_sha": "6939eab03a6e23d2bd2c3f5e34fe1d48e542e787",
+   "project": "openssl"
+  },
+  {
+   "advisory_id": "CVE-2018-0739",
+   "fix_sha": "2ac4c6f7b2b2af20c0e2b0ba05367e454cd11b33",
+   "project": "openssl"
+  }
+ ],
+ "failed": []
+}
