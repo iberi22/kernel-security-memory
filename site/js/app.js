@@ -22,6 +22,16 @@ const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
 // --- Helper Functions ---
 
+// Only http(s) links from the data reach an href; anything else becomes '#'.
+function safeUrl(u) {
+  try {
+    const parsed = new URL(String(u), window.location.href);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : '#';
+  } catch (_) {
+    return '#';
+  }
+}
+
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str)
@@ -987,13 +997,13 @@ async function renderCveView(project, cveId) {
         ${(cve.fixes || []).map(fix => `
           <div class="link-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg>
-            Fix Commit: <a href="${escapeHtml(fix.url)}" target="_blank" rel="noopener noreferrer" class="mono">${escapeHtml(fix.sha)}</a>
+            Fix Commit: <a href="${escapeHtml(safeUrl(fix.url))}" target="_blank" rel="noopener noreferrer" class="mono">${escapeHtml(fix.sha)}</a>
           </div>
         `).join('')}
         ${(cve.patch_urls || []).map(url => `
           <div class="link-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-            Patch: <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="mono" style="word-break: break-all;">${escapeHtml(url)}</a>
+            Patch: <a href="${escapeHtml(safeUrl(url))}" target="_blank" rel="noopener noreferrer" class="mono" style="word-break: break-all;">${escapeHtml(url)}</a>
           </div>
         `).join('')}
       </div>
@@ -1190,7 +1200,10 @@ function setupCodeViewerButtons(cve) {
           afterText,
           beforeRange: fnObj ? fnObj.before_range : null,
           afterRange: fnObj ? fnObj.after_range : null,
+          wholeFile: !fnObj,
           rateLimited: (beforeRes && beforeRes.rateLimited) || (afterRes && afterRes.rateLimited),
+          error: (beforeRes && beforeRes.error && afterRes && afterRes.error)
+            ? `Could not load the file: ${beforeRes.error}` : undefined,
           commitUrl: commitData.commitUrl
         });
 

@@ -19,14 +19,23 @@ function setCached(key, value) {
   } catch (_) {}
 }
 
+// After a 403/429 the API is not called again for this long (the
+// unauthenticated limit resets hourly); each blocked call would fail anyway.
+const RATE_LIMIT_BACKOFF_MS = 10 * 60 * 1000;
+
 export async function fetchCommit(repo, sha) {
   const cacheKey = `gh_commit_${repo}_${sha}`;
   const cached = getCached(cacheKey);
   if (cached) return cached;
+  const blockedUntil = Number(getCached('gh_rate_limited_until') || 0);
+  if (Date.now() < blockedUntil) {
+    return { rateLimited: true, status: 429, commitUrl: `https://github.com/${repo}/commit/${sha}` };
+  }
 
   try {
     const res = await fetch(`https://api.github.com/repos/${repo}/commits/${sha}`);
     if (res.status === 403 || res.status === 429) {
+      setCached('gh_rate_limited_until', Date.now() + RATE_LIMIT_BACKOFF_MS);
       return {
         rateLimited: true,
         status: res.status,
@@ -64,7 +73,8 @@ export async function fetchRawFile(repo, ref, filePath) {
   if (cached !== null) return cached;
 
   try {
-    const res = await fetch(`https://raw.githubusercontent.com/${repo}/${ref}/${filePath}`);
+    const encodedPath = filePath.split('/').map(encodeURIComponent).join('/');
+    const res = await fetch(`https://raw.githubusercontent.com/${repo}/${ref}/${encodedPath}`);
     if (res.status === 403 || res.status === 429) {
       return {
         rateLimited: true,
@@ -148,6 +158,7 @@ export function buildCodeViewerElement({
   afterText,
   beforeRange,
   afterRange,
+  wholeFile,
   rateLimited,
   error,
   commitUrl
@@ -241,11 +252,13 @@ export function buildCodeViewerElement({
   leftHeader.appendChild(leftRangeInfo);
   leftCol.appendChild(leftHeader);
 
-  if (!beforeRange && (!beforeText || typeof beforeText !== 'string')) {
+  // A function without a before range was added by the fix; only file rows
+  // (no function) show the whole file.
+  if ((!beforeRange && !wholeFile) || typeof beforeText !== 'string' || !beforeText) {
     const emptyNotice = document.createElement('div');
     emptyNotice.style.padding = '16px';
     emptyNotice.style.color = 'var(--text-subtle)';
-    emptyNotice.textContent = '(Function newly added in this fix)';
+    emptyNotice.textContent = beforeRange || wholeFile ? '(File not present before this fix)' : '(Function newly added in this fix)';
     leftCol.appendChild(emptyNotice);
   } else {
     const beforeLines = sliceCode(beforeText, beforeRange);
@@ -281,11 +294,11 @@ export function buildCodeViewerElement({
   rightHeader.appendChild(rightRangeInfo);
   rightCol.appendChild(rightHeader);
 
-  if (!afterRange && (!afterText || typeof afterText !== 'string')) {
+  if ((!afterRange && !wholeFile) || typeof afterText !== 'string' || !afterText) {
     const emptyNotice = document.createElement('div');
     emptyNotice.style.padding = '16px';
     emptyNotice.style.color = 'var(--text-subtle)';
-    emptyNotice.textContent = '(Function removed in this fix)';
+    emptyNotice.textContent = afterRange || wholeFile ? '(File removed by this fix)' : '(Function removed in this fix)';
     rightCol.appendChild(emptyNotice);
   } else {
     const afterLines = sliceCode(afterText, afterRange);
