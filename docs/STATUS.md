@@ -1,6 +1,6 @@
 # Status
 
-Date: 2026-10-11 UTC (vulnerability atlas).
+Date: 2026-10-11 UTC (atlas, agent use, first fingerprint batch).
 
 ## Measured state
 
@@ -15,10 +15,11 @@ Date: 2026-10-11 UTC (vulnerability atlas).
 | Agent guardrails | 6 CWE families, 16 citations, every fix commit verified upstream | `docs/skills/defensive-security-auditor/references/guardrails.md` |
 | OSS Scanner integration | `scripts/oss_scanner/threat_model.py` writes an OSS-Scanner `threat_model.md` from a human context file plus KSM evidence; `enroll.py` writes `project.yaml` and validates it with the upstream `tools/validate.py`; selection manifest of the 23 enrolled projects (17 with OSV GIT data) | `docs/OSS-SCANNER.md`, `docs/studies/selection/oss-scanner-projects.json` |
 | Vulnerability Atlas | Static UI (`site/`) over generated site data: 18,434 CVEs in 12 projects (evidence-pack CVEs missing from catalogs included), CWE names from MITRE, top-10 related CVEs per CVE by TF-IDF over shared metadata. `ksm` CLI (`pyproject.toml`). Before/after code is fetched live from GitHub | `scripts/site/build_site_data.py`, `ksm/` |
-| Fix fingerprints | 397 fix commits (curl 189, OpenSSL 169, SQLite 17, git 10, systemd 10, PostgreSQL 2), 0 failed, produced by Xavier `code-graph fingerprint`; no source text. Matcher self-test over 905 before/after pairs: fixed versions flagged against their own pair 1.1%. Five old releases (27,948 functions): 43 of 47 strong findings (score >= 0.9) matched a later fix of the same project (curl 7.50.0 26/27, OpenSSL 1.0.1 12/15, git 2.0.0 5/5, systemd 230 and SQLite 3.8.0 none); 0 strong findings from other projects' fixes. Unit tests never match; a function deleted by its fix counts only when near-identical | `docs/studies/fingerprints/`, `scripts/fingerprints/evaluate_release.py` |
+| Fix fingerprints | 1,423 fix commits: C upstream 397 (curl 189, OpenSSL 169, SQLite 17, git 10, systemd 10, PostgreSQL 2), RustSec 726, Linux kernel 300 (first weekly batch, newest first), 1 failed, produced by Xavier `code-graph fingerprint`; no source text. Matcher self-test over 905 before/after pairs: fixed versions flagged against their own pair 1.1%. Five old releases (27,948 functions): 43 of 47 strong findings (score >= 0.9) matched a later fix of the same project (curl 7.50.0 26/27, OpenSSL 1.0.1 12/15, git 2.0.0 5/5, systemd 230 and SQLite 3.8.0 none); 0 strong findings from other projects' fixes. Unit tests never match; a function deleted by its fix counts only when near-identical | `docs/studies/fingerprints/`, `scripts/fingerprints/evaluate_release.py` |
 | Agent use | CLI (`ksm update/setup/doctor/deps/audit/scan/search/show/related`, all with `--json`), MCP server (`ksm mcp`, 7 tools), public skill `skills/ksm/SKILL.md`; no Xavier needed at run time. Acceptance on edge-hive by an agent given only the skill: completed install, readiness and all three checks unaided | `docs/design/AGENT-USE.md` |
 | RustSec | 2,024 advisories (OSV crates.io export, GHSA twins folded), 727 link a commit; 726 fingerprinted (`fix_evidence: advisory-commit-link`, not verified fixes) | `docs/studies/cve-history/rustsec/` |
-| Tests | 860 run, 4 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| Public use | Pages deployed by `pages.yml` (site, data, `bundle.tar.gz`, legacy `/memory` and `/schemas`); release `code-graph-229aa969` (Linux x86_64 binary + sha256). Fresh public install (`uv tool install git+...`, `ksm update`, `ksm setup`, `ksm doctor`) ready with no local files. Scans 2026-10-11: edge-hive 149 dependency advisories in 66 packages, 3 audit findings, 0 strong scan findings; xavier 24 advisories in 23 packages, 14 audit findings, 0 strong | release `code-graph-229aa969` |
+| Tests | 863 run, 4 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 
