@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Sequence
+from typing import Any, List, Optional, Sequence, Union
 
 from ksm.data import (
     DEFAULT_UPDATE_URL,
@@ -56,8 +56,20 @@ def _cmd_update(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_stats(data_dir: Optional[Union[str, Path]] = None) -> dict[str, Any]:
+    """Load index and return catalog and corpus summary statistics."""
+    data = load_index(data_dir)
+    return {
+        "schema": data.get("schema"),
+        "ksm_commit": data.get("ksm_commit"),
+        "generated": data.get("generated"),
+        "totals": data.get("totals", {}),
+        "projects": data.get("projects", []),
+    }
+
+
 def _cmd_stats(args: argparse.Namespace) -> int:
-    data = load_index(args.data_dir)
+    data = run_stats(args.data_dir)
     totals = data.get("totals", {})
     projects = data.get("projects", [])
 
@@ -173,6 +185,19 @@ def _cmd_tree(args: argparse.Namespace) -> int:
     return 2
 
 
+def run_show(
+    cve: str,
+    project: Optional[str] = None,
+    data_dir: Optional[Union[str, Path]] = None,
+) -> dict[str, Any]:
+    """Retrieve full record for a CVE, auto-detecting project if omitted."""
+    if not project:
+        project = find_cve_project(cve, data_dir)
+        if not project:
+            raise ValueError(f"could not find project for CVE {cve}")
+    return load_cve(project, cve, data_dir)
+
+
 def _cmd_show(args: argparse.Namespace) -> int:
     project = args.project
     if not project:
@@ -239,6 +264,16 @@ def _cmd_show(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_related(
+    cve: str,
+    project: Optional[str] = None,
+    data_dir: Optional[Union[str, Path]] = None,
+) -> list[dict[str, Any]]:
+    """Retrieve related CVEs for a given advisory."""
+    cve_data = run_show(cve, project=project, data_dir=data_dir)
+    return cve_data.get("related", [])
+
+
 def _cmd_related(args: argparse.Namespace) -> int:
     project = args.project
     if not project:
@@ -268,9 +303,14 @@ def _cmd_related(args: argparse.Namespace) -> int:
     return 0
 
 
-def _cmd_search(args: argparse.Namespace) -> int:
-    search_rows = load_search(args.data_dir)
-    q = args.query.strip().lower()
+def run_search(
+    query: str,
+    limit: Optional[int] = None,
+    data_dir: Optional[Union[str, Path]] = None,
+) -> list[dict[str, Any]]:
+    """Search CVE index by substring query across fields."""
+    search_rows = load_search(data_dir)
+    q = query.strip().lower()
 
     matches = []
     for row in search_rows:
@@ -292,8 +332,13 @@ def _cmd_search(args: argparse.Namespace) -> int:
                 "functions": funcs or None,
             })
 
-    if args.limit is not None and args.limit >= 0:
-        matches = matches[: args.limit]
+    if limit is not None and limit >= 0:
+        matches = matches[:limit]
+    return matches
+
+
+def _cmd_search(args: argparse.Namespace) -> int:
+    matches = run_search(args.query, limit=args.limit, data_dir=args.data_dir)
 
     if args.json:
         print(json.dumps(matches, indent=2))
@@ -314,28 +359,31 @@ def _cmd_search(args: argparse.Namespace) -> int:
     return 0
 
 
-def _cmd_audit(args: argparse.Namespace) -> int:
-    try:
-        auditor = _get_auditor_module()
-    except Exception as exc:
-        sys.stderr.write(f"Error loading defensive auditor: {exc}\n")
-        return 2
-
-    clusters_path = get_pattern_clusters_path(args.data_dir)
+def run_audit(
+    path: Union[str, Path],
+    data_dir: Optional[Union[str, Path]] = None,
+) -> dict[str, Any]:
+    """Run defensive pattern audit on path and return evidence chain."""
+    auditor = _get_auditor_module()
+    clusters_path = get_pattern_clusters_path(data_dir)
     cluster_map = {}
     if clusters_path and clusters_path.is_file():
-        try:
-            cluster_map = auditor.load_pattern_clusters(str(clusters_path))
-        except Exception as exc:
-            sys.stderr.write(f"Error loading pattern clusters from {clusters_path}: {exc}\n")
-            return 2
+        cluster_map = auditor.load_pattern_clusters(str(clusters_path))
 
+    files_audited, findings, file_digests = auditor.audit_path(str(path), cluster_map=cluster_map)
+    return auditor.build_evidence_chain(str(path), files_audited, findings, file_digests=file_digests)
+
+
+def _cmd_audit(args: argparse.Namespace) -> int:
     try:
-        files_audited, findings, file_digests = auditor.audit_path(args.path, cluster_map=cluster_map)
-        evidence = auditor.build_evidence_chain(args.path, files_audited, findings, file_digests=file_digests)
+        evidence = run_audit(args.path, data_dir=args.data_dir)
     except Exception as exc:
         sys.stderr.write(f"Error during audit traversal: {exc}\n")
         return 2
+
+    audit_sec = evidence.get("audit", {})
+    files_audited = audit_sec.get("files_audited", [])
+    findings = audit_sec.get("findings", [])
 
     if args.json:
         print(json.dumps(evidence, indent=2, ensure_ascii=False))
@@ -343,19 +391,23 @@ def _cmd_audit(args: argparse.Namespace) -> int:
         print(f"Audit Target: {args.path}")
         print(f"Files Audited: {len(files_audited)}")
         print(f"Findings: {len(findings)}")
-        print(f"Verdict: {evidence['audit']['verdict']}")
-        print(f"Evidence Chain Hash (SHA256): {evidence['evidence_chain_hash']}")
+        print(f"Verdict: {audit_sec.get('verdict')}")
+        print(f"Evidence Chain Hash (SHA256): {evidence.get('evidence_chain_hash')}")
 
-    if args.strict and (evidence["audit"]["verdict"] in ("FAIL", "INCOMPLETE") or len(findings) > 0):
+    if args.strict and (audit_sec.get("verdict") in ("FAIL", "INCOMPLETE") or len(findings) > 0):
         return 1
     return 0
 
 
-def _cmd_scan(args: argparse.Namespace) -> int:
-    target_path = Path(args.path).resolve()
+def run_scan(
+    path: Union[str, Path],
+    max_files: Optional[int] = None,
+    data_dir: Optional[Union[str, Path]] = None,
+) -> list[dict[str, Any]]:
+    """Scan code files with code-graph and match fix fingerprints."""
+    target_path = Path(path).resolve()
     if not target_path.exists():
-        sys.stderr.write(f"Error: target path does not exist: {target_path}\n")
-        return 2
+        raise FileNotFoundError(f"target path does not exist: {target_path}")
 
     # Discover files
     collected_files = []
@@ -376,25 +428,25 @@ def _cmd_scan(args: argparse.Namespace) -> int:
                         continue
 
     if not collected_files:
-        sys.stderr.write(f"Error: no supported source files under {target_path} "
-                         f"({', '.join(sorted(SUPPORTED_EXTENSIONS))}).\n")
-        return 2
-    if args.max_files is not None and 0 <= args.max_files < len(collected_files):
-        sys.stderr.write(f"Warning: scanning the first {args.max_files} of "
+        raise ValueError(
+            f"no supported source files under {target_path} "
+            f"({', '.join(sorted(SUPPORTED_EXTENSIONS))})."
+        )
+    if max_files is not None and 0 <= max_files < len(collected_files):
+        sys.stderr.write(f"Warning: scanning the first {max_files} of "
                          f"{len(collected_files)} files (--max-files).\n")
-        collected_files = collected_files[: args.max_files]
+        collected_files = collected_files[: max_files]
 
     # Resolve code-graph binary
     code_graph_bin = os.environ.get("KSM_CODE_GRAPH") or shutil.which("code-graph")
     if not code_graph_bin:
-        sys.stderr.write(
+        raise RuntimeError(
             "Error: 'code-graph' executable not found.\n"
             "Please install code-graph or set KSM_CODE_GRAPH to its location.\n"
             "Prebuilt Linux binary: https://github.com/iberi22/kernel-security-memory/releases "
             "(asset code-graph-x86_64-linux.tar.gz)\n"
-            "Or build from source via the cargo command in README.\n"
+            "Or build from source via the cargo command in README."
         )
-        return 2
 
     target_docs = []
     failed = 0
@@ -412,37 +464,51 @@ def _cmd_scan(args: argparse.Namespace) -> int:
         else:
             failed += 1
     if collected_files and failed == len(collected_files):
-        # Every file failed: wrong binary (an old code-graph without the
-        # `fingerprint` subcommand) rather than a clean result.
-        sys.stderr.write(
+        raise RuntimeError(
             f"Error: {code_graph_bin} produced no ksm-sfp/1 output for any of "
             f"{len(collected_files)} files. It needs the `fingerprint` subcommand "
-            "(Xavier code-graph, see docs/design/VULN-ATLAS.md); set KSM_CODE_GRAPH.\n")
-        return 2
+            "(Xavier code-graph, see docs/design/VULN-ATLAS.md); set KSM_CODE_GRAPH."
+        )
     if failed:
         sys.stderr.write(f"Warning: {failed} of {len(collected_files)} files could not be fingerprinted.\n")
 
     # Lazy import ksm.match
     try:
-        from ksm.match import load_corpus, match_documents, render_markdown
+        from ksm.match import load_corpus, match_documents
     except ImportError as exc:
-        sys.stderr.write(f"Error: failed to import ksm.match: {exc}\n")
-        return 2
+        raise RuntimeError(f"Error: failed to import ksm.match: {exc}") from exc
 
-    fingerprints_dir = get_fingerprints_dir(args.data_dir)
+    fingerprints_dir = get_fingerprints_dir(data_dir)
     try:
         corpus = load_corpus(str(fingerprints_dir))
         if not corpus:
-            sys.stderr.write(f"Error: no fix fingerprints in {fingerprints_dir}; run `ksm update`.\n")
-            return 2
+            raise RuntimeError(f"Error: no fix fingerprints in {fingerprints_dir}; run `ksm update`.")
         findings = match_documents(target_docs, corpus)
     except Exception as exc:
-        sys.stderr.write(f"Error during fingerprint matching: {exc}\n")
+        raise RuntimeError(f"Error during fingerprint matching: {exc}") from exc
+
+    return findings
+
+
+def _cmd_scan(args: argparse.Namespace) -> int:
+    try:
+        findings = run_scan(args.path, max_files=args.max_files, data_dir=args.data_dir)
+    except (FileNotFoundError, ValueError, RuntimeError) as exc:
+        msg = str(exc)
+        if not msg.startswith("Error:"):
+            msg = f"Error: {msg}"
+        if not msg.endswith("\n"):
+            msg += "\n"
+        sys.stderr.write(msg)
+        return 2
+    except Exception as exc:
+        sys.stderr.write(f"Error: {exc}\n")
         return 2
 
     if args.json:
         out_content = json.dumps(findings, indent=2)
     else:
+        from ksm.match import render_markdown
         out_content = render_markdown(findings)
 
     if args.out:
@@ -453,6 +519,11 @@ def _cmd_scan(args: argparse.Namespace) -> int:
     if args.strict and findings:
         return 1
     return 0
+
+
+def _cmd_mcp(args: argparse.Namespace) -> int:
+    from ksm.mcp import run_server
+    return run_server(data_dir=args.data_dir)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -520,6 +591,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_scan.add_argument("--data-dir", help="Path to KSM data directory")
     p_scan.add_argument("--json", action="store_true", help="Output findings as JSON")
 
+    # mcp
+    p_mcp = subparsers.add_parser("mcp", help="Run MCP server over stdio")
+    p_mcp.add_argument("--data-dir", help="Path to KSM data directory")
+
     return parser
 
 
@@ -540,6 +615,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "search": _cmd_search,
         "audit": _cmd_audit,
         "scan": _cmd_scan,
+        "mcp": _cmd_mcp,
     }
 
     handler = dispatch.get(args.subcommand)
