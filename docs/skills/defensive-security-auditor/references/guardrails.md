@@ -208,7 +208,7 @@ Preconditions recorded in the cluster: Asynchronous lifecycle, double free, or a
 - **Trigger** — language family `rust` as classified by `_detect_language()` in `scripts/defensive_auditor.py`. "Use After Free / Dereference After Drop or Deallocation (Rust)": Raw pointer or resource accessed after deallocation or drop in Rust.
 
   ```python
-  \b(?:libc::free|dealloc|drop)\s*\(\s*([a-zA-Z0-9_]+)[^)]*\);\s*(?!\s*\1\s*=\s*(?:ptr::null|std::ptr::null|null_mut)\s*;)[^;]*(?:\*+\s*\1|\b\1\s*\.)
+  \b(?:libc::free|dealloc|drop_in_place|ManuallyDrop::drop)\s*\(\s*([a-zA-Z0-9_]+)[^)]*\);\s*(?!\s*\1\s*=\s*(?:ptr::null|std::ptr::null|null_mut)\s*;)[^;]*(?:\*+\s*\1|\b\1\s*\.)
   ```
 
 - **Check** — run `python3 scripts/defensive_auditor.py --target <changed paths> --clusters docs/studies/pattern_clusters.json --output docs/studies/audit-evidence.json --strict` and grep the evidence for `"rule_id": "SEC-CWE-416-USE-AFTER-FREE-RUST"`. If the rule id is present, the pre-commit contract is violated: fix before committing, then run `python3 scripts/quality_gate.py --target <changed paths> --evidence docs/studies/audit-evidence.json` and require exit code 0.
