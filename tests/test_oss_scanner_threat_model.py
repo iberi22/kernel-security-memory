@@ -70,10 +70,13 @@ class ThreatModelTest(unittest.TestCase):
         return run_script(*args)
 
     def test_unparseable_context_is_a_clean_error(self):
-        self.ctx.write_text("description: x\nexercise:\n  - `bad`\n", encoding="utf-8")
+        # Invalid for both parsers: PyYAML (unclosed flow sequence) and the
+        # stdlib fallback used when PyYAML is absent (indented non-list line).
+        self.ctx.write_text("description: x\nexercise:\n  - ok\n  nested: [unclosed\n",
+                            encoding="utf-8")
         result = self._generate(self.out)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-        self.assertIn("cannot parse context", result.stderr)
+        self.assertRegex(result.stderr, r"error: (cannot parse|invalid) context ")
         self.assertNotIn("Traceback", result.stderr)
 
     def test_headings_present(self):
