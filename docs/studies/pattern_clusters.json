@@ -8,7 +8,7 @@
       "cwe_id": "UNKNOWN",
       "title": "Unstated or Legacy Advisory Without CWE Classification",
       "count": 9617,
-      "with_fix_sha": 9244,
+      "with_fix_sha": 9243,
       "preconditions": [],
       "projects_distribution": {
         "git": 1,

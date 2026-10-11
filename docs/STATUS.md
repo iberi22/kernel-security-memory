@@ -7,13 +7,13 @@ Date: 2026-10-10 UTC.
 | Area | Value | Source of truth |
 |---|---|---|
 | Evidence pack records | 35 (1 Linux seed + 34 vetted Fable records: git 8, nginx 2, openssh 8, sqlite 8, systemd 8) | `python3 scripts/build_pack.py --check` |
-| CVE catalogs | 19 catalogs, 18,489 rows, 17,736 with a 40-hex fix SHA | `docs/studies/cve-history/manifest.json` |
-| Upstream snapshot catalogs | `linux-cna` 17,337 rows (all with fix SHA, kernel CNA `vulns.git`); `curl-upstream` 215 (189 SHA); `openssl-upstream` 297 (169 SHA); OSV repo-scoped `git-upstream` 25 (10), `systemd-upstream` 60 (12), `sqlite-upstream` 62 (17), `postgres-upstream` 2 (2). For OSV rows `fix_shas` come only from FIX references; GIT `fixed` boundaries (often release stamps or merges) are kept separately as `fixed_in_shas` | `fetch_kernel_cna_shas.py`, `fetch_upstream_advisories.py` |
+| CVE catalogs | 19 catalogs, 18,489 rows, 17,734 with a 40-hex fix SHA | `docs/studies/cve-history/manifest.json` |
+| Upstream snapshot catalogs | `linux-cna` 17,337 rows (all with fix SHA, kernel CNA `vulns.git`); `curl-upstream` 215 (189 SHA); `openssl-upstream` 297 (169 SHA); OSV repo-scoped `git-upstream` 25 (10), `systemd-upstream` 60 (10), `sqlite-upstream` 62 (17), `postgres-upstream` 2 (2). For OSV rows `fix_shas` come only from FIX references; GIT `fixed` boundaries (often release stamps or merges) are kept separately as `fixed_in_shas`; FIX references that are merge commits (4 in systemd, checked against the committed `commit-parents.jsonl`) are demoted to `fixed_in_shas` | `fetch_kernel_cna_shas.py`, `fetch_upstream_advisories.py` |
 | NVD keyword catalogs | 12, all `CURSOR_PAUSED` between 2000 and 2012; most rows of the 7 newer ones are unrelated products | `fetch_history_*.py` |
 | CWE coverage | 9,617 of 18,424 clustered CVEs (52.2%) are `UNKNOWN` (was 97.6%): 468 CWEs stated by catalogs, 8,339 from the deterministic overlay (NVD 2.0 primary 7,920, CISA vulnrichment ADP 376, NVD secondary 43). The remainder are NVD/CISA `noinfo` or pre-2002 ids. 65 ids present in two catalogs are counted once | `docs/studies/cwe-overlay.jsonl`, `docs/studies/pattern_clusters.json` |
 | Fix fragments | 35 pack records: 90 files, 97 functions (94 parsed, 3 `PARSER_SKIPPED`); line ranges and body hashes only, no code | `docs/studies/fragments/` |
 | Agent guardrails | 6 CWE families, 16 citations, every fix commit verified upstream | `docs/skills/defensive-security-auditor/references/guardrails.md` |
-| Tests | 635 run, 1 skipped (live-network smoke test) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| Tests | 653 run, 1 skipped (live-network smoke test) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 

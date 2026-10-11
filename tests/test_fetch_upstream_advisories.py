@@ -11,6 +11,7 @@ guard. Those run only when the script is invoked without --offline.
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -33,6 +34,12 @@ from fetch_upstream_advisories import (  # noqa: E402
     SNAPSHOT_LIMIT_BYTES,
     SNAPSHOT_SCHEMA,
     FetchError,
+    GIT_REPO,
+    apply_commit_parent_policy,
+    load_commit_parents,
+    _github_slug,
+    _normalize_repo_url,
+    COMMIT_PARENTS_ENV,
     _commit_sha_in_repo,
     _curl_rows,
     _first_sha,
@@ -226,12 +233,16 @@ def write_snapshot(directory, project, records):
     return directory
 
 
-def run_cli(*args):
+def run_cli(*args, env_extra=None):
+    env = dict(os.environ)
+    if env_extra:
+        env.update(env_extra)
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args],
         capture_output=True,
         text=True,
         cwd=str(REPO_ROOT),
+        env=env,
     )
 
 
@@ -894,14 +905,34 @@ class TestOsvCatalogContract(unittest.TestCase):
 
 class TestCliOfflineOsv(unittest.TestCase):
     def test_check_passes_after_offline_build(self):
+        # The OSV build verifies every fix sha against the commit-parents sidecar;
+        # this fixture's fix shas are all single-parent, so it must build and
+        # --check cleanly against a sidecar that names them.
         directory = write_osv_snapshot(Path(tempfile.mkdtemp()) / "git", "git", osv_fixture_records())
-        build = run_cli("--project", "git", "--out-dir", str(directory), "--offline")
+        sidecar = Path(tempfile.mkdtemp()) / "commit-parents.jsonl"
+        rows, _ = _osv_rows(osv_fixture_records(), PROJECT_META["git"])
+        shas = sorted({sha for row in rows for sha in row["fix_shas"]})
+        sidecar.write_text(
+            "".join(
+                json.dumps({
+                    "repo": GIT_REPO,
+                    "sha": sha,
+                    "parents": 1,
+                    "fetched_via": f"gh api repos/git/git/commits/{sha}",
+                }, sort_keys=True) + "\n"
+                for sha in shas
+            ),
+            encoding="utf-8",
+        )
+        env = {"KSM_COMMIT_PARENTS": str(sidecar)}
+        build = run_cli("--project", "git", "--out-dir", str(directory), "--offline", env_extra=env)
         self.assertEqual(build.returncode, 0, build.stderr)
         self.assertTrue((directory / "catalog.jsonl").exists())
         self.assertTrue((directory / "index.json").exists())
-        check = run_cli("--project", "git", "--out-dir", str(directory), "--offline", "--check")
+        check = run_cli("--project", "git", "--out-dir", str(directory), "--offline", "--check", env_extra=env)
         self.assertEqual(check.returncode, 0, check.stderr)
         self.assertIn("entries,", check.stdout)
+        self.assertIn("0 merge fix ref(s) demoted", check.stdout)
 
 
 class TestOsvPostGuard(unittest.TestCase):
@@ -928,6 +959,152 @@ class TestOsvPostGuard(unittest.TestCase):
         finally:
             urllib.request.urlopen = original
         self.assertIn("exceeds", str(caught.exception))
+
+
+SHA_A_CAND = "a" * 40
+SHA_B_CAND = "3" * 40
+
+
+def write_sidecar(path, rows):
+    path.write_text(
+        "".join(json.dumps(r, sort_keys=True) + "\n" for r in rows), encoding="utf-8"
+    )
+    return path
+
+
+def sidecar_row(repo, sha, parents):
+    slug = _github_slug(repo)
+    return {
+        "repo": repo,
+        "sha": sha,
+        "parents": parents,
+        "fetched_via": f"gh api repos/{slug}/commits/{sha}",
+    }
+
+
+class TestCommitParentPolicy(unittest.TestCase):
+    """A fix sha is a real fix only when it is a single-parent commit.
+
+    On the code before this change every in-repo FIX/PATCH reference was written
+    into fix_shas verbatim, so a merge commit (parents != 1) was mislabeled as the
+    fix. The policy reads the sidecar and moves parents != 1 into fixed_in_shas.
+    """
+
+    def _policy_rows(self, parents_by_sha):
+        sidecar = write_sidecar(
+            Path(tempfile.mkdtemp()) / "commit-parents.jsonl",
+            [sidecar_row(GIT_REPO, sha, parents) for sha, parents in parents_by_sha.items()],
+        )
+        index = load_commit_parents(sidecar)
+        rows = [{
+            "advisory_id": "CVE-2024-32002",
+            "fix_shas": list(parents_by_sha),
+            "fixed_in_shas": ["e" * 40],
+        }]
+        kept, demoted = apply_commit_parent_policy(rows, GIT_REPO, index)
+        return kept[0], demoted
+
+    def test_single_parent_stays_and_merge_is_demoted(self):
+        row, demoted = self._policy_rows({SHA_A_CAND: 1, SHA_B_CAND: 2})
+        self.assertEqual(row["fix_shas"], [SHA_A_CAND])           # parents==1 kept
+        self.assertIn(SHA_B_CAND, row["fixed_in_shas"])           # merge demoted
+        self.assertNotIn(SHA_B_CAND, row["fix_shas"])
+        self.assertEqual(demoted, 1)
+
+    def test_root_commit_is_demoted_too(self):
+        row, demoted = self._policy_rows({SHA_A_CAND: 0})          # parents==0
+        self.assertEqual(row["fix_shas"], [])
+        self.assertIn(SHA_A_CAND, row["fixed_in_shas"])
+        self.assertEqual(demoted, 1)
+
+    def test_demoted_sha_already_a_boundary_is_not_duplicated(self):
+        row, demoted = self._policy_rows({SHA_A_CAND: 2})
+        self.assertEqual(row["fixed_in_shas"].count(SHA_A_CAND), 1)
+        self.assertEqual(demoted, 1)
+
+    def test_missing_candidate_fails_loudly_naming_the_sha(self):
+        index = {}  # empty sidecar: the candidate is not in it
+        rows = [{"advisory_id": "CVE-2024-32002", "fix_shas": [SHA_A_CAND], "fixed_in_shas": []}]
+        with self.assertRaises(FetchError) as ctx:
+            apply_commit_parent_policy(rows, GIT_REPO, index)
+        self.assertIn(SHA_A_CAND, str(ctx.exception))
+        self.assertIn("commit-parents", str(ctx.exception))
+
+
+class TestBuildCatalogAppliesParentPolicy(unittest.TestCase):
+    def test_merge_fix_sha_moves_to_fixed_in_and_counted_in_index(self):
+        records = osv_fixture_records()
+        snapshot = osv_snapshot_bytes("git", records)
+        # The fixture's CVE-2024-32002 fix sha is a merge; CVE-2026-40223 is not.
+        norm = _normalize_repo_url(GIT_REPO)
+        index = {(norm, SHA_A_CAND): 2, (norm, SHA_B_CAND): 1}
+        catalog_text, index_text, rows = build_catalog("git", snapshot, index)
+        by_id = {r["advisory_id"]: r for r in rows}
+        self.assertEqual(by_id["CVE-2024-32002"]["fix_shas"], [])
+        self.assertEqual(by_id["CVE-2026-40223"]["fix_shas"], [SHA_B_CAND])
+        parsed = json.loads(index_text)
+        self.assertEqual(parsed["merge_fix_refs_demoted"], 1)
+
+
+class TestCommittedSidecar(unittest.TestCase):
+    """The committed sidecar is a checkpoint, not a guess."""
+
+    def test_committed_sidecar_is_complete_over_upstream_candidates(self):
+        import fetch_upstream_advisories as F
+
+        path = Path(__file__).resolve().parents[1] / "docs" / "studies" / "cve-history" / "commit-parents.jsonl"
+        if not path.exists():
+            self.skipTest("commit-parents.jsonl not generated in this checkout")
+        index = load_commit_parents(path)
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        # one row per (repo, sha), sorted, no duplicates.
+        keys = [(F._normalize_repo_url(r["repo"]), r["sha"]) for r in rows]
+        self.assertEqual(len(keys), len(set(keys)))
+        self.assertEqual(keys, sorted(keys))
+        # Every entry the four OSV upstream catalogs publish as a fix sha is present.
+        for project in F.OSV_PROJECTS:
+            meta = F.PROJECT_META[project]
+            snap = path.parent / meta["name"] / "source.json"
+            if not snap.exists():
+                continue
+            rows_o, _ = F._osv_rows(F.load_snapshot_records(project, snap.read_bytes()), meta)
+            for row in rows_o:
+                for sha in row["fix_shas"]:
+                    self.assertIn((F._normalize_repo_url(meta["repo"]), sha), index, sha)
+
+
+class TestCliCommitParentsCheck(unittest.TestCase):
+    """The CLI verifies fix shas against the sidecar it is pointed at."""
+
+    def test_offline_check_fails_when_a_fix_sha_is_absent_from_the_sidecar(self):
+        directory = write_osv_snapshot(Path(tempfile.mkdtemp()) / "git", "git", osv_fixture_records())
+        # Sidecar that omits the CVE-2024-32002 fix sha entirely.
+        sidecar = write_sidecar(
+            Path(tempfile.mkdtemp()) / "commit-parents.jsonl",
+            [sidecar_row(GIT_REPO, SHA_B_CAND, 1)],
+        )
+        check = run_cli(
+            "--project", "git", "--out-dir", str(directory), "--offline", "--check",
+            env_extra={COMMIT_PARENTS_ENV: str(sidecar)},
+        )
+        self.assertEqual(check.returncode, 1)
+        self.assertIn(SHA_A_CAND, check.stderr)
+
+    def test_offline_build_then_check_reproduces_the_demoted_catalog(self):
+        directory = write_osv_snapshot(Path(tempfile.mkdtemp()) / "git", "git", osv_fixture_records())
+        sidecar = write_sidecar(
+            Path(tempfile.mkdtemp()) / "commit-parents.jsonl",
+            [sidecar_row(GIT_REPO, SHA_A_CAND, 2), sidecar_row(GIT_REPO, SHA_B_CAND, 1)],
+        )
+        env = {COMMIT_PARENTS_ENV: str(sidecar)}
+        build = run_cli("--project", "git", "--out-dir", str(directory), "--offline", env_extra=env)
+        self.assertEqual(build.returncode, 0, build.stderr)
+        row = next(json.loads(l) for l in (directory / "catalog.jsonl").read_text().splitlines()
+                   if json.loads(l)["advisory_id"] == "CVE-2024-32002")
+        self.assertEqual(row["fix_shas"], [])
+        check = run_cli("--project", "git", "--out-dir", str(directory), "--offline", "--check", env_extra=env)
+        self.assertEqual(check.returncode, 0, check.stderr)
+        self.assertIn("1 merge fix ref(s) demoted", check.stdout)
 
 
 if __name__ == "__main__":

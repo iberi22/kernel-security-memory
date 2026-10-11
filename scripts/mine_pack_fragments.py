@@ -604,6 +604,11 @@ def main(argv=None):
         return 2
     if skipped and not features:
         return 2
+    if args.check and skipped:
+        # A skipped record's committed file was never compared: not a clean check.
+        for rid, why in skipped:
+            print(f"SKIPPED {rid}: {why}", file=sys.stderr)
+        return 2
     if args.check:
         if mismatches:
             for rid, why in mismatches:

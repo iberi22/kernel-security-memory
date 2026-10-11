@@ -248,6 +248,16 @@ class TestOfflineRoundtrip(unittest.TestCase):
         self.assertIn("offline: missing cached content", out)
         self.assertEqual(list(self.out.glob("*.json")), [])
 
+    def test_check_fails_when_any_record_is_skipped(self):
+        """One good record must not hide a skipped one from --check."""
+        self.assertEqual(self._run(["--offline"])[0], 0)
+        second = json.loads((self.records / "record_synthetic.json").read_text(encoding="utf-8"))
+        second["id"] = "synthetic-pack-fragments-uncached"
+        (self.records / "record_uncached.json").write_text(json.dumps(second), encoding="utf-8")
+        rc, out = self._run(["--offline", "--check"])
+        self.assertEqual(rc, 2, out)
+        self.assertIn("SKIPPED synthetic-pack-fragments-uncached", out)
+
 
 class TestCommittedNoHunkHeaders(unittest.TestCase):
     def test_no_at_at_markers_in_committed_features(self):

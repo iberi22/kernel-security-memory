@@ -45,6 +45,8 @@ PROJECTS = ("curl", "git", "glibc", "linux", "nginx", "openssh",
             "openssl", "postgresql", "qemu", "sqlite", "systemd", "unbound")
 
 RUN_DATE = "2027-03-04"          # injected through KSM_TODAY
+STORED_END = "2027-02-15"        # a COMPLETE window that closed before RUN_DATE
+GAP_START = "2027-02-16"         # STORED_END + 1 day: where the scan must resume
 LAST_SLICE_START = "2026-10-12"  # last 90-day slice before RUN_DATE is 2026-10-12
 CARRIED_ERROR = "Fetch error: The read operation timed out"
 EMPTY_PAGE = {"vulnerabilities": [], "totalResults": 0}
@@ -88,15 +90,17 @@ def path_patches(module, out_dir):
     return []  # the other 11 take --out-dir / an out_dir argument
 
 
-def run_fetch(project, out_dir, *, error=None, max_calls=None):
+def run_fetch(project, out_dir, *, error=None, max_calls=None, capture_stdout=False):
     """Run one fetch with faked NVD responses and no sleeping.
 
-    Returns (index dict, list of requested URLs).
+    Returns (index dict, list of requested URLs) and, with ``capture_stdout``,
+    the run's stdout as a third value.
     """
     module = fetch_module(project)
     urls = []
     out = Path(out_dir)
     index_path, catalog_path = out / "index.json", out / "catalog.jsonl"
+    stdout = io.StringIO()
 
     def fake_request(url, cumulative_bytes):
         urls.append(url)
@@ -117,12 +121,15 @@ def run_fetch(project, out_dir, *, error=None, max_calls=None):
             stack.enter_context(mock.patch.object(module, "make_nvd_request", side_effect=fake_request))
         stack.enter_context(mock.patch("urllib.request.urlopen", side_effect=fake_urlopen))
         stack.enter_context(mock.patch("time.sleep"))
-        stack.enter_context(redirect_stdout(io.StringIO()))
+        stack.enter_context(redirect_stdout(stdout))
         if is_linux(module):
             module.fetch_history(max_calls=max_calls if max_calls is not None else 1000)
         else:
             module.fetch_nvd_data(str(out), max_time_seconds=10 ** 6)
-    return json.loads(index_path.read_text(encoding="utf-8")), urls
+    index = json.loads(index_path.read_text(encoding="utf-8"))
+    if capture_stdout:
+        return index, urls, stdout.getvalue()
+    return index, urls
 
 
 def write_index(out_dir, **overrides):
@@ -338,6 +345,63 @@ class TestErrorsDoNotBlockLaterRuns(FetcherHardeningTestBase):
                     self.assertIsNotNone(index["resume"])
 
 
+class TestCompleteWindowReopensWhenTheRunDateMovesOn(FetcherHardeningTestBase):
+    """A COMPLETE catalog whose ``window.end`` predates the run date has a gap.
+
+    Before the fix every fetcher returned "already COMPLETE" for such a catalog,
+    so it stopped being refreshed the moment the run date moved past the stored
+    window and stayed silently stale.
+    """
+
+    def _complete_index(self, out_dir, end):
+        write_index(
+            out_dir,
+            coverage="COMPLETE",
+            status="COMPLETE",
+            cursor_date=None,
+            window_closed=True,
+            window={"start": "1999-01-01", "end": end},
+            entry_count=0,
+            requests=19,
+            resume=None,
+        )
+        (Path(out_dir) / "catalog.jsonl").write_text("", encoding="utf-8")
+
+    def test_gap_after_a_stale_complete_window_is_resumed(self):
+        for project in PROJECTS:
+            with self.subTest(project=project):
+                with tempfile.TemporaryDirectory() as tmp:
+                    self._complete_index(tmp, STORED_END)
+                    index, urls, output = run_fetch(project, tmp, capture_stdout=True)
+
+                    self.assertIn(f"Reopening window: resuming at {GAP_START}", output)
+                    self.assertGreater(len(urls), 0, f"{project} fetched nothing")
+                    if urls[0] != "linux-slice":
+                        query = urllib.parse.parse_qs(urllib.parse.urlparse(urls[0]).query)
+                        self.assertEqual(query["pubStartDate"], [f"{GAP_START}T00:00:00.000"],
+                                         f"{project} did not resume at stored_end + 1 day")
+                        self.assertEqual(query["pubEndDate"], [f"{RUN_DATE}T23:59:59.999"])
+                    # The gap is scanned, so the new window closes honestly.
+                    self.assertEqual(index["coverage"], "COMPLETE")
+                    self.assertIsNone(index["resume"])
+                    self.assertEqual(index["window"],
+                                     {"start": "1999-01-01", "end": RUN_DATE})
+
+    def test_complete_window_that_reaches_the_run_date_stays_closed(self):
+        for project in PROJECTS:
+            with self.subTest(project=project):
+                with tempfile.TemporaryDirectory() as tmp:
+                    self._complete_index(tmp, RUN_DATE)
+                    index, urls, output = run_fetch(project, tmp, capture_stdout=True)
+
+                    self.assertEqual(urls, [], f"{project} re-fetched a closed window")
+                    self.assertIn("already COMPLETE", output)
+                    self.assertEqual(index["coverage"], "COMPLETE")
+                    self.assertIsNone(index["resume"])
+                    self.assertEqual(index["window"], {"start": "1999-01-01", "end": RUN_DATE})
+                    self.assertEqual(index["requests"], 19)
+
+
 class TestLinuxCompleteWindow(unittest.TestCase):
     """fetch_history_linux.py is the one fetcher with its own loop."""
 
@@ -352,7 +416,7 @@ class TestLinuxCompleteWindow(unittest.TestCase):
     def _run(self, module):
         with mock.patch.object(module, "INDEX_PATH", str(self.out_dir / "index.json")), \
              mock.patch.object(module, "CATALOG_PATH", str(self.out_dir / "catalog.jsonl")), \
-             mock.patch("urllib.request.urlopen", side_effect=FakeNvdResponse()), \
+             mock.patch("urllib.request.urlopen", side_effect=lambda *_a, **_k: FakeNvdResponse()), \
              mock.patch("time.sleep"), \
              redirect_stdout(io.StringIO()) as out:
             result = module.fetch_history(max_calls=1000)
@@ -369,6 +433,8 @@ class TestLinuxCompleteWindow(unittest.TestCase):
             status="COMPLETE",
             cursor_date=None,
             window_closed=True,
+            # window.end is the run date: the window really is closed.
+            window={"start": "1999-01-01", "end": "2026-10-12"},
             entry_count=1,
             requests=113,
             resume=None,
@@ -389,6 +455,42 @@ class TestLinuxCompleteWindow(unittest.TestCase):
         self.assertEqual(after["requests"], 113)
         self.assertEqual(after["entry_count"], 1)
         self.assertEqual(before, index_path.read_text(encoding="utf-8"))
+
+    def test_stale_complete_window_is_resumed_the_day_after_its_end(self):
+        module = fetch_module("linux")
+        record = {
+            "advisory_id": "CVE-2020-1234",
+            "published": "2020-01-01",
+            "cwe": None,
+            "cwe_state": "UNKNOWN",
+            "patch_urls": [],
+            "fix_shas": [],
+            "subsystem": "unassigned",
+        }
+        (self.out_dir / "catalog.jsonl").write_text(json.dumps(record) + "\n", encoding="utf-8")
+        index_path = write_index(
+            self.out_dir,
+            project="linux",
+            coverage="COMPLETE",
+            status="COMPLETE",
+            cursor_date=None,
+            window_closed=True,
+            # Closed three days before the run date: the gap is unscanned.
+            window={"start": "1999-01-01", "end": "2026-10-09"},
+            entry_count=1,
+            requests=113,
+            resume=None,
+        )
+
+        result, output = self._run(module)
+        self.assertTrue(result)
+        self.assertIn("Reopening window: resuming at 2026-10-10", output)
+        after = json.loads(index_path.read_text(encoding="utf-8"))
+        self.assertEqual(after["coverage"], "COMPLETE")
+        self.assertIsNone(after["resume"])
+        self.assertEqual(after["window"], {"start": "1999-01-01", "end": "2026-10-12"})
+        # The previously recorded entries survive the reopen.
+        self.assertEqual(after["entry_count"], 1)
 
 
 class TestFetcherIoHelpers(unittest.TestCase):

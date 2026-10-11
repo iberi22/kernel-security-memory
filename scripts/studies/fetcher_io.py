@@ -33,6 +33,13 @@ The invariants:
    catalog forever (unbound stopped at cursor 2003-06-09). ``errors`` now holds
    only the current run's failures and the older ones are kept as capped
    ``error_history``: history is never silently dropped and never gates a run.
+
+5. **A COMPLETE catalog reopens when the run date moves past its window.**
+   ``window.end`` is the date the last scan ran on, so a COMPLETE catalog whose
+   stored end predates the run date has an unscanned gap; every fetcher used to
+   return "already COMPLETE" and the catalog went stale in silence.
+   :func:`complete_window_gap_start` returns ``stored_end + 1 day`` so the
+   caller resumes in the gap, and coverage stays INCOMPLETE until it closes.
 """
 
 import datetime
@@ -82,6 +89,37 @@ def resolve_run_date(today: Optional[str] = None) -> datetime.date:
 def window_end_iso(today: Optional[str] = None) -> str:
     """``window.end`` for a run: the run date as an ISO string."""
     return resolve_run_date(today).isoformat()
+
+
+def complete_window_gap_start(prev_index: Any, today: Optional[str] = None) -> Optional[datetime.date]:
+    """Where a COMPLETE catalog reopens, or ``None`` when it is really complete.
+
+    ``window.end`` is the date the last scan ran on, so a catalog marked COMPLETE
+    with ``window.end`` older than the run date has an unscanned gap between the
+    two: every run that reached it returned "already COMPLETE" and the catalog
+    silently stopped being refreshed. Returning ``stored_end + 1 day`` lets the
+    caller resume in that gap instead of returning, and coverage then stays
+    INCOMPLETE until the new window closes (the loop decides, not this helper).
+
+    ``None`` means there is nothing to reopen: no usable stored end, or the stored
+    window already reaches the run date.
+    """
+    if not isinstance(prev_index, dict):
+        return None
+    window = prev_index.get("window")
+    if not isinstance(window, dict):
+        return None
+    end = window.get("end")
+    if not isinstance(end, str) or not ISO_DATE.match(end):
+        return None
+    try:
+        end_date = datetime.date.fromisoformat(end)
+    except ValueError:
+        return None
+    run_date = resolve_run_date(today)
+    if end_date >= run_date:
+        return None
+    return end_date + datetime.timedelta(days=1)
 
 
 def expected_window(today: Optional[str] = None) -> Dict[str, str]:
