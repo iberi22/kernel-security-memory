@@ -8,8 +8,10 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts/studies"))
+import enrich_from_osv  # noqa: E402  referenced as enrich_from_osv.<fn> in the sidecar tests
 from enrich_from_osv import (  # noqa: E402
     DEFAULT_PROJECTS,
     OsvClient,
@@ -333,6 +335,94 @@ class TestRepoState(unittest.TestCase):
                              expected_catalog, f"{project}/catalog.jsonl is stale")
             self.assertEqual((project_dir / "index.json").read_text(encoding="utf-8"),
                              expected_index, f"{project}/index.json is stale")
+
+
+class TestCommitParentPolicyEnrich(unittest.TestCase):
+    """OSV fix shas are verified against the commit-parents sidecar.
+
+    On the code before this change enrich wrote every in-repo FIX/PATCH reference
+    into fix_shas, so a merge commit was mislabeled as the fix. NVD catalogs have
+    no fixed_in column, so a demoted sha is dropped from fix_shas and counted.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        root = Path(self.tmp.name)
+        self.client = OsvClient(root / "osv-cache", offline=True)
+        self.project = root / "curl"
+        self.project.mkdir()
+        (self.project / "index.json").write_text(json.dumps({
+            "schema_version": "cve-history-v1", "project": "curl", "repo": CURL_REPO,
+            "entry_count": 2, "with_fix_sha": 0}), encoding="utf-8")
+        rows = [
+            {"advisory_id": "CVE-2023-38545", "published": "2023-10-18", "cwe": None,
+             "cwe_state": "UNKNOWN", "patch_urls": [], "fix_shas": [], "subsystem": None},
+            {"advisory_id": "CVE-2022-0001", "published": "2022-01-01", "cwe": None,
+             "cwe_state": "UNKNOWN", "patch_urls": [], "fix_shas": [], "subsystem": None},
+        ]
+        (self.project / "catalog.jsonl").write_text(
+            "".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        cache = root / "osv-cache"
+        cache.mkdir()
+        (cache / "CVE-2023-38545.json").write_text(json.dumps(
+            osv_doc("CVE-2023-38545", fixes=[SHA_A])), encoding="utf-8")
+        (cache / "CVE-2022-0001.json").write_text(json.dumps(
+            osv_doc("CVE-2022-0001", fixes=[SHA_B])), encoding="utf-8")
+        self.sidecar = root / "commit-parents.jsonl"
+
+    def _sidecar_index(self, parents_by_sha):
+        self.sidecar.write_text("".join(
+            json.dumps({"repo": CURL_REPO, "sha": sha, "parents": p,
+                        "fetched_via": f"gh api repos/curl/curl/commits/{sha}"}, sort_keys=True) + "\n"
+            for sha, p in parents_by_sha.items()), encoding="utf-8")
+        return enrich_from_osv.load_commit_parents(self.sidecar)
+
+    def _by_id(self, catalog_text):
+        return {json.loads(l)["advisory_id"]: json.loads(l) for l in catalog_text.splitlines()}
+
+    def test_merge_fix_sha_dropped_single_parent_kept(self):
+        index = self._sidecar_index({SHA_A: 2, SHA_B: 1})
+        catalog_text, index_text, stats = enrich_from_osv.enrich_project(self.project, self.client, index)
+        by_id = self._by_id(catalog_text)
+        self.assertEqual(by_id["CVE-2023-38545"]["fix_shas"], [])       # merge dropped
+        self.assertEqual(by_id["CVE-2022-0001"]["fix_shas"], [SHA_B])    # single-parent kept
+        self.assertEqual(stats["merge_fix_refs_demoted"], 1)
+        self.assertEqual(json.loads(index_text)["merge_fix_refs_demoted"], 1)
+
+    def test_no_sidecar_means_no_policy_and_no_index_field(self):
+        # parents_index is None (no sidecar): legacy behavior, both shas kept.
+        catalog_text, index_text, stats = enrich_from_osv.enrich_project(self.project, self.client)
+        by_id = self._by_id(catalog_text)
+        self.assertEqual(by_id["CVE-2023-38545"]["fix_shas"], [SHA_A])
+        self.assertEqual(by_id["CVE-2022-0001"]["fix_shas"], [SHA_B])
+        self.assertNotIn("merge_fix_refs_demoted", json.loads(index_text))
+
+    def test_missing_candidate_fails_loudly_naming_the_sha(self):
+        index = self._sidecar_index({SHA_B: 1})  # SHA_A absent from the sidecar
+        with self.assertRaises(ValueError) as ctx:
+            enrich_from_osv.enrich_project(self.project, self.client, index)
+        self.assertIn(SHA_A, str(ctx.exception))
+
+    def test_apply_parent_policy_unit(self):
+        kept, demoted = enrich_from_osv.apply_parent_policy([SHA_A, SHA_B], CURL_REPO,
+                                                            {(enrich_from_osv.normalize_repo(CURL_REPO), SHA_A): 1,
+                                                             (enrich_from_osv.normalize_repo(CURL_REPO), SHA_B): 2})
+        self.assertEqual(kept, [SHA_A])
+        self.assertEqual(demoted, 1)
+
+    def test_fetch_commit_parents_writes_sidecar_without_touching_the_committed_one(self):
+        committed = Path(__file__).resolve().parents[1] / "docs" / "studies" / "cve-history" / "commit-parents.jsonl"
+        before = committed.read_text(encoding="utf-8") if committed.exists() else None
+        with mock.patch.object(enrich_from_osv, "COMMIT_PARENTS_PATH", self.sidecar), \
+             mock.patch.object(enrich_from_osv, "_gh_commit_parents", return_value=1):
+            rows = enrich_from_osv.fetch_commit_parents([self.project], self.client)
+        self.assertEqual({r["sha"] for r in rows}, {SHA_A, SHA_B})
+        self.assertTrue(all(r["parents"] == 1 for r in rows))
+        self.assertTrue(self.sidecar.exists())
+        # the committed sidecar must be byte-identical (not extended with the fixtures)
+        after = committed.read_text(encoding="utf-8") if committed.exists() else None
+        self.assertEqual(before, after)
 
 
 if __name__ == "__main__":

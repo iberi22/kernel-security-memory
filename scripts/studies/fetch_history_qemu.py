@@ -149,8 +149,17 @@ def fetch_nvd_data(out_dir, max_time_seconds=180):
         if prev_index.get("resume") and "next_start_date" in prev_index["resume"]:
             current_start = datetime.date.fromisoformat(prev_index["resume"]["next_start_date"])
         elif prev_index.get("coverage") == "COMPLETE":
-            print("Catalog is already COMPLETE.")
-            return
+            # window.end is the date the last scan ran on, so a COMPLETE catalog
+            # whose stored end predates the run date has an unscanned gap: resume
+            # at stored_end + 1 day instead of returning "already COMPLETE" and
+            # going stale in silence. Coverage stays INCOMPLETE until the new
+            # window closes.
+            gap_start = fetcher_io.complete_window_gap_start(prev_index)
+            if gap_start is None:
+                print("Catalog is already COMPLETE.")
+                return
+            print(f"Reopening window: resuming at {gap_start.isoformat()}.")
+            current_start = gap_start
 
     # A corrupt catalog line is fatal too (fetcher_io.read_catalog).
     kept_records = fetcher_io.read_catalog(catalog_path)

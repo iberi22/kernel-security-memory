@@ -33,12 +33,22 @@ ten of those commits verified that claim (see _curl_rows).
 Every output can be rebuilt byte-for-byte from the committed snapshot
 (``source.json``) with ``--offline --check``, so no network access is needed to
 verify the delivery. Descriptions are never copied (docs/DATA-POLICY.md).
+
+fix_shas are single-parent commits only. An advisory often points its FIX/PATCH
+reference at a merge commit; a merge has more than one parent, so it is not the
+commit that fixed the bug. The parent count of every fix-sha candidate is a fact
+looked up in the committed sidecar ``commit-parents.jsonl`` (refreshed only by the
+explicit ``--fetch-commit-parents``): parents == 1 stays in fix_shas, parents != 1
+is moved into fixed_in_shas and counted as ``merge_fix_refs_demoted``. A candidate
+missing from the sidecar fails the build loudly instead of being guessed.
 """
 
 import argparse
 import hashlib
 import json
+import os
 import re
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -71,6 +81,17 @@ GIT_REPO = "https://github.com/git/git"
 SYSTEMD_REPO = "https://github.com/systemd/systemd"
 SQLITE_REPO = "https://github.com/sqlite/sqlite"
 POSTGRES_REPO = "https://github.com/postgres/postgres"
+# Committed sidecar: one row per (repo, sha) fix-sha candidate with its parent
+# count, refreshed only by --fetch-commit-parents. Located beside the catalogs.
+CVE_HISTORY_ROOT = Path(__file__).resolve().parents[2] / "docs" / "studies" / "cve-history"
+COMMIT_PARENTS_PATH = CVE_HISTORY_ROOT / "commit-parents.jsonl"
+COMMIT_PARENTS_ENV = "KSM_COMMIT_PARENTS"  # test override: a sidecar path to read/write
+
+
+def _commit_parents_path():
+    """Path of the sidecar: the committed one, or KSM_COMMIT_PARENTS in tests."""
+    override = os.environ.get(COMMIT_PARENTS_ENV)
+    return Path(override) if override else COMMIT_PARENTS_PATH
 GIT_PACKAGE = "github.com/git/git"
 SYSTEMD_PACKAGE = "github.com/systemd/systemd"
 SQLITE_PACKAGE = "github.com/sqlite/sqlite"
@@ -118,8 +139,8 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description="Build a complete advisory catalog (curl, openssl, or an OSV.dev GIT repo) from the source's own feed."
     )
-    parser.add_argument("--project", required=True, choices=("curl", "openssl", *OSV_PROJECTS))
-    parser.add_argument("--out-dir", required=True, help="Catalog directory (holds source.json).")
+    parser.add_argument("--project", choices=("curl", "openssl", *OSV_PROJECTS))
+    parser.add_argument("--out-dir", help="Catalog directory (holds source.json).")
     parser.add_argument(
         "--offline",
         action="store_true",
@@ -133,6 +154,15 @@ def parse_args(argv=None):
     parser.add_argument(
         "--source",
         help="Snapshot path (default: <out-dir>/source.json).",
+    )
+    parser.add_argument(
+        "--fetch-commit-parents",
+        action="store_true",
+        help=(
+            "Network refresh of the commit-parents sidecar: for every OSV fix-sha "
+            "candidate of git/systemd/sqlite/postgres, query GitHub for its parent "
+            "count and write docs/studies/cve-history/commit-parents.jsonl."
+        ),
     )
     return parser.parse_args(argv)
 
@@ -529,11 +559,134 @@ def load_snapshot_records(project, snapshot_bytes):
 # ---------------------------------------------------------------------- output
 
 
-def build_catalog(project, snapshot_bytes):
+def _github_slug(repo_url):
+    """owner/name for a github.com repo URL, or None for another host."""
+    path = _normalize_repo_url(repo_url).split("://", 1)[-1]
+    if not path.startswith("github.com/"):
+        return None
+    parts = path[len("github.com/"):].split("/")
+    if len(parts) != 2 or not all(parts):
+        return None
+    return f"{parts[0]}/{parts[1]}"
+
+
+def load_commit_parents(path=None):
+    """Read the sidecar into {(normalized_repo, sha): parents}.
+
+    A missing file is an empty index (the policy then fails loudly on the first
+    candidate rather than silently guessing). A malformed row is fatal: the
+    sidecar is the single source of truth a reviewer can check.
+    """
+    path = Path(path) if path else _commit_parents_path()
+    index = {}
+    if not path.exists():
+        return index
+    for line_no, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not raw.strip():
+            continue
+        row = json.loads(raw)
+        repo, sha, parents = row.get("repo"), row.get("sha"), row.get("parents")
+        if not isinstance(parents, int) or not isinstance(sha, str) or not isinstance(repo, str):
+            raise FetchError(f"{path}:{line_no}: malformed commit-parents row {raw!r}")
+        index[(_normalize_repo_url(repo), sha)] = parents
+    return index
+
+
+def apply_commit_parent_policy(rows, repo, parents_index):
+    """Keep only single-parent fix shas; move merges into fixed_in_shas.
+
+    Every fix-sha candidate must be in ``parents_index``: the sidecar is the only
+    permitted source, so a candidate missing from it fails the build loudly (the
+    caller turns this into a non-zero ``--check``) instead of being left in or
+    guessed. parents != 1 (a merge, or a root commit) is not the fix, so it moves
+    into ``fixed_in_shas`` and is counted. Returns (rows, demoted_count).
+    """
+    norm_repo = _normalize_repo_url(repo)
+    demoted = 0
+    for row in rows:
+        kept = []
+        for sha in row.get("fix_shas") or []:
+            parents = parents_index.get((norm_repo, sha))
+            if parents is None:
+                raise FetchError(
+                    f"{repo}: fix sha {sha} (advisory {row.get('advisory_id')}) is absent from "
+                    f"{_commit_parents_path().name}; refresh it with --fetch-commit-parents"
+                )
+            if parents == 1:
+                kept.append(sha)
+            else:
+                demoted += 1
+                fixed_in = row.setdefault("fixed_in_shas", [])
+                if sha not in fixed_in:
+                    fixed_in.append(sha)
+        row["fix_shas"] = kept
+    return rows, demoted
+
+
+def _gh_commit_parents(slug, sha):
+    """Parent count of one commit, straight from the GitHub API."""
+    result = subprocess.run(
+        ["gh", "api", f"repos/{slug}/commits/{sha}", "--jq", ".parents|length"],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    if result.returncode != 0:
+        raise FetchError(f"gh api repos/{slug}/commits/{sha} failed: {result.stderr.strip()}")
+    try:
+        return int(result.stdout.strip())
+    except ValueError as exc:
+        raise FetchError(f"gh api repos/{slug}/commits/{sha}: non-integer parents {result.stdout!r}") from exc
+
+
+def fetch_commit_parents():
+    """Refresh commit-parents.jsonl from GitHub for every OSV fix-sha candidate.
+
+    Reads each git/systemd/sqlite/postgres snapshot (offline) to enumerate the
+    candidates (the raw FIX/PATCH shas, before the single-parent policy) and asks
+    GitHub for each parent count. Existing rows for other repos are preserved.
+    Returns the sorted list of rows written.
+    """
+    collected = load_commit_parents()
+    for project in OSV_PROJECTS:
+        meta = PROJECT_META[project]
+        snapshot_path = CVE_HISTORY_ROOT / meta["name"] / "source.json"
+        if not snapshot_path.exists():
+            raise FetchError(f"snapshot {snapshot_path} not found; cannot enumerate fix candidates")
+        records = load_snapshot_records(project, snapshot_path.read_bytes())
+        rows, _ = _osv_rows(records, meta)  # parents_index not applied: raw candidates
+        repo = meta["repo"]
+        slug = _github_slug(repo)
+        if slug is None:
+            raise FetchError(f"{repo} is not a github.com repository; gh api cannot count its commit parents")
+        for row in rows:
+            for sha in row.get("fix_shas") or []:
+                parents = _gh_commit_parents(slug, sha)
+                collected[(_normalize_repo_url(repo), sha)] = {
+                    "repo": repo,
+                    "sha": sha,
+                    "parents": parents,
+                    "fetched_via": f"gh api repos/{slug}/commits/{sha}",
+                }
+    rows_sorted = sorted(collected.values(), key=lambda r: (_normalize_repo_url(r["repo"]), r["sha"]))
+    text = "".join(json.dumps(r, sort_keys=True, ensure_ascii=False) + "\n" for r in rows_sorted)
+    target = _commit_parents_path()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    _write_if_changed(target, text)
+    return rows_sorted
+
+
+def build_catalog(project, snapshot_bytes, parents_index=None):
     records = load_snapshot_records(project, snapshot_bytes)
     built = ROW_BUILDERS[project](records)
     rows, stats = built
     rows.sort(key=lambda row: row["advisory_id"])
+    if parents_index is not None and project in OSV_PROJECTS:
+        # Fix shas are verified against the sidecar: only single-parent commits
+        # stay in fix_shas, merges move to fixed_in_shas and are counted.
+        rows, demoted = apply_commit_parent_policy(rows, PROJECT_META[project]["repo"], parents_index)
+        stats = dict(stats)
+        stats["merge_fix_refs_demoted"] = demoted
     catalog_text = "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows)
     index_text = json.dumps(
         _build_index(project, snapshot_bytes, rows, stats), indent=2, ensure_ascii=False
@@ -632,6 +785,12 @@ def _build_osv_index(project, snapshot_bytes, rows, stats):
             "another repository the CVE record also lists and are excluded.",
         ]
     )
+    demoted = stats.get("merge_fix_refs_demoted", 0)
+    if demoted:
+        notes += (
+            f" {demoted} fix reference(s) name a merge commit (parents != 1 in "
+            "commit-parents.jsonl) and were moved out of fix_shas into fixed_in_shas."
+        )
     return {
         "schema_version": "cve-history-v1",
         "project": meta["name"],
@@ -647,6 +806,7 @@ def _build_osv_index(project, snapshot_bytes, rows, stats):
         "with_fix_sha": with_fix_sha,
         "with_fixed_in": with_fixed_in,
         "with_cwe": sum(1 for r in rows if r["cwe"]),
+        "merge_fix_refs_demoted": demoted,
         "errors": [],
         "notes": notes,
     }
@@ -654,6 +814,29 @@ def _build_osv_index(project, snapshot_bytes, rows, stats):
 
 def main(argv=None):
     args = parse_args(argv)
+
+    if args.fetch_commit_parents:
+        # Explicit network refresh of the sidecar; needs neither --project nor
+        # --out-dir (it reads each project's snapshot under CVE_HISTORY_ROOT).
+        try:
+            rows = fetch_commit_parents()
+        except (FetchError, ValueError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+        merges = sum(1 for r in rows if r["parents"] != 1)
+        print(
+            f"Wrote {_commit_parents_path()}: {len(rows)} commit-parent record(s), "
+            f"{merges} with parents != 1"
+        )
+        return 0
+
+    if not args.project or not args.out_dir:
+        print(
+            "Error: --project and --out-dir are required unless --fetch-commit-parents is given",
+            file=sys.stderr,
+        )
+        return 2
+
     out_dir = Path(args.out_dir)
     snapshot_path = Path(args.source) if args.source else out_dir / "source.json"
 
@@ -671,14 +854,23 @@ def main(argv=None):
         out_dir.mkdir(parents=True, exist_ok=True)
         snapshot_path.write_bytes(snapshot_bytes)
 
+    # OSV projects verify every fix sha against the committed sidecar; the two
+    # project-hosted feeds (curl, openssl) keep their own verified fix column.
+    parents_index = load_commit_parents() if args.project in OSV_PROJECTS else None
+
     try:
-        catalog_text, index_text, rows = build_catalog(args.project, snapshot_bytes)
+        catalog_text, index_text, rows = build_catalog(args.project, snapshot_bytes, parents_index)
     except (ValueError, FetchError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
     catalog_path = out_dir / "catalog.jsonl"
     index_path = out_dir / "index.json"
+
+    demoted_clause = ""
+    if args.project in OSV_PROJECTS:
+        demoted = json.loads(index_text).get("merge_fix_refs_demoted", 0)
+        demoted_clause = f", {demoted} merge fix ref(s) demoted"
 
     if args.check:
         problems = []
@@ -698,7 +890,8 @@ def main(argv=None):
             f"OK {args.project}: {len(rows)} entries, "
             f"{sum(1 for r in rows if r['fix_shas'])} with fix sha, "
             f"{sum(1 for r in rows if r.get('fixed_in_shas'))} with fixed_in, "
-            f"{sum(1 for r in rows if r['cwe'])} with cwe (offline --check)"
+            f"{sum(1 for r in rows if r['cwe'])} with cwe"
+            f"{demoted_clause} (offline --check)"
         )
         return 0
 
@@ -709,7 +902,8 @@ def main(argv=None):
         f"Wrote {args.project}: {len(rows)} entries, "
         f"{sum(1 for r in rows if r['fix_shas'])} with fix sha, "
         f"{sum(1 for r in rows if r.get('fixed_in_shas'))} with fixed_in, "
-        f"{sum(1 for r in rows if r['cwe'])} with cwe, "
+        f"{sum(1 for r in rows if r['cwe'])} with cwe"
+        f"{demoted_clause}, "
         f"snapshot {len(snapshot_bytes)} bytes -> {snapshot_path}"
     )
     return 0
