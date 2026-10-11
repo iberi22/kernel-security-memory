@@ -135,6 +135,27 @@ def build_catalog_and_index(zip_bytes, records):
         }
         rows.append(row)
 
+    # The export lists many advisories twice (GHSA-... aliasing RUSTSEC-...).
+    # Keep the RUSTSEC row and fold the other row's commits into it.
+    by_id = {r["advisory_id"]: r for r in rows}
+    merged = []
+    for r in rows:
+        twin = next((a for a in r["aliases"] if a.startswith("RUSTSEC-") and a in by_id), None)
+        if twin and not r["advisory_id"].startswith("RUSTSEC-"):
+            keep = by_id[twin]
+            for key in ("fix_shas", "reference_commit_shas", "patch_urls"):
+                for v in r[key]:
+                    if v not in keep[key]:
+                        keep[key].append(v)
+            if r["advisory_id"] not in keep["aliases"]:
+                keep["aliases"] = sorted(keep["aliases"] + [r["advisory_id"]])
+            if not keep["repo"]:
+                keep["repo"] = r["repo"]
+            if not keep["cwe"] and r["cwe"]:
+                keep["cwe"], keep["cwe_state"] = r["cwe"], r["cwe_state"]
+            continue
+        merged.append(r)
+    rows = merged
     rows.sort(key=lambda r: r["advisory_id"])
 
     newest_modified = max((r.get("modified") or "" for r in records), default="")

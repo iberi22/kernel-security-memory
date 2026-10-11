@@ -167,6 +167,25 @@ class TestRustsecCatalog(unittest.TestCase):
         self.assertEqual(idx["with_cwe"], 1)
         self.assertEqual(idx["fetched_at"], "2024-08-22T14:00:00Z")
 
+    def test_ghsa_twin_is_folded_into_the_rustsec_row(self):
+        build_catalog_and_index = fetch_rustsec.build_catalog_and_index
+        parse_records_from_zip = fetch_rustsec.parse_records_from_zip
+        records = [
+            {"id": "RUSTSEC-2031-0001", "aliases": ["CVE-2031-1"], "published": "2031-01-01T00:00:00Z",
+             "modified": "2031-01-02T00:00:00Z",
+             "affected": [{"package": {"ecosystem": "crates.io", "name": "c"}}], "references": []},
+            {"id": "GHSA-aaaa-bbbb-cccc", "aliases": ["RUSTSEC-2031-0001", "CVE-2031-1"],
+             "published": "2031-01-01T00:00:00Z", "modified": "2031-01-02T00:00:00Z",
+             "affected": [{"package": {"ecosystem": "crates.io", "name": "c"}}],
+             "references": [{"type": "WEB", "url": "https://github.com/o/c/commit/" + "e" * 40}]},
+        ]
+        z = create_zip_fixture(records)
+        _, _, rows = build_catalog_and_index(z, parse_records_from_zip(z))
+        self.assertEqual([r["advisory_id"] for r in rows], ["RUSTSEC-2031-0001"])
+        self.assertEqual(rows[0]["reference_commit_shas"], ["e" * 40])
+        self.assertEqual(rows[0]["repo"], "o/c")
+        self.assertIn("GHSA-aaaa-bbbb-cccc", rows[0]["aliases"])
+
     def test_check_flag(self):
         # 1. Run generation
         fetch_rustsec.main(["--out-dir", str(self.out_dir), "--cache", str(self.cache_zip), "--offline"])
