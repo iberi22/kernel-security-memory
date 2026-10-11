@@ -185,6 +185,15 @@ pairs, 2026-10-11): fixed versions flagged against their own pair 1.7%, vulnerab
 versions found 14.6% (margin 0.05; 24% at 0.02, 33% at 0.01). Most fixes change
 too little structure to separate the versions; the margin stays conservative.
 
+The self-test compares each corpus function with its own pair, so it mostly
+checks that the scoring rules hold (a fixed version never violates its own
+missing-guard rule; tiny functions never score on similarity) rather than
+detection quality. Detection is measured by scanning real older releases
+(curl 7.50.0: 11 of 12 findings with score >= 0.9 matched fixes released after
+that version). Similarity only counts toward the score when both functions have
+at least 40 named nodes; a target guard counts as a precondition only on an
+earlier line and when it does not name the callee (a check of the call's result).
+
 Self-test metric reported in CI: share of corpus *after* functions that the matcher
 flags against their own CVE (should be 0) and share of *before* functions it finds
 (recall on the corpus). Thresholds change only with these numbers.
@@ -290,8 +299,9 @@ ksm audit PATH             regex auditor (scripts/defensive_auditor.py)
 ksm scan PATH [--json]     code-graph fingerprint on supported files + matcher report
 ```
 
-Data lookup order: `--data-dir`, `$KSM_DATA`, the repo checkout's `site/data`,
-`$XDG_DATA_HOME/ksm`. `ksm scan` needs `code-graph` on `PATH` (or `$KSM_CODE_GRAPH`);
+Data lookup order: `--data-dir`, `$KSM_DATA`, the bundle installed by `ksm update`
+(`$XDG_DATA_HOME/ksm`), the repo checkout's `site/data`. `bundle.sha256` is served
+next to the bundle, so it detects corrupted downloads, not a compromised site. `ksm scan` needs `code-graph` on `PATH` (or `$KSM_CODE_GRAPH`);
 the release workflow attaches a Linux build.
 
 ## 8. Workflows

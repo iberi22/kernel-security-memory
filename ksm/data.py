@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import re
 import shutil
 import tarfile
 import tempfile
@@ -14,12 +15,28 @@ from typing import Any, Optional, Union
 DEFAULT_UPDATE_URL = "https://iberi22.github.io/kernel-security-memory/data/"
 
 
+# Advisory ids are path components: CVE-..., OSV-..., letters, digits and dashes only.
+CVE_ID_RE = re.compile(r"^[A-Z][A-Z0-9]*-[A-Z0-9-]+$")
+CWE_ID_RE = re.compile(r"^(CWE-\d+|UNKNOWN)$")
+PROJECT_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
+
+
+def _user_data_dir() -> Path:
+    """Where `ksm update` installs the bundle: $XDG_DATA_HOME/ksm or ~/.local/share/ksm."""
+    xdg_data = os.environ.get("XDG_DATA_HOME")
+    if xdg_data and xdg_data.strip():
+        return (Path(xdg_data).expanduser() / "ksm").resolve()
+    return (Path.home() / ".local" / "share" / "ksm").resolve()
+
+
 def resolve_data_dir(data_dir: Optional[Union[str, Path]] = None) -> Path:
     """Resolve the KSM data directory in precedence order:
-    1. --data-dir (explicit argument)
-    2. 
-    3. <repo checkout>/site/data (detected relative to package file)
-    4. /ksm (default ~/.local/share/ksm)
+    1. --data-dir
+    2. $KSM_DATA
+    3. the installed bundle ($XDG_DATA_HOME/ksm), when `ksm update` has run
+    4. <repo checkout>/site/data, when built locally
+    5. the bundle location (default for `ksm update`)
+    `ksm update` writes to 1, 2 or 5, so reads after an update always see it.
     """
     if data_dir is not None and str(data_dir).strip():
         return Path(data_dir).expanduser().resolve()
@@ -28,16 +45,15 @@ def resolve_data_dir(data_dir: Optional[Union[str, Path]] = None) -> Path:
     if env_ksm_data and env_ksm_data.strip():
         return Path(env_ksm_data).expanduser().resolve()
 
-    # Relative to package: ksm/data.py -> repo root -> site/data
+    user_dir = _user_data_dir()
+    if (user_dir / "index.json").is_file():
+        return user_dir
+
     repo_site_data = Path(__file__).resolve().parent.parent / "site" / "data"
-    if repo_site_data.is_dir():
+    if (repo_site_data / "index.json").is_file():
         return repo_site_data.resolve()
 
-    xdg_data = os.environ.get("XDG_DATA_HOME")
-    if xdg_data and xdg_data.strip():
-        return (Path(xdg_data).expanduser() / "ksm").resolve()
-
-    return (Path.home() / ".local" / "share" / "ksm").resolve()
+    return user_dir
 
 
 def _is_safe_tar_member(member: tarfile.TarInfo) -> bool:
@@ -69,11 +85,7 @@ def update(
         if env_ksm_data and env_ksm_data.strip():
             dest_path = Path(env_ksm_data).expanduser().resolve()
         else:
-            xdg_data = os.environ.get("XDG_DATA_HOME")
-            if xdg_data and xdg_data.strip():
-                dest_path = (Path(xdg_data).expanduser() / "ksm").resolve()
-            else:
-                dest_path = (Path.home() / ".local" / "share" / "ksm").resolve()
+            dest_path = _user_data_dir()
 
     # Normalize base URL
     raw_url = str(url).strip()
@@ -200,6 +212,8 @@ def load_search(data_dir: Optional[Union[str, Path]] = None) -> list[list[Any]]:
 
 def load_cwe(cwe_id: str, data_dir: Optional[Union[str, Path]] = None) -> dict[str, Any]:
     """Load cwe/<cwe_id>.json from the resolved data directory."""
+    if not CWE_ID_RE.match(cwe_id.strip().upper()):
+        raise FileNotFoundError(f"not a CWE id: {cwe_id!r}")
     data_path = resolve_data_dir(data_dir)
     target = data_path / "cwe" / f"{cwe_id.upper()}.json"
     if not target.is_file():
@@ -211,6 +225,8 @@ def load_cwe(cwe_id: str, data_dir: Optional[Union[str, Path]] = None) -> dict[s
 
 def load_cve(project: str, cve_id: str, data_dir: Optional[Union[str, Path]] = None) -> dict[str, Any]:
     """Load cve/<project>/<cve_id>.json from the resolved data directory."""
+    if not CVE_ID_RE.match(cve_id.strip().upper()) or not PROJECT_RE.match(project):
+        raise FileNotFoundError(f"not a CVE id / project name: {cve_id!r} {project!r}")
     data_path = resolve_data_dir(data_dir)
     target = data_path / "cve" / project / f"{cve_id.upper()}.json"
     if not target.is_file():

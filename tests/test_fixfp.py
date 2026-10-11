@@ -248,6 +248,30 @@ class TestBuildOne(unittest.TestCase):
         self.assertIsNotNone(fns[0]["before"])
         self.assertIsNotNone(fns[0]["after"])
 
+    def test_renamed_file_reads_vulnerable_side_from_previous_path(self):
+        fetched = []
+        cand = {"project": "curl", "advisory_id": "CVE-2030-9006", "fix_sha": FIX, "cwe": None}
+        renamed = dict(fake_file("lib/new.c", "@@ -10,3 +10,4 @@ f\n ctx\n-old\n+new\n+more\n ctx\n",
+                                 status="renamed"), previous_filename="lib/old.c")
+        fc, _, rf = self._fakes(fake_commit([renamed]))
+
+        def fetch_blob(repo, sha, path):
+            fetched.append((sha, path))
+            return b"bytes"
+        doc, _ = build_one(cand, self.out, fetch_commit=fc, fetch_blob=fetch_blob, run_fingerprint=rf)
+        self.assertIn((PARENT, "lib/old.c"), fetched)
+        self.assertIn((FIX, "lib/new.c"), fetched)
+        self.assertIsNotNone(doc["files"][0]["functions"][0]["before"])
+
+    def test_commit_at_api_file_limit_is_partial(self):
+        cand = {"project": "curl", "advisory_id": "CVE-2030-9007", "fix_sha": FIX, "cwe": None}
+        files = [fake_file("lib/socks.c", "@@ -10,3 +10,4 @@ f\n ctx\n-old\n+new\n+more\n ctx\n")]
+        files += [fake_file(f"lib/f{i}.c", "@@ -10,3 +10,4 @@ f\n ctx\n-old\n+new\n+more\n ctx\n")
+                  for i in range(299)]
+        fc, fb, rf = self._fakes(fake_commit(files))
+        doc, _ = build_one(cand, self.out, fetch_commit=fc, fetch_blob=fb, run_fingerprint=rf)
+        self.assertEqual(doc["coverage"], "PARTIAL")
+
     def test_test_directories_skipped(self):
         cand = {"project": "curl", "advisory_id": "CVE-2030-9005", "fix_sha": FIX, "cwe": None}
         commit = fake_commit([fake_file("tests/unit/unit1.c", "@@ -1 +1 @@\n-a\n+b\n")])

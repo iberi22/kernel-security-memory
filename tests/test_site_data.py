@@ -172,6 +172,18 @@ class TestEvidenceOutsideCatalogs(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
+    def test_path_like_ids_never_become_files(self):
+        import shutil
+        repo = Path(self.tmp.name) / "repo2"
+        shutil.copytree(self.repo, repo)
+        cat = repo / "docs" / "studies" / "cve-history" / "curl" / "catalog.jsonl"
+        with open(cat, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps({"advisory_id": "../../escape", "cwe": "../x", "fix_shas": []}) + "\n")
+        out = Path(self.tmp.name) / "out2"
+        build_site_data(repo_root=repo, out_dir=out, no_bundle=True)
+        self.assertFalse((Path(self.tmp.name) / "escape.json").exists())
+        self.assertEqual([p for p in out.rglob("*") if ".." in p.name or p.name == "escape.json"], [])
+
     def test_pack_only_cve_is_listed(self):
         cve = json.loads((self.out / "cve" / "nginx" / "CVE-2031-0001.json").read_text())
         self.assertEqual(cve["catalogs"], ["pack"])

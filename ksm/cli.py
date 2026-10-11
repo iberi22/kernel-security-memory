@@ -375,7 +375,13 @@ def _cmd_scan(args: argparse.Namespace) -> int:
                     except OSError:
                         continue
 
-    if args.max_files is not None and args.max_files >= 0:
+    if not collected_files:
+        sys.stderr.write(f"Error: no supported source files under {target_path} "
+                         f"({', '.join(sorted(SUPPORTED_EXTENSIONS))}).\n")
+        return 2
+    if args.max_files is not None and 0 <= args.max_files < len(collected_files):
+        sys.stderr.write(f"Warning: scanning the first {args.max_files} of "
+                         f"{len(collected_files)} files (--max-files).\n")
         collected_files = collected_files[: args.max_files]
 
     # Resolve code-graph binary

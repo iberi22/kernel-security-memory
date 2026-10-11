@@ -309,6 +309,24 @@ if len(sys.argv) >= 3 and sys.argv[1] == "fingerprint":
             else:
                 os.environ.pop("KSM_CODE_GRAPH", None)
 
+    def test_scan_without_supported_files_is_an_error(self):
+        empty = Path(self.tmp_dir) / "docs"
+        empty.mkdir()
+        (empty / "notes.txt").write_text("x\n")
+        env_backup = os.environ.get("KSM_CODE_GRAPH")
+        try:
+            os.environ["KSM_CODE_GRAPH"] = str(self.code_graph_bin)
+            err_buf = io.StringIO()
+            with redirect_stderr(err_buf), redirect_stdout(io.StringIO()):
+                code = main(["scan", str(empty), "--data-dir", self.data_dir])
+            self.assertEqual(code, 2)
+            self.assertIn("no supported source files", err_buf.getvalue())
+        finally:
+            if env_backup is not None:
+                os.environ["KSM_CODE_GRAPH"] = env_backup
+            else:
+                os.environ.pop("KSM_CODE_GRAPH", None)
+
     def test_scan_missing_binary(self):
         env_backup = os.environ.get("KSM_CODE_GRAPH")
         path_backup = os.environ.get("PATH")
@@ -399,6 +417,39 @@ class TestKsmUpdateAndData(unittest.TestCase):
                 os.environ["KSM_DATA"] = old_env
             else:
                 os.environ.pop("KSM_DATA", None)
+
+    def test_installed_bundle_wins_over_local_site_build(self):
+        # After `ksm update` (which writes the XDG dir) reads must use it, even
+        # in a checkout that also has a locally built site/data.
+        with tempfile.TemporaryDirectory() as tmp:
+            from unittest import mock
+            import ksm.data as data_mod
+            xdg = Path(tmp) / "xdg"
+            (xdg / "ksm").mkdir(parents=True)
+            (xdg / "ksm" / "index.json").write_text("{}")
+            repo = Path(tmp) / "repo"
+            (repo / "site" / "data").mkdir(parents=True)
+            (repo / "site" / "data" / "index.json").write_text("{}")
+            saved = {k: os.environ.get(k) for k in ("XDG_DATA_HOME", "KSM_DATA")}
+            try:
+                os.environ.pop("KSM_DATA", None)
+                os.environ["XDG_DATA_HOME"] = str(xdg)
+                with mock.patch.object(data_mod, "__file__", str(repo / "ksm" / "data.py")):
+                    self.assertEqual(resolve_data_dir(), (xdg / "ksm").resolve())
+            finally:
+                for k, v in saved.items():
+                    if v is None:
+                        os.environ.pop(k, None)
+                    else:
+                        os.environ[k] = v
+
+    def test_path_like_ids_are_rejected(self):
+        with self.assertRaises(FileNotFoundError):
+            load_cve("curl", "../../index", FIXTURE_DATA_DIR)
+        with self.assertRaises(FileNotFoundError):
+            load_cve("../cwe", "CVE-2099-1001", FIXTURE_DATA_DIR)
+        with self.assertRaises(FileNotFoundError):
+            load_cwe("../index", FIXTURE_DATA_DIR)
 
     def test_shard_helpers(self):
         idx = load_index(FIXTURE_DATA_DIR)

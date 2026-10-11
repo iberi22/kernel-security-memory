@@ -1,6 +1,6 @@
-from collections import defaultdict
 """Vulnerability Atlas site data builder."""
 
+from collections import defaultdict
 from datetime import datetime, timezone
 import gzip
 import hashlib
@@ -14,6 +14,8 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ksm.cwe_groups import GROUP_NAMES, get_cwe_group
 from ksm.related import compute_related_and_vectors
+
+SAFE_ID_RE = re.compile(r"^[A-Z][A-Z0-9]*-[A-Za-z0-9-]+$")
 
 REPO_MAP: Dict[str, Optional[str]] = {
     "linux": "torvalds/linux",
@@ -275,7 +277,8 @@ def build_site_data(
                     continue
                 row = json.loads(line)
                 adv_id = row.get("advisory_id")
-                if not adv_id:
+                # Ids become file names (cve/<project>/<id>.json): no separators.
+                if not adv_id or not SAFE_ID_RE.match(adv_id):
                     continue
                 key = (proj_name, adv_id)
 
@@ -327,7 +330,7 @@ def build_site_data(
     for (proj_name, adv_id), ev in sorted(
             list(fragments_map.items()) + list(fingerprints_map.items()), key=lambda kv: kv[0]):
         key = (proj_name, adv_id)
-        if key in merged_cves:
+        if key in merged_cves or not SAFE_ID_RE.match(adv_id):
             continue
         sha = ev.get("fix_commit") or ev.get("fix_sha")
         merged_cves[key] = {
@@ -416,7 +419,7 @@ def build_site_data(
             pstat["years"][pub[:4]] += 1
 
         # CWE ID and Group
-        cwe_key = cwe_id if (cwe_id and cwe_id != "UNKNOWN") else "UNKNOWN"
+        cwe_key = cwe_id if (cwe_id and re.match(r"^CWE-\d+$", cwe_id)) else "UNKNOWN"
         cwe_grp = get_cwe_group(cwe_key)
         group_cve_counts[cwe_grp] += 1
 

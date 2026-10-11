@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -54,6 +55,7 @@ EXT_TO_LANG = {
 
 
 RATE_LIMIT_STATUSES = (403, 429)
+COMMIT_API_FILE_LIMIT = 300
 
 
 class FetchError(RuntimeError):
@@ -343,7 +345,7 @@ def fetch_commit_default(repo, sha):
 
 
 def fetch_blob_default(repo, sha, path):
-    url = f"https://raw.githubusercontent.com/{repo}/{sha}/{path}"
+    url = f"https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(path)}"
     req = urllib.request.Request(url, headers={"User-Agent": "ksm-fixfp"})
     try:
         with urllib.request.urlopen(req, timeout=120) as resp:
@@ -413,6 +415,8 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
     if not parent_sha:
         raise FetchError("no parent commit")
     files = commit.get("files", []) or []
+    # The commit API lists at most 300 files; a larger fix is only partly seen.
+    truncated = len(files) >= COMMIT_API_FILE_LIMIT
 
     doc_files = []
     skipped = 0
@@ -439,7 +443,11 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
                 if status == "added":
                     before_bytes = None
                 else:
-                    before_bytes = fetch_blob(repo_used, parent_sha, path)
+                    # A renamed or copied file lived at previous_filename in the parent.
+                    before_path = f.get("previous_filename") or path
+                    before_bytes = fetch_blob(repo_used, parent_sha, before_path)
+                    if before_bytes is None:
+                        skipped += 1
                 if status == "removed":
                     after_bytes = None
                 else:
@@ -494,13 +502,13 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
             doc_files.append({"path": path, "language": lang, "functions": fns})
         doc_files.sort(key=lambda x: x["path"])
 
-    if not doc_files and skipped and not parser_skipped:
-        coverage = "PARTIAL"
-    elif not doc_files and parser_skipped:
+    if not doc_files and parser_skipped and not skipped:
         coverage = "PARSER_SKIPPED"
     elif not doc_files:
-        coverage = "FETCH_FAILED"
-    elif skipped or parser_skipped:
+        # No supported source change (or none left after skips): nothing failed
+        # to download, the commit just has no fingerprintable functions.
+        coverage = "PARTIAL"
+    elif skipped or parser_skipped or truncated:
         coverage = "PARTIAL"
     else:
         coverage = "OK"

@@ -32,7 +32,7 @@ def load_corpus(fingerprints_dir):
             d = json.loads(fp.read_text(encoding="utf-8"))
         except Exception:
             continue
-        if d.get("schema") != "ksm-fixfp/1":
+        if not isinstance(d, dict) or d.get("schema") != "ksm-fixfp/1":
             continue
         docs.append(d)
     docs.sort(key=lambda d: (str(d.get("project", "")), str(d.get("advisory_id", "")),
@@ -147,6 +147,15 @@ def guard_rules(before, after, delta):
     return out
 
 
+def _precondition_guard(guards, var, call_line, callee):
+    """A guard on `var` before the call that is not a check of the call's own
+    result (`if (f(x) == NULL)` names the callee). Same rule as on the fix side,
+    without the distance window: any earlier check counts in the target."""
+    return any(var in (g.get("vars", []) or []) and callee not in (g.get("vars", []) or [])
+               and int(g.get("line", 0)) < call_line
+               for g in guards or [])
+
+
 def find_missing_guards(t_fn, rules):
     """Calls in T matching a rule whose argument variable has no earlier guard."""
     out = []
@@ -161,7 +170,7 @@ def find_missing_guards(t_fn, rules):
             if c != callee or i >= len(args) or not args[i]:
                 continue
             var = args[i]
-            if _guard_has_var((t_fn or {}).get("guards", []), var, line + 1):
+            if _precondition_guard((t_fn or {}).get("guards", []), var, line, callee):
                 continue
             key = (line, var, callee)
             if key not in seen:
@@ -177,9 +186,12 @@ def commit_url(project, repo, fix_sha):
     return f"https://github.com/{repo}/commit/{fix_sha}"
 
 
-def _pair_score(s_b, s_a, n_missing):
-    score = s_b - max(0.0, s_a - s_b) + 0.1 * n_missing
-    return min(1.0, max(0.0, score))
+def _pair_score(s_b, s_a, n_missing, sized):
+    """Contract score; similarity only counts when both functions are large
+    enough (tiny functions look alike), so a tiny function scores 0.1 per
+    missing guard at most."""
+    base = s_b - max(0.0, s_a - s_b) if sized else 0.0
+    return min(1.0, max(0.0, base + 0.1 * n_missing))
 
 
 def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
@@ -235,13 +247,13 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
                     continue
                 s_b = cosine(t_kg, before.get("kgrams", {}) or {})
                 s_a = cosine(t_kg, (after or {}).get("kgrams", {}) or {}) if after else 0.0
-                structural = (s_b >= min_before and s_b >= s_a + margin
-                              and int(tfn.get("node_count", min_nodes)) >= min_nodes
-                              and int(before.get("node_count", min_nodes)) >= min_nodes)
+                sized = (int(tfn.get("node_count", min_nodes)) >= min_nodes
+                         and int(before.get("node_count", min_nodes)) >= min_nodes)
+                structural = sized and s_b >= min_before and s_b >= s_a + margin
                 missing = find_missing_guards(tfn, rules[i])
                 if not structural and not missing:
                     continue
-                score = _pair_score(s_b, s_a, len(missing))
+                score = _pair_score(s_b, s_a, len(missing), sized)
                 matches.append({
                     "advisory_id": doc.get("advisory_id", ""),
                     "project": doc.get("project", ""),
@@ -255,6 +267,7 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
                     "s_before": round(s_b, 4),
                     "s_after": round(s_a, 4),
                     "missing_guards": missing,
+                    "structural": structural,
                     "_score": score,
                 })
             if not matches:
@@ -265,7 +278,7 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
             seen_lines = set()
             reasons = []
             for m in matches:
-                if m["s_before"] >= min_before and m["s_before"] >= m["s_after"] + margin:
+                if m["structural"]:
                     reasons.append(
                         f"looks like {m['advisory_id']} vulnerable "
                         f"{tname} (s_before={m['s_before']:.2f} vs s_after={m['s_after']:.2f})")

@@ -69,7 +69,7 @@ def extract_cve_features(
 
     # 7. Callees added/removed & 8. Structural kgrams (from fingerprints)
     if fingerprint:
-        functions = fingerprint.get("functions", [])
+        functions = list(fingerprint.get("functions", []) or [])
         if not functions and "files" in fingerprint:
             for file_obj in fingerprint["files"]:
                 functions.extend(file_obj.get("functions", []))

@@ -186,6 +186,42 @@ class TestMissingGuards(unittest.TestCase):
         self.assertEqual(findings, [])
 
 
+class TestReviewRegressions(unittest.TestCase):
+    def _rule_corpus(self, node_count=100):
+        before = fn("f", {"aa": 1}, mh=[7] * 64,
+                    calls=[{"callee": "memcpy", "line": 3, "args": ["d", "s", "n"]}])
+        after = fn("f", {"bb": 1}, mh=[7] * 64,
+                   calls=[{"callee": "memcpy", "line": 5, "args": ["d", "s", "n"]}],
+                   guards=[{"kind": "if", "line": 4, "vars": ["n"]}])
+        before["node_count"] = after["node_count"] = node_count
+        return [pair_doc(before=before, after=after,
+                         delta={"added_guards": [{"kind": "if", "vars": ["n"]}]})]
+
+    def test_tiny_function_is_never_strong_or_structural(self):
+        t = fn("f", {"aa": 1}, mh=[7] * 64,
+               calls=[{"callee": "memcpy", "line": 9, "args": ["d", "s", "len"]}])
+        t["node_count"] = 10
+        got = match_documents([tdoc("t.c", [t])], self._rule_corpus(node_count=10))
+        self.assertEqual(len(got), 1)  # the missing guard is still reported
+        self.assertLess(got[0]["score"], 0.9)
+        self.assertFalse(any(r.startswith("looks like") for r in got[0]["reasons"]))
+
+    def test_result_check_on_the_call_line_is_not_a_precondition(self):
+        t = fn("f", {"zz": 1}, mh=[7] * 64,
+               calls=[{"callee": "memcpy", "line": 9, "args": ["d", "s", "len"]}],
+               guards=[{"kind": "if", "line": 9, "vars": ["d", "len", "memcpy", "s"]}])
+        got = match_documents([tdoc("t.c", [t])], self._rule_corpus())
+        self.assertEqual([(g["line"], g["variable"]) for g in got[0]["lines"]], [(9, "len")])
+
+    def test_non_object_corpus_file_is_ignored(self):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, "x.json").write_text(json.dumps([1, 2]))
+            Path(tmp, "y.json").write_text(json.dumps(pair_doc()))
+            self.assertEqual(len(load_corpus(tmp)), 1)
+
+
 class TestOrderingAndRender(unittest.TestCase):
     def test_deterministic_ordering(self):
         c1 = pair_doc(adv="CVE-2030-0001", before=fn("f", {"aa": 5}, mh=[7] * 64),

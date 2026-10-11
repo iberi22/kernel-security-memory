@@ -16,7 +16,7 @@ Date: 2026-10-11 UTC (vulnerability atlas).
 | OSS Scanner integration | `scripts/oss_scanner/threat_model.py` writes an OSS-Scanner `threat_model.md` from a human context file plus KSM evidence; `enroll.py` writes `project.yaml` and validates it with the upstream `tools/validate.py`; selection manifest of the 23 enrolled projects (17 with OSV GIT data) | `docs/OSS-SCANNER.md`, `docs/studies/selection/oss-scanner-projects.json` |
 | Vulnerability Atlas | Static UI (`site/`) over generated site data: 18,434 CVEs in 12 projects (evidence-pack CVEs missing from catalogs included), CWE names from MITRE, top-10 related CVEs per CVE by TF-IDF over shared metadata. `ksm` CLI (`pyproject.toml`). Before/after code is fetched live from GitHub | `scripts/site/build_site_data.py`, `ksm/` |
 | Fix fingerprints | 100 fix commits (60 curl, 40 OpenSSL), 195 changed functions, 178 with both versions, produced by Xavier `code-graph fingerprint`; no source text. Matcher self-test: fixed versions flagged against their own pair 1.7%, vulnerable versions found 14.6%. `ksm scan` of curl 7.50.0: 11 of 12 findings with score >= 0.9 matched fixes released after that version | `docs/studies/fingerprints/`, `ksm/match.py` |
-| Tests | 764 run, 4 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| Tests | 773 run, 4 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 
