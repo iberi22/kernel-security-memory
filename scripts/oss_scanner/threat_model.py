@@ -286,7 +286,14 @@ def main(argv=None):
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
 
-    ctx = load_context(args.context)
+    try:
+        ctx = load_context(args.context)
+    except (OSError, ValueError) as exc:
+        print(f"error: invalid context {args.context}: {exc}", file=sys.stderr)
+        return 2
+    except Exception as exc:  # noqa: BLE001 - PyYAML parse errors
+        print(f"error: cannot parse context {args.context}: {type(exc).__name__}: {exc}", file=sys.stderr)
+        return 2
     lang_counts, hotspots = audit_repo(args.repo, ctx["leave_alone"])
     families, digest = load_guardrails()
     text = render(args.name, ctx, lang_counts, hotspots, families,

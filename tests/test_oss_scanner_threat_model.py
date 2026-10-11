@@ -69,6 +69,13 @@ class ThreatModelTest(unittest.TestCase):
             args += ["--out", str(out)]
         return run_script(*args)
 
+    def test_unparseable_context_is_a_clean_error(self):
+        self.ctx.write_text("description: x\nexercise:\n  - `bad`\n", encoding="utf-8")
+        result = self._generate(self.out)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("cannot parse context", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+
     def test_headings_present(self):
         result = self._generate(self.out)
         self.assertEqual(result.returncode, 0, result.stderr)
