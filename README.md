@@ -18,6 +18,7 @@ ksm doctor                      # verify data and scanner readiness (exits 0 whe
 ksm stats
 ksm show CVE-2016-8619          # metadata, fix commits, what the fix changed, related CVEs
 ksm search read_data
+ksm deps path/to/repo           # locked dependencies with published advisories (OSV)
 ksm audit path/to/code          # regex rules of the defensive auditor
 ksm scan path/to/code           # structural match against fix fingerprints
 ```
@@ -40,7 +41,7 @@ ksm audit path/to/code          # regex rules of the defensive auditor
 ksm scan path/to/code           # structural match against fix fingerprints
 ```
 
-`ksm scan` needs Xavier's `code-graph` with the `fingerprint` subcommand (`KSM_CODE_GRAPH` or `PATH`): `cargo install --locked --git https://github.com/iberi22/xavier --rev <XAVIER_REV from .github/workflows/fingerprints.yml> code-graph`. It reports functions that look more like the vulnerable version of a known fix than the fixed one, and calls missing a check that the fix added, with file, line and variable. Findings are hypotheses to review. Measured on five old releases (curl 7.50.0, OpenSSL 1.0.1, git 2.0.0, systemd 230, SQLite 3.8.0; 27,948 functions): 47 of 51 findings with score >= 0.9 matched a fix of the same project published after the release, and fixes of other projects produced no strong finding. Matching is therefore useful for missing patches of a known project; it does not yet find the same bug in unrelated code.
+`ksm scan` needs the `code-graph` scanner (`ksm setup` installs it; or `KSM_CODE_GRAPH` / `PATH`, or build it: `cargo install --locked --git https://github.com/iberi22/xavier --rev <XAVIER_REV from .github/workflows/fingerprints.yml> code-graph`). It reports functions that look more like the vulnerable version of a known fix than the fixed one, and calls missing a check that the fix added, with file, line and variable. Findings are hypotheses to review. Measured on five old releases (curl 7.50.0, OpenSSL 1.0.1, git 2.0.0, systemd 230, SQLite 3.8.0; 27,948 functions): 43 of 47 findings with score >= 0.9 matched a fix of the same project published after the release, and fixes of other projects produced no strong finding. Matching is therefore useful for missing patches of a known project; it does not yet find the same bug in unrelated code.
 
 Prebuilt Linux binary in the [releases page](https://github.com/iberi22/kernel-security-memory/releases) (`code-graph-<rev>` tags), verify with the .sha256 file.
 

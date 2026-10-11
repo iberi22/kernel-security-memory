@@ -41,7 +41,25 @@ agent to review.
 
 ## Acceptance test
 
-Run on `iberi22/edge-hive` (Rust workspace plus a TypeScript admin UI), read-only:
-`ksm doctor`, `ksm deps`, `ksm audit`, `ksm scan`, the MCP tools through a stdio
-client, and an agent that is given only `skills/ksm/SKILL.md` and asked to
-security-check the repository. Results are recorded in `docs/STATUS.md`.
+Run on `iberi22/edge-hive` (Rust workspace plus a TypeScript admin UI), read-only,
+2026-10-11:
+
+- An agent (Gemini 3.8 flash, low effort) given only `skills/ksm/SKILL.md`, a fresh
+  install and an empty data dir ran `ksm update`, `ksm setup` (the release binary
+  was not published yet: 404, then it used the `--from-cargo` fallback the tool
+  printed), `ksm doctor` (ready), then `deps`, `audit` and `scan` with `--json`,
+  read the top findings in the code and wrote a report in the skill's template.
+  No step needed help.
+- `ksm deps` on the working tree: 176 advisories in 74 locked packages
+  (Cargo.lock 120, edge-hive-admin/src-tauri/Cargo.lock 18, edge-hive-admin/package-lock.json 38),
+  e.g. wasmtime 41.0.4 RUSTSEC-2026-0085 (fixed in 42.0.2), checked against
+  api.osv.dev directly. The repository ignores `Cargo.lock` in `.gitignore`, so a
+  clean clone exposes only the npm lockfile: commit `Cargo.lock` for applications.
+- `ksm audit`: 3 findings in shell scripts; the agent judged
+  `scripts/sync-issues.sh:131` (`eval $cmd` with a title read from markdown
+  front matter) a real injection risk with low exposure, the other two safe.
+- `ksm scan` with 726 RustSec fix fingerprints: 0 strong, 24 weak findings
+  (none confirmed). Rust coverage is new; strong matches need code derived from a
+  fixed crate.
+- The MCP server answered `initialize`, `tools/list` (7 tools) and `ksm_deps`
+  (176 findings) over stdio.

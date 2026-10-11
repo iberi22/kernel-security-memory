@@ -349,7 +349,7 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
 
 # Score at or above which a finding is reported as strong. Measured on five old
 # releases (scripts/fingerprints/evaluate_release.py, 397 fix fingerprints):
-# 47 of 51 strong findings matched a fix of that project published after the
+# 43 of 47 strong findings matched a fix of that project published after the
 # release, and none came from another project's fixes.
 STRONG_SCORE = 0.9
 
