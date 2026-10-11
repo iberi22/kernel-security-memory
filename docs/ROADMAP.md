@@ -1,6 +1,6 @@
 # Roadmap
 
-| Stage | Deliverable | Current state (2026-10-10) |
+| Stage | Deliverable | Current state (2026-10-11) |
 |---|---|---|
 | 0 | Public docs, evidence contract, JSON/SQL packaging | Done |
 | 1 | Remote seven-method sensitivity + retrieval smoke | Dispatched to Jules; no measured ranking yet |
@@ -9,7 +9,7 @@
 | 4 | Curated causal lessons + independent label review | Partial: 35 pack records, lessons kept as hypotheses; no independent label review yet |
 | 5 | Hybrid retrieval and revocable Xavier adapter | Partial: dry-run publisher, quality gate that rejects stale evidence, injectable guardrails for 6 CWE families; vectors not built |
 | 6 | Larger time/family-separated evaluation, refresh pipeline | Partial: weekly refresh workflow proposes PRs; no evaluation yet |
-| Later | Additional open-source projects with selection manifest | 19 catalogs exist; selection manifest pending |
+| Later | Additional open-source projects with selection manifest | 19 catalogs; selection manifest of the 23 OSS Scanner projects (`docs/studies/selection/`) |
 
 ## Next
 
@@ -17,6 +17,8 @@
 2. Promote verified catalog rows to pack records (with commit metadata) so guardrails can cite more than three examples per family.
 3. CWE for the remaining `noinfo` ids: anything model-assisted is stored as `hypothesis` with its method, never as `observed`.
 4. Build vectors and evaluate retrieval on a time-separated split.
-5. Look for official feeds for openssh, nginx, qemu, unbound and glibc (distribution trackers, mailing-list archives) before relying on NVD keyword search.
+5. Add OSV repo-scoped catalogs for the 17 OSS Scanner projects with OSV GIT data.
+6. Ingest OSS Scanner findings of enrolled SWAL projects as `hypothesis` records once a real report exists.
+7. Look for official feeds for openssh, nginx, qemu, unbound and glibc (distribution trackers, mailing-list archives) before relying on NVD keyword search.
 
 Each stage needs evidence, source snapshots, exact verification and honest incomplete status. Generated explanations are never published automatically.

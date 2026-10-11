@@ -1,6 +1,6 @@
 # Status
 
-Date: 2026-10-10 UTC.
+Date: 2026-10-11 UTC.
 
 ## Measured state
 
@@ -13,11 +13,12 @@ Date: 2026-10-10 UTC.
 | CWE coverage | 9,617 of 18,424 clustered CVEs (52.2%) are `UNKNOWN` (was 97.6%): 468 CWEs stated by catalogs, 8,339 from the deterministic overlay (NVD 2.0 primary 7,920, CISA vulnrichment ADP 376, NVD secondary 43). The remainder are NVD/CISA `noinfo` or pre-2002 ids. 65 ids present in two catalogs are counted once | `docs/studies/cwe-overlay.jsonl`, `docs/studies/pattern_clusters.json` |
 | Fix fragments | 35 pack records: 90 files, 97 functions (94 parsed, 3 `PARSER_SKIPPED`); line ranges and body hashes only, no code | `docs/studies/fragments/` |
 | Agent guardrails | 6 CWE families, 16 citations, every fix commit verified upstream | `docs/skills/defensive-security-auditor/references/guardrails.md` |
-| Tests | 653 run, 1 skipped (live-network smoke test) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| OSS Scanner integration | `scripts/oss_scanner/threat_model.py` writes an OSS-Scanner `threat_model.md` from a human context file plus KSM evidence; `enroll.py` writes `project.yaml` and validates it with the upstream `tools/validate.py`; selection manifest of the 23 enrolled projects (17 with OSV GIT data) | `docs/OSS-SCANNER.md`, `docs/studies/selection/oss-scanner-projects.json` |
+| Tests | 672 run, 3 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 
-Evidence schema and deterministic JSON/SQL pack; read-only lexical+graph pack reader; honest catalog states (`NOT_FETCHED`, `CURSOR_PAUSED`, `SNAPSHOT_COMPLETE`); fix-SHA resolution from the kernel CNA, OSV and project advisory feeds; git-mirror SHA verification; heuristic C function-fragment miner with explicit `PARSER_SKIPPED` / `INCOMPLETE` coverage; CWE pattern clusters and typed SQLite graph; defensive auditor with a reproducible evidence hash and a publication quality gate; Fable-to-pack converter backed by cached GitHub commit metadata; `scripts/studies/refresh_all.py` plus a weekly workflow that proposes catalog refreshes as a pull request.
+Evidence schema and deterministic JSON/SQL pack; read-only lexical+graph pack reader; honest catalog states (`NOT_FETCHED`, `CURSOR_PAUSED`, `SNAPSHOT_COMPLETE`); fix-SHA resolution from the kernel CNA, OSV and project advisory feeds; git-mirror SHA verification; heuristic C function-fragment miner with explicit `PARSER_SKIPPED` / `INCOMPLETE` coverage; CWE pattern clusters and typed SQLite graph; defensive auditor with a reproducible evidence hash and a publication quality gate (Rust memory rules fire only inside `unsafe` code); Fable-to-pack converter backed by cached GitHub commit metadata; `scripts/studies/refresh_all.py` plus a weekly workflow that proposes catalog refreshes as a pull request.
 
 No LLM is used anywhere in extraction or enrichment.
 
