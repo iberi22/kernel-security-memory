@@ -97,12 +97,10 @@ class TestMCPServer(unittest.TestCase):
         tools = resps[0].get("result", {}).get("tools", [])
         tool_names = [t["name"] for t in tools]
 
-        expected_names = ["ksm_stats", "ksm_search", "ksm_show", "ksm_related", "ksm_audit", "ksm_scan"]
+        expected_names = ["ksm_stats", "ksm_search", "ksm_show", "ksm_related", "ksm_audit",
+                          "ksm_scan", "ksm_deps"]
         for expected in expected_names:
             self.assertIn(expected, tool_names)
-
-        # ksm_deps should NOT be present when ksm.deps is not importable
-        self.assertNotIn("ksm_deps", tool_names)
 
         # Check schemas
         for t in tools:
@@ -114,7 +112,7 @@ class TestMCPServer(unittest.TestCase):
 
     def test_tools_list_with_deps_available(self):
         stub = types.ModuleType("ksm.deps")
-        stub.scan_dependencies = lambda p, data_dir=None: [{"name": "fake-dep"}]
+        stub.run_deps = lambda p, data_dir=None: [{"name": "fake-dep"}]
         sys.modules["ksm.deps"] = stub
 
         req = {"jsonrpc": "2.0", "id": "tools-2", "method": "tools/list"}
@@ -345,7 +343,7 @@ if len(sys.argv) >= 3 and sys.argv[1] == "fingerprint":
     def test_tool_deps(self):
         # 1. When ksm.deps is available
         stub = types.ModuleType("ksm.deps")
-        stub.scan_dependencies = lambda p, data_dir=None: [{"dep": "libssl", "version": "3.0"}]
+        stub.run_deps = lambda p, data_dir=None: [{"dep": "libssl", "version": "3.0"}]
         sys.modules["ksm.deps"] = stub
 
         req = {
@@ -362,11 +360,11 @@ if len(sys.argv) >= 3 and sys.argv[1] == "fingerprint":
         self.assertEqual(len(parsed), 1)
         self.assertEqual(parsed[0]["dep"], "libssl")
 
-        # 2. When ksm.deps is NOT available
+        # 2. The real module: a missing path is a tool error, not a protocol error
         sys.modules.pop("ksm.deps", None)
         resps2 = process_requests([req], data_dir=self.data_dir)
         self.assertTrue(resps2[0].get("result", {}).get("isError"))
-        self.assertIn("Unknown tool", resps2[0]["result"]["content"][0]["text"])
+        self.assertIn("/fake/project", resps2[0]["result"]["content"][0]["text"])
 
     def test_unknown_tool_is_error(self):
         req = {

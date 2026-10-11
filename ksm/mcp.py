@@ -32,22 +32,22 @@ INTERNAL_ERROR = -32603
 
 
 def get_deps_module() -> Optional[Any]:
-    """Return ksm.deps module if importable with scan_dependencies, else None."""
+    """Return ksm.deps module if importable with run_deps, else None."""
     try:
         mod = importlib.import_module("ksm.deps")
-        if hasattr(mod, "scan_dependencies"):
+        if hasattr(mod, "run_deps"):
             return mod
     except (ImportError, AttributeError):
         pass
     if "ksm.deps" in sys.modules:
         mod = sys.modules["ksm.deps"]
-        if hasattr(mod, "scan_dependencies"):
+        if hasattr(mod, "run_deps"):
             return mod
     return None
 
 
 def is_deps_available() -> bool:
-    """Check if ksm.deps is importable and provides scan_dependencies."""
+    """Check if ksm.deps is importable and provides run_deps."""
     return get_deps_module() is not None
 
 
@@ -346,7 +346,7 @@ class MCPServer:
             if not path or not isinstance(path, str):
                 return tool_error("Missing required string parameter 'path'")
             try:
-                res = deps_mod.scan_dependencies(path, data_dir=self.data_dir)
+                res = deps_mod.run_deps(path, data_dir=self.data_dir)
                 return tool_content(res)
             except Exception as exc:
                 return tool_error(f"Error running ksm_deps: {exc}")

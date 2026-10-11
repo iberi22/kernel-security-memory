@@ -82,4 +82,4 @@ The server implements the standard MCP `tools/list` and `tools/call` methods:
 | `ksm_related` | `{"cve": string, "project"?: string}` | Returns related CVEs sharing features and similarity scores. |
 | `ksm_audit` | `{"path": string}` | Runs the defensive regex pattern auditor on the target file or directory and returns the evidence chain. |
 | `ksm_scan` | `{"path": string, "max_files"?: int}` | Scans source files with Xavier `code-graph` and matches against fix fingerprints. |
-| `ksm_deps` | `{"path": string}` | Scans dependencies when `ksm.deps` is available (automatically omitted from `tools/list` if unavailable). |
+| `ksm_deps` | `{"path": string}` | Locked dependencies with published advisories (OSV); needs network on the first query, then uses the local cache. |
