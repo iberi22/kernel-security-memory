@@ -1,0 +1,7 @@
+# Synthetic fixture: mirrors the shape of an oss-scanner projects/<name>/ dir.
+repo: https://github.com/example/alpha#main
+primary_contact: alpha-maintainer@example.org
+homepage: https://example.org/alpha
+disabled: false
+dockerfile: Dockerfile
+threat_model: docs/threat-model.md
