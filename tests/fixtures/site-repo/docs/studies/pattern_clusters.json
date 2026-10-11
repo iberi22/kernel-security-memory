@@ -1,0 +1,24 @@
+{
+  "clusters": [
+    {
+      "cwe_id": "CWE-787",
+      "title": "Out-of-bounds Write"
+    },
+    {
+      "cwe_id": "CWE-125",
+      "title": "Out-of-bounds Read"
+    },
+    {
+      "cwe_id": "CWE-476",
+      "title": "NULL Pointer Dereference"
+    },
+    {
+      "cwe_id": "CWE-416",
+      "title": "Use After Free"
+    },
+    {
+      "cwe_id": "UNKNOWN",
+      "title": "Unstated or Legacy Advisory Without CWE Classification"
+    }
+  ]
+}

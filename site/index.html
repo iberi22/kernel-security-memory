@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KSM Vulnerability Atlas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <button id="sidebar-toggle" class="btn-icon" aria-label="Toggle navigation drawer" aria-controls="sidebar" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <a href="#/" class="site-title" aria-label="KSM Vulnerability Atlas Home">
+        <span class="site-logo-badge">KSM</span>
+        <span class="site-title-text">Vulnerability Atlas</span>
+      </a>
+    </div>
+
+    <div class="topbar-center">
+      <form id="search-form" class="search-form" role="search">
+        <label for="search-input" class="sr-only">Search vulnerabilities</label>
+        <input type="search" id="search-input" class="search-input" placeholder="Search CVE, CWE, function, subsystem..." autocomplete="off">
+        <button type="submit" class="search-btn" aria-label="Submit search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="topbar-right">
+      <div id="header-totals" class="header-totals" aria-live="polite">
+        <span class="total-pill loading-pill">Loading catalog...</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <div id="sidebar-backdrop" class="sidebar-backdrop" tabindex="-1" aria-hidden="true"></div>
+    <aside id="sidebar" class="sidebar" aria-label="Catalog Navigation">
+      <div class="sidebar-header">
+        <div class="sidebar-title-row">
+          <span class="sidebar-heading">Navigation</span>
+          <button id="tree-mode-toggle" class="btn-text btn-sm" aria-label="Toggle tree hierarchy organization">
+            Group First
+          </button>
+        </div>
+      </div>
+      <nav id="nav-tree" class="nav-tree" aria-label="Vulnerabilities tree hierarchy">
+        <div class="tree-loading">Loading tree...</div>
+      </nav>
+    </aside>
+
+    <main id="main-content" class="main-content" tabindex="-1">
+      <div id="view-container" class="view-container" aria-live="polite">
+        <div class="view-loading">
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Loading KSM Vulnerability Atlas...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

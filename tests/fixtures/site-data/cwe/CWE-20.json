@@ -1,0 +1,15 @@
+{
+  "id": "CWE-20",
+  "name": "Improper Input Validation",
+  "group": "Input validation and paths",
+  "rows": [
+    [
+      "CVE-2099-1002",
+      "curl",
+      "2023-12-06",
+      true,
+      true,
+      true
+    ]
+  ]
+}

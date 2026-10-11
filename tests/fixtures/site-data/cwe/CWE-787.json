@@ -1,0 +1,15 @@
+{
+  "id": "CWE-787",
+  "name": "Out-of-bounds Write",
+  "group": "Memory safety",
+  "rows": [
+    [
+      "CVE-2099-1001",
+      "curl",
+      "2023-10-11",
+      true,
+      true,
+      true
+    ]
+  ]
+}

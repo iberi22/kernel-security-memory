@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kernel-security-memory"
+dynamic = ["version"]
+description = "Kernel Security Memory CLI and defensive security tools"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+ksm = "ksm.cli:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "ksm.__version__"}
+
+# The regex auditor stays at scripts/defensive_auditor.py (other scripts and
+# the guardrail docs cite that path); it is installed as the top-level module
+# `defensive_auditor`.
+[tool.setuptools]
+packages = ["ksm"]
+py-modules = ["defensive_auditor"]
+
+[tool.setuptools.package-dir]
+"" = "scripts"
+ksm = "ksm"

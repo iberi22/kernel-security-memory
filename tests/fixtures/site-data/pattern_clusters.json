@@ -1,0 +1,10 @@
+{
+  "schema_version": "pattern-clusters-v1",
+  "clusters": [
+    {
+      "cwe_id": "CWE-787",
+      "title": "Out-of-bounds Write",
+      "pattern_count": 1
+    }
+  ]
+}

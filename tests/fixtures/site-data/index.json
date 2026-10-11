@@ -1,0 +1,81 @@
+{
+  "schema": "ksm-site/1",
+  "ksm_commit": "abcdef1234567890abcdef1234567890abcdef12",
+  "generated": "2026-10-11T12:00:00Z",
+  "totals": {
+    "cves": 3,
+    "with_fix": 3,
+    "with_fragments": 2,
+    "with_fingerprint": 2,
+    "projects": 2
+  },
+  "projects": [
+    {
+      "name": "curl",
+      "repo": "curl/curl",
+      "catalogs": [
+        "curl",
+        "curl-upstream"
+      ],
+      "cves": 2,
+      "with_fix": 2,
+      "with_fragments": 2,
+      "with_fingerprint": 2,
+      "years": {
+        "2023": 2
+      }
+    },
+    {
+      "name": "linux",
+      "repo": "torvalds/linux",
+      "catalogs": [
+        "kernel"
+      ],
+      "cves": 1,
+      "with_fix": 1,
+      "with_fragments": 0,
+      "with_fingerprint": 0,
+      "years": {
+        "2024": 1
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "Memory safety",
+      "cves": 2,
+      "cwes": [
+        {
+          "id": "CWE-787",
+          "name": "Out-of-bounds Write",
+          "cves": 1,
+          "projects": {
+            "curl": 1
+          }
+        },
+        {
+          "id": "CWE-416",
+          "name": "Use After Free",
+          "cves": 1,
+          "projects": {
+            "linux": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "Input validation and paths",
+      "cves": 1,
+      "cwes": [
+        {
+          "id": "CWE-20",
+          "name": "Improper Input Validation",
+          "cves": 1,
+          "projects": {
+            "curl": 1
+          }
+        }
+      ]
+    }
+  ]
+}

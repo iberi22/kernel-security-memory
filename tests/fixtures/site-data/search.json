@@ -1,0 +1,23 @@
+[
+  [
+    "CVE-2099-1001",
+    "curl",
+    "CWE-787",
+    null,
+    "do_SOCKS5"
+  ],
+  [
+    "CVE-2099-1002",
+    "curl",
+    "CWE-20",
+    "cookie",
+    "Curl_cookie_add"
+  ],
+  [
+    "CVE-2099-1003",
+    "linux",
+    "CWE-416",
+    "net",
+    "nft_set_destroy"
+  ]
+]
