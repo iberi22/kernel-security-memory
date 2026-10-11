@@ -26,6 +26,11 @@ CATALOG_PATH = "docs/studies/cve-history/linux/catalog.jsonl"
 PER_RESPONSE_LIMIT = 1 * 1024 * 1024  # 1 MiB
 CUMULATIVE_LIMIT = 8 * 1024 * 1024    # 8 MiB
 MAX_REQUESTS = 400
+# Bound the read itself, not only by bytes: a stream that never reaches EOF and
+# never grows past PER_RESPONSE_LIMIT (a truncated or malformed stream) would
+# otherwise spin the read loop forever. A legitimate sub-1 MiB body needs <=128
+# 8 KiB reads, so this cap is far above any real response.
+MAX_READ_CHUNKS = 4096
 
 CWE_PATTERN = re.compile(r"^CWE-\d+$")
 CVE_PATTERN = re.compile(r"^CVE-[0-9]{4}-[0-9]{4,}$")
@@ -309,7 +314,16 @@ def fetch_history(max_calls=None):
             if prev_index.get("resume") and isinstance(prev_index["resume"], dict):
                 start_date_str = prev_index["resume"].get("next_start_date", start_date_str)
             elif prev_index.get("coverage") == "COMPLETE":
-                already_complete = True
+                # window.end is the date the last scan ran on, so a COMPLETE
+                # catalog whose stored end predates the run date has an
+                # unscanned gap: resume at stored_end + 1 day instead of
+                # returning "already COMPLETE" and going stale in silence.
+                gap_start = fetcher_io.complete_window_gap_start(prev_index)
+                if gap_start is None:
+                    already_complete = True
+                else:
+                    print(f"Reopening window: resuming at {gap_start.isoformat()}.")
+                    start_date_str = gap_start.isoformat()
 
     if os.path.exists(CATALOG_PATH):
         catalog_records = fetcher_io.read_catalog(CATALOG_PATH)
@@ -375,10 +389,16 @@ def fetch_history(max_calls=None):
                 with urllib.request.urlopen(req, timeout=25) as resp:
                     status_code = resp.status
                     body = bytearray()
+                    chunks_read = 0
                     while True:
                         chunk = resp.read(8192)
                         if not chunk:
                             break
+                        chunks_read += 1
+                        if chunks_read > MAX_READ_CHUNKS:
+                            raise Exception(
+                                f"Read exceeded {MAX_READ_CHUNKS} chunks without EOF or crossing the response cap"
+                            )
                         body.extend(chunk)
                         if len(body) > PER_RESPONSE_LIMIT:
                             raise Exception("Response limit exceeded 1 MiB")
@@ -391,10 +411,16 @@ def fetch_history(max_calls=None):
                         with urllib.request.urlopen(req, timeout=25) as resp:
                             status_code = resp.status
                             body = bytearray()
+                            chunks_read = 0
                             while True:
                                 chunk = resp.read(8192)
                                 if not chunk:
                                     break
+                                chunks_read += 1
+                                if chunks_read > MAX_READ_CHUNKS:
+                                    raise Exception(
+                                        f"Read exceeded {MAX_READ_CHUNKS} chunks without EOF or crossing the response cap"
+                                    )
                                 body.extend(chunk)
                                 if len(body) > PER_RESPONSE_LIMIT:
                                     raise Exception("Response limit exceeded 1 MiB")

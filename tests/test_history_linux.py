@@ -170,6 +170,36 @@ class _FakeResponse:
         return False
 
 
+class _TruthyZeroBytes:
+    """A read() result that is truthy but adds no bytes to a bytearray body."""
+
+    def __iter__(self):
+        return iter(())
+
+    def __bool__(self):
+        return True
+
+
+class _NonGrowingResponse:
+    """A truncated stream: read() is always truthy, never EOF, never grows.
+
+    Emulates a stream where ``not chunk`` is never true and ``body`` stays under
+    the byte cap, so a read loop bounded only by bytes would run forever.
+    """
+
+    def __init__(self):
+        self.status = 200
+
+    def read(self, _size=-1):
+        return _TruthyZeroBytes()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_exc):
+        return False
+
+
 class TestLinuxFetchHardening(unittest.TestCase):
     """fetch_history_linux.py owns its loop instead of using BaseHistoryFetcher."""
 
@@ -240,18 +270,61 @@ class TestLinuxFetchHardening(unittest.TestCase):
     def test_complete_window_is_not_rewritten_as_incomplete(self):
         from scripts.studies import fetch_history_linux
 
+        # KSM_TODAY is pinned to the stored window.end so the window really is
+        # closed for this run: the fetcher must return "already COMPLETE" without
+        # re-fetching, so urlopen is never called. A bare-MagicMock urlopen would
+        # spin the read loop forever if the window ever reopened, so the mock is
+        # backed by a terminating _FakeResponse as a backstop.
+        window_end = "2026-10-08"
         record = {"advisory_id": "CVE-2020-1234", "published": "2020-01-01"}
         self.catalog_path.write_text(json.dumps(record) + "\n", encoding="utf-8")
         self._write_index(coverage="COMPLETE", status="COMPLETE", cursor_date=None,
-                          window_closed=True, entry_count=1, requests=113, resume=None)
+                          window_closed=True, entry_count=1, requests=113, resume=None,
+                          window={"start": "1999-01-01", "end": window_end})
         before = self.index_path.read_text(encoding="utf-8")
 
-        with mock.patch.object(fetch_history_linux, "INDEX_PATH", str(self.index_path)), \
+        with mock.patch.dict(os.environ, {"KSM_TODAY": window_end}), \
+             mock.patch.object(fetch_history_linux, "INDEX_PATH", str(self.index_path)), \
              mock.patch.object(fetch_history_linux, "CATALOG_PATH", str(self.catalog_path)), \
-             mock.patch("urllib.request.urlopen") as urlopen, \
+             mock.patch("urllib.request.urlopen",
+                        side_effect=lambda *_a, **_k: _FakeResponse(b'{"vulnerabilities": []}')) as urlopen, \
              mock.patch("time.sleep"), redirect_stdout(io.StringIO()):
             completed = fetch_history_linux.fetch_history(max_calls=1000)
 
         urlopen.assert_not_called()
         self.assertTrue(completed)
         self.assertEqual(self.index_path.read_text(encoding="utf-8"), before)
+
+    def test_reopen_with_a_non_growing_stream_is_bounded(self):
+        """A reopened window hitting a non-EOF stream must stop, not spin forever.
+
+        The stale COMPLETE window reopens (Finding 3), and the served response
+        never reaches EOF and never grows past the byte cap. Before the read was
+        bounded by a chunk count this loop never returned (the test hung); now
+        the run parks the cursor INCOMPLETE and records the failure.
+        """
+        from scripts.studies import fetch_history_linux
+
+        record = {"advisory_id": "CVE-2020-1234", "published": "2020-01-01",
+                  "fix_shas": [], "patch_urls": []}
+        self.catalog_path.write_text(json.dumps(record) + "\n", encoding="utf-8")
+        # Stored window.end closes three days before the run date, so it reopens.
+        self._write_index(coverage="COMPLETE", status="COMPLETE", cursor_date=None,
+                          window_closed=True, entry_count=1, requests=113, resume=None,
+                          window={"start": "1999-01-01", "end": "2026-10-09"})
+
+        with mock.patch.dict(os.environ, {"KSM_TODAY": "2026-10-12"}), \
+             mock.patch.object(fetch_history_linux, "INDEX_PATH", str(self.index_path)), \
+             mock.patch.object(fetch_history_linux, "CATALOG_PATH", str(self.catalog_path)), \
+             mock.patch("urllib.request.urlopen",
+                        side_effect=lambda *_a, **_k: _NonGrowingResponse()), \
+             mock.patch("time.sleep"), redirect_stdout(io.StringIO()):
+            completed = fetch_history_linux.fetch_history(max_calls=1000)
+
+        self.assertFalse(completed, "a non-EOF stream must not be reported COMPLETE")
+        after = json.loads(self.index_path.read_text(encoding="utf-8"))
+        self.assertEqual(after["coverage"], "INCOMPLETE")
+        self.assertTrue(
+            any("chunks" in e for e in after["errors"]),
+            f"expected a bounded-read error, got {after['errors']}",
+        )

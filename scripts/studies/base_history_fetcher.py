@@ -27,6 +27,13 @@ CWE_PATTERN = re.compile(r"^CWE-\d+$", re.IGNORECASE)
 CVE_PATTERN = re.compile(r"^CVE-[0-9]{4}-[0-9]{4,}$")
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+# A response body is read in 8 KiB chunks and capped at per_response_limit
+# (1 MiB), so a well-behaved stream reaches EOF or crosses the cap within ~128
+# reads. A stream that keeps returning truthy bytes without growing the body
+# past the cap (a truncated or malformed stream) would spin the read loop
+# forever, so the read is also bounded by a chunk count far above any legitimate
+# body.
+MAX_READ_CHUNKS = 4096
 
 
 class BaseHistoryFetcher:
@@ -128,6 +135,17 @@ class BaseHistoryFetcher:
             self.current_start = datetime.date.fromisoformat(next_date_str)
             self.cursor_date = next_date_str
             self.resume_present = True
+        elif self.coverage == "COMPLETE":
+            # window.end is the date the last scan ran on, so a COMPLETE catalog
+            # whose stored end predates the run date has an unscanned gap: resume
+            # at stored_end + 1 day instead of returning "already COMPLETE" and
+            # going stale in silence. The state stays INCOMPLETE (and the cursor
+            # is pre-saved) until the new window closes.
+            gap_start = fetcher_io.complete_window_gap_start(data)
+            if gap_start is not None:
+                self.current_start = gap_start
+                self.coverage = "INCOMPLETE"
+                self.resume_present = True
 
     def determine_status(self, entry_count: int, coverage: str, cursor_date: Optional[str]) -> Tuple[str, Optional[str], bool]:
         """Compute status, cursor date, and window_closed flag."""
@@ -206,10 +224,18 @@ class BaseHistoryFetcher:
     def _read_bounded_response(self, resp: Any) -> Dict[str, Any]:
         """Read one response body, enforcing the per-response and cumulative byte caps."""
         body = bytearray()
+        chunks_read = 0
         while True:
             chunk = resp.read(8192)
             if not chunk:
                 break
+            chunks_read += 1
+            # Bound the read itself, not just by bytes: a stream that never
+            # reaches EOF and never grows past the byte cap must still stop.
+            if chunks_read > MAX_READ_CHUNKS:
+                raise RuntimeError(
+                    f"Read exceeded {MAX_READ_CHUNKS} chunks without EOF or crossing the response cap"
+                )
             body.extend(chunk)
             self.cumulative_bytes += len(chunk)
             if len(body) > self.per_response_limit:

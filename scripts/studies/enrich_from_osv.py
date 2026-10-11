@@ -30,6 +30,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 import urllib.error
@@ -40,6 +41,10 @@ ROOT = Path(__file__).resolve().parents[2]
 # KSM_CVE_HISTORY_DIR lets the offline tests point the script at a temp tree.
 CVE_HISTORY_DIR = Path(os.environ.get("KSM_CVE_HISTORY_DIR") or ROOT / "docs/studies/cve-history")
 CACHE_DIRNAME = "osv-cache"
+# Committed sidecar: one row per (repo, sha) fix-sha candidate with its GitHub
+# parent count. Parents == 1 is a real fix commit; parents != 1 is a merge and is
+# not written into fix_shas. Refreshed only by --fetch-commit-parents.
+COMMIT_PARENTS_PATH = CVE_HISTORY_DIR / "commit-parents.jsonl"
 OSV_VULN_URL = "https://api.osv.dev/v1/vulns/{vuln_id}"
 DEFAULT_PROJECTS = ("openssl", "curl", "glibc", "openssh")
 USER_AGENT = "ksm-osv-enrich/1.0 (+https://github.com/iberi22/kernel-security-memory)"
@@ -126,6 +131,104 @@ def extract_cwe_ids(doc):
         if CWE_RE.fullmatch(value) and value not in cwe_ids:
             cwe_ids.append(value)
     return cwe_ids
+
+
+def _github_slug(url):
+    """owner/name for a github.com repo URL, or None for another host."""
+    normalized = normalize_repo(url).split("://", 1)[-1]
+    if not normalized.startswith("github.com/"):
+        return None
+    parts = normalized[len("github.com/"):].split("/")
+    if len(parts) != 2 or not all(parts):
+        return None
+    return f"{parts[0]}/{parts[1]}"
+
+
+def load_commit_parents(path=None):
+    """Read commit-parents.jsonl into {(normalized_repo, sha): parents}."""
+    path = Path(path) if path else COMMIT_PARENTS_PATH
+    index = {}
+    if not path.exists():
+        return index
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        if not raw.strip():
+            continue
+        row = json.loads(raw)
+        index[(normalize_repo(row["repo"]), row["sha"])] = row["parents"]
+    return index
+
+
+def apply_parent_policy(fixes, upstream_repo, parents_index):
+    """Keep single-parent fix shas; drop merges. This catalog has no fixed_in
+    column, so a demoted sha is excluded from fix_shas and counted.
+
+    Every candidate must be in ``parents_index``: the sidecar is the only
+    permitted source, so a candidate absent from it fails loudly (naming the
+    sha) instead of being kept or guessed. Returns (kept_shas, demoted_count).
+    """
+    normalized = normalize_repo(upstream_repo)
+    kept, demoted = [], 0
+    for sha in fixes:
+        parents = parents_index.get((normalized, sha))
+        if parents is None:
+            raise ValueError(
+                f"fix sha {sha} for {upstream_repo} is absent from {COMMIT_PARENTS_PATH.name}; "
+                "refresh it with --fetch-commit-parents"
+            )
+        if parents == 1:
+            kept.append(sha)
+        else:
+            demoted += 1
+    return kept, demoted
+
+
+def _gh_commit_parents(slug, sha):
+    result = subprocess.run(
+        ["gh", "api", f"repos/{slug}/commits/{sha}", "--jq", ".parents|length"],
+        capture_output=True, text=True, timeout=60,
+    )
+    if result.returncode != 0:
+        raise ValueError(f"gh api repos/{slug}/commits/{sha} failed: {result.stderr.strip()}")
+    try:
+        return int(result.stdout.strip())
+    except ValueError as exc:
+        raise ValueError(f"gh api repos/{slug}/commits/{sha}: non-integer parents") from exc
+
+
+def fetch_commit_parents(projects, client):
+    """Refresh commit-parents.jsonl from GitHub for every OSV fix-sha candidate.
+
+    Enumerates the raw candidates (FIX/PATCH shas inside each project's repo
+    from the OSV cache) and asks GitHub for each parent count, preserving rows
+    for other repos. Returns the sorted rows written.
+    """
+    collected = load_commit_parents()
+    for project_dir in projects:
+        index_data = json.loads((project_dir / "index.json").read_text(encoding="utf-8"))
+        repo = index_data.get("repo")
+        slug = _github_slug(repo)
+        for row in read_catalog(project_dir / "catalog.jsonl"):
+            advisory_id = row.get("advisory_id")
+            if not advisory_id:
+                continue
+            facts = collect_osv_facts(client, str(advisory_id), repo)
+            for sha in facts["fixes"]:
+                if slug is None:
+                    raise ValueError(
+                        f"{repo} is not a github.com repository; gh api cannot count parents for {sha}"
+                    )
+                collected[(normalize_repo(repo), sha)] = {
+                    "repo": repo,
+                    "sha": sha,
+                    "parents": _gh_commit_parents(slug, sha),
+                    "fetched_via": f"gh api repos/{slug}/commits/{sha}",
+                }
+    rows_sorted = sorted(collected.values(), key=lambda r: (normalize_repo(r["repo"]), r["sha"]))
+    text = "".join(json.dumps(r, sort_keys=True, ensure_ascii=False) + "\n" for r in rows_sorted)
+    if not (COMMIT_PARENTS_PATH.exists() and COMMIT_PARENTS_PATH.read_text(encoding="utf-8") == text):
+        COMMIT_PARENTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        COMMIT_PARENTS_PATH.write_text(text, encoding="utf-8")
+    return rows_sorted
 
 
 class OsvClient:
@@ -268,8 +371,14 @@ def catalog_text(rows):
     return "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows)
 
 
-def enrich_project(project_dir, client):
-    """Recompute the enriched catalog/index for one project in memory."""
+def enrich_project(project_dir, client, parents_index=None):
+    """Recompute the enriched catalog/index for one project in memory.
+
+    When ``parents_index`` is given (the commit-parents sidecar was present), OSV
+    fix shas are verified against it: only single-parent commits stay in fix_shas
+    and merges are dropped and counted. When it is None there is no sidecar, so
+    no verification happens and the output is byte-identical to before.
+    """
     project_dir = Path(project_dir)
     catalog_file = project_dir / "catalog.jsonl"
     index_file = project_dir / "index.json"
@@ -293,6 +402,7 @@ def enrich_project(project_dir, client):
     baseline_fix_sha = count(lambda row: bool(row.get("fix_shas")))
     baseline_cwe = count(lambda row: isinstance(row.get("cwe"), str) and row["cwe"].strip())
 
+    demoted = 0
     for row in rows:
         advisory_id = row.get("advisory_id")
         if not advisory_id:
@@ -301,6 +411,9 @@ def enrich_project(project_dir, client):
         facts = collect_osv_facts(client, str(advisory_id), upstream_repo)
         if not facts["queried"]:
             stats["not_in_osv"] += 1
+        if parents_index is not None:
+            facts["fixes"], row_demoted = apply_parent_policy(facts["fixes"], upstream_repo, parents_index)
+            demoted += row_demoted
         enrich_row(row, facts)
 
     stats["with_fix_sha_before"] = index_data.get("with_fix_sha_before", baseline_fix_sha)
@@ -315,6 +428,12 @@ def enrich_project(project_dir, client):
     index_data["with_cwe_before"] = stats["with_cwe_before"]
     index_data["with_cwe"] = stats["with_cwe"]
     index_data["not_in_osv"] = stats["not_in_osv"]
+    if parents_index is not None:
+        stats["merge_fix_refs_demoted"] = demoted
+        if demoted:
+            # Recorded only when it moves, so a project with no demotions keeps
+            # byte-identical output for --check.
+            index_data["merge_fix_refs_demoted"] = demoted
     return catalog_text(rows), json.dumps(index_data, indent=2, ensure_ascii=False) + "\n", stats
 
 
@@ -334,17 +453,39 @@ def main(argv=None):
                         help="Comma-separated project names (default: %(default)s)")
     parser.add_argument("--offline", action="store_true", help="Use only the OSV cache; never open a connection")
     parser.add_argument("--check", action="store_true", help="Recompute and exit non-zero if the tree differs")
+    parser.add_argument("--fetch-commit-parents", action="store_true",
+                        help="Network refresh: query GitHub for each OSV fix-sha candidate's parent count and write commit-parents.jsonl")
     args = parser.parse_args(argv)
 
     names = [p.strip() for p in args.projects.split(",") if p.strip()]
     if not names:
         raise SystemExit("Error: --projects is empty")
     projects = resolve_projects(names)
+
+    if args.fetch_commit_parents:
+        client = OsvClient(CVE_HISTORY_DIR / CACHE_DIRNAME, offline=True)
+        try:
+            rows = fetch_commit_parents(projects, client)
+        except (ValueError, OSError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            raise SystemExit(1)
+        merges = sum(1 for r in rows if r["parents"] != 1)
+        print(f"Wrote {COMMIT_PARENTS_PATH}: {len(rows)} commit-parent record(s), {merges} with parents != 1")
+        raise SystemExit(0)
+
     client = OsvClient(CVE_HISTORY_DIR / CACHE_DIRNAME, offline=args.offline)
+    # The commit-parents policy is active only when the sidecar is present; when
+    # it is absent there are no fix-sha facts to verify against and the output
+    # stays byte-identical to the pre-sidecar behavior.
+    parents_index = load_commit_parents() if COMMIT_PARENTS_PATH.exists() else None
 
     failed = False
     for project_dir in projects:
-        expected_catalog, expected_index, stats = enrich_project(project_dir, client)
+        try:
+            expected_catalog, expected_index, stats = enrich_project(project_dir, client, parents_index)
+        except ValueError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            raise SystemExit(1)
         label = stats["project"]
         if args.check:
             catalog_file = project_dir / "catalog.jsonl"
