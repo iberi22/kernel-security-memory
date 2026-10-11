@@ -1,0 +1,40 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      react:
+        specifier: ^19.2.3
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.3
+        version: 19.2.3(react@19.2.3)
+
+packages:
+
+  '@scope/ui-kit@2.1.0':
+    resolution: {integrity: sha512-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc==}
+    engines: {node: '>=18'}
+
+  leftpad@0.3.1:
+    resolution: {integrity: sha512-dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd==}
+
+  react@19.2.3:
+    resolution: {integrity: sha512-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee==}
+
+  react-dom@19.2.3(react@19.2.3):
+    resolution: {integrity: sha512-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff==}
+
+  only-peer@1.0.0(react@19.2.3)(leftpad@0.3.1):
+    resolution: {integrity: sha512-0000000000000000000000000000000000000000000000000000000000000000==}
+
+snapshots:
+
+  react-dom@19.2.3(react@19.2.3):
+    dependencies:
+      react: 19.2.3
