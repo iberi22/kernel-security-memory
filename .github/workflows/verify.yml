@@ -2,13 +2,22 @@ name: Verify evidence pack
 on:
   push:
   pull_request:
-permissions:
-  contents: read
+
+# Least privilege by default; the job below declares the read access it needs.
+permissions: {}
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    # Least privilege: validation only reads the checkout, never writes.
+    permissions:
+      contents: read
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Untrusted PR code runs below; keep the token out of .git/config.
+          persist-credentials: false
       - name: Validate, test and check reproducible export
         run: |
           python3 -m unittest discover -s tests -v

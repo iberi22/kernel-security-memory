@@ -1,0 +1,219 @@
+{
+  "fetched_at": "2026-10-10T15:17:49-07:00",
+  "osv_cache_digest": "d17a2bf76c25915c9278fc28512dcff7d0f853465e6b6fd654c4b415c6196701",
+  "project_count": 23,
+  "projects": [
+    {
+      "branch": null,
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "anti-xss",
+      "osv_git_supported": false,
+      "repo": "https://github.com/voku/anti-xss"
+    },
+    {
+      "branch": "master",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "botan",
+      "osv_git_supported": true,
+      "repo": "https://github.com/randombit/botan"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "cryptsetup",
+      "osv_git_supported": true,
+      "repo": "https://gitlab.com/cryptsetup/cryptsetup"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "go-jose",
+      "osv_git_supported": true,
+      "repo": "https://github.com/go-jose/go-jose"
+    },
+    {
+      "branch": null,
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "homebrew",
+      "osv_git_supported": false,
+      "repo": "https://github.com/Homebrew/brew"
+    },
+    {
+      "branch": "master",
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "hotcrp",
+      "osv_git_supported": true,
+      "repo": "https://github.com/kohler/hotcrp"
+    },
+    {
+      "branch": null,
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "libheif",
+      "osv_git_supported": true,
+      "repo": "https://github.com/strukturag/libheif"
+    },
+    {
+      "branch": "RC_2_1",
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "libtorrent",
+      "osv_git_supported": true,
+      "repo": "https://github.com/arvidn/libtorrent"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "mise",
+      "osv_git_supported": true,
+      "repo": "https://github.com/jdx/mise"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "napi-rs",
+      "osv_git_supported": false,
+      "repo": "https://github.com/napi-rs/napi-rs"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "neqo",
+      "osv_git_supported": true,
+      "repo": "https://github.com/mozilla/neqo"
+    },
+    {
+      "branch": "master",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "nestjs",
+      "osv_git_supported": true,
+      "repo": "https://github.com/nestjs/nest"
+    },
+    {
+      "branch": null,
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "nss",
+      "osv_git_supported": false,
+      "repo": "https://github.com/mozilla/nss"
+    },
+    {
+      "branch": null,
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "nuclei",
+      "osv_git_supported": true,
+      "repo": "https://github.com/projectdiscovery/nuclei"
+    },
+    {
+      "branch": null,
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "nvm",
+      "osv_git_supported": true,
+      "repo": "https://github.com/nvm-sh/nvm"
+    },
+    {
+      "branch": "master",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "nx",
+      "osv_git_supported": true,
+      "repo": "https://github.com/nrwl/nx"
+    },
+    {
+      "branch": "master",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [
+        "openssl",
+        "openssl-upstream"
+      ],
+      "name": "openssl",
+      "osv_git_supported": true,
+      "repo": "https://github.com/openssl/openssl"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "pion-dtls",
+      "osv_git_supported": true,
+      "repo": "https://github.com/pion/dtls"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": false,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "prevail",
+      "osv_git_supported": true,
+      "repo": "https://github.com/vbpf/prevail"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "sccache",
+      "osv_git_supported": false,
+      "repo": "https://github.com/mozilla/sccache"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "uppy",
+      "osv_git_supported": true,
+      "repo": "https://github.com/transloadit/uppy"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": true,
+      "has_threat_model": true,
+      "ksm_catalogs": [],
+      "name": "uutils-coreutils",
+      "osv_git_supported": true,
+      "repo": "https://github.com/uutils/coreutils"
+    },
+    {
+      "branch": "main",
+      "has_dockerfile_here": false,
+      "has_threat_model": false,
+      "ksm_catalogs": [],
+      "name": "zmap",
+      "osv_git_supported": false,
+      "repo": "https://github.com/zmap/zmap"
+    }
+  ],
+  "source_commit": "2cef161ea2a5612eb42c29454735ea9c1e5ff744",
+  "source_repo": "https://github.com/anthropics/oss-scanner"
+}

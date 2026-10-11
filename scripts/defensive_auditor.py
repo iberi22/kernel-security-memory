@@ -49,8 +49,10 @@ SECURITY_RULES = [
         "severity": "HIGH",
         "language": "Rust",
         "languages": ["rust"],
-        "pattern": r"\b(?:libc::free|dealloc|drop)\s*\(\s*([a-zA-Z0-9_]+)[^)]*\);\s*(?!\s*\1\s*=\s*(?:ptr::null|std::ptr::null|null_mut)\s*;)[^;]*(?:\*+\s*\1|\b\1\s*\.)",
+        "pattern": r"\b(?:libc::free|dealloc|drop_in_place|ManuallyDrop::drop)\s*\(\s*(?:&\s*(?:mut\s+)?)?([a-zA-Z0-9_]+)[^)]*\);\s*(?!\s*\1\s*=\s*(?:ptr::null|std::ptr::null|null_mut)\s*;)[^;]*(?:\*+\s*\1|\b\1\s*\.)",
         "explanation": "Raw pointer or resource accessed after deallocation or drop in Rust.",
+        # Safe Rust cannot use a value after drop (borrow checker); only unsafe code can.
+        "requires_unsafe": True,
         "lesson": "Enforce Rust ownership invariants or invalidate raw pointers immediately upon manual deallocation.",
     },
     {
@@ -106,6 +108,10 @@ SECURITY_RULES = [
         "languages": ["rust"],
         "pattern": r"\b(?:Vec::with_capacity|alloc::alloc|Layout::array|Layout::from_size_align)\s*(?:<[^>]+>)?\s*\(\s*([a-zA-Z0-9_]+)\s*(\*|\+)\s*([a-zA-Z0-9_]+)",
         "explanation": "Unchecked arithmetic inside allocation size or capacity in Rust.",
+        # In safe Rust an overflowing capacity panics or under-allocates without memory
+        # corruption; it matters where the size feeds unsafe code (set_len, raw writes).
+        "requires_unsafe": True,
+        "skip_literal_operands": (1, 3),
         "lesson": "Use checked_mul() or checked_add() before computing collection capacity or layout size.",
     },
     {
@@ -211,6 +217,78 @@ def load_pattern_clusters(clusters_path):
     return {c.get("cwe_id"): c for c in clusters if isinstance(c, dict) and "cwe_id" in c}
 
 
+def _raw_open(content, i):
+    """If content[i:] starts a raw string (r"..." / r#"..."#), return its hash count."""
+    j, n = i + 1, len(content)
+    hashes = 0
+    while j < n and content[j] == "#":
+        hashes += 1
+        j += 1
+    if content[i] == "r" and j < n and content[j] == '"':
+        return hashes
+    return None
+
+
+def _char_len(content, i):
+    """If content[i:] starts a char literal ('x' / '}' / '\\''), return its length."""
+    m = re.match(r"'(?:[^'\\]|\\.)'", content[i:i + 5])
+    return len(m.group(0)) if m else None
+
+
+_UNSAFE_OPEN = re.compile(r"\bunsafe\b(?:\s+(?:extern\s+\"[^\"]*\"\s+)?fn\b[^{;]*)?\s*\{")
+
+
+def _unsafe_spans(content):
+    """Return (start, end) offsets of `unsafe { }` and `unsafe fn ... { }` bodies.
+
+    An `unsafe impl` header does NOT make its safe methods unsafe (it only
+    establishes a trait obligation), so it opens no span. Brace matching
+    skips string literals, raw strings (r#"..."#), character literals
+    ('x', including braces like '}' and escapes like '\\''), // line
+    comments and /* block comments */; good enough for rule gating, and
+    a body we fail to close extends to the end of the file (fail open
+    towards reporting).
+    """
+    spans = []
+    for opening in _UNSAFE_OPEN.finditer(content):
+        depth, i, n = 0, opening.end() - 1, len(content)
+        while i < n:
+            ch = content[i]
+            if ch == '"':
+                i += 1
+                while i < n and content[i] != '"':
+                    i += 2 if content[i] == "\\" else 1
+            elif ch == 'r' and _raw_open(content, i) is not None:
+                hashes = _raw_open(content, i)
+                closer = '"' + '#' * hashes
+                end = content.find(closer, i + 1 + hashes + 1)
+                i = n if end == -1 else end + len(closer)
+                continue
+            elif ch == "'" and _char_len(content, i) is not None:
+                i += _char_len(content, i)
+            elif content.startswith("//", i):
+                nl = content.find("\n", i)
+                i = n if nl == -1 else nl
+                continue
+            elif content.startswith("/*", i):
+                end = content.find("*/", i + 2)
+                i = n if end == -1 else end + 2
+                continue
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        spans.append((opening.start(), i))
+    return spans
+
+
+def _in_spans(pos, spans):
+    return any(start <= pos <= end for start, end in spans)
+
+
 def scan_content(content, filename="<buffer>", cluster_map=None):
     """Scan text content for defensive security violations."""
     findings = []
@@ -223,7 +301,14 @@ def scan_content(content, filename="<buffer>", cluster_map=None):
             continue
 
         regex = re.compile(rule["pattern"], re.MULTILINE)
+        unsafe_spans = _unsafe_spans(content) if rule.get("requires_unsafe") else None
         for match in regex.finditer(content):
+            if unsafe_spans is not None and not _in_spans(match.start(), unsafe_spans):
+                continue
+            literal_groups = rule.get("skip_literal_operands")
+            if literal_groups and all(
+                    (match.group(g) or "").isdigit() for g in literal_groups):
+                continue
             # Compute line number
             start_pos = match.start()
             line_no = content[:start_pos].count("\n") + 1

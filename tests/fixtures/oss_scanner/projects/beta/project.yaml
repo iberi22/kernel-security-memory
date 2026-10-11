@@ -1,0 +1,11 @@
+# Synthetic fixture: .git suffix, no branch, PGP block and CCs must never leak.
+repo: https://example.com/beta.git
+primary_contact: beta-owner@example.org
+auto_ccs:
+  - second@example.org
+homepage: https://example.org/beta
+pgp: |
+  -----BEGIN PGP PUBLIC KEY BLOCK-----
+  mDMEZmljdGl0aW91cyBma2Uga2V5IGJsb2NrCg==
+  -----END PGP PUBLIC KEY BLOCK-----
+disabled: false
