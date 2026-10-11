@@ -14,6 +14,8 @@ import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+
+from ksm import net as _net
 from pathlib import Path
 
 SCHEMA = "ksm-fixfp/1"
@@ -355,7 +357,7 @@ def fetch_commit_default(repo, sha):
         url = f"https://api.github.com/repos/{r}/commits/{sha}"
         req = urllib.request.Request(url, headers=_gh_headers())
         try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            with _net.urlopen(req, timeout=60) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             data["_ksm_repo"] = r
             return data
@@ -374,7 +376,7 @@ def fetch_blob_default(repo, sha, path):
     url = f"https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(path)}"
     req = urllib.request.Request(url, headers={"User-Agent": "ksm-fixfp"})
     try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        with _net.urlopen(req, timeout=120) as resp:
             return resp.read()
     except urllib.error.HTTPError as exc:
         if exc.code == 404:

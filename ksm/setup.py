@@ -16,6 +16,8 @@ import sys
 import tarfile
 import tempfile
 import urllib.request
+
+from ksm import net as _net
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
 
@@ -59,7 +61,7 @@ def download_url(name: str) -> str:
 def download_file(url: str, dest: Path, timeout: int = 300) -> Path:
     """Fetch url into dest (stdlib only, User-Agent like ksm.data.update)."""
     req = urllib.request.Request(url, headers={"User-Agent": "ksm-cli"})
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
+    with _net.urlopen(req, timeout=timeout) as resp:
         dest.write_bytes(resp.read())
     return dest
 
