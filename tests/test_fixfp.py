@@ -270,7 +270,18 @@ class TestBuildOne(unittest.TestCase):
                   for i in range(299)]
         fc, fb, rf = self._fakes(fake_commit(files))
         doc, _ = build_one(cand, self.out, fetch_commit=fc, fetch_blob=fb, run_fingerprint=rf)
-        self.assertEqual(doc["coverage"], "PARTIAL")
+        # 300 touched functions: never "OK"; the breadth limit labels it TOO_BROAD.
+        self.assertEqual(doc["coverage"], "TOO_BROAD")
+
+    def test_broad_commit_keeps_no_function_fingerprints(self):
+        from ksm.fixfp import apply_breadth_limit
+        fn = {"name": "f", "before": {}, "after": {}, "delta": {}}
+        doc = {"coverage": "OK", "files": [{"path": "a.rs", "functions": [dict(fn)] * 61}]}
+        apply_breadth_limit(doc)
+        self.assertEqual((doc["coverage"], doc["functions_touched"], doc["files"][0]["functions"]),
+                         ("TOO_BROAD", 61, []))
+        small = {"coverage": "OK", "files": [{"path": "a.rs", "functions": [dict(fn)] * 60}]}
+        self.assertEqual(apply_breadth_limit(small)["coverage"], "OK")
 
     def test_test_directories_skipped(self):
         cand = {"project": "curl", "advisory_id": "CVE-2030-9005", "fix_sha": FIX, "cwe": None}

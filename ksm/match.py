@@ -199,10 +199,9 @@ def _pair_score(s_b, s_a, n_missing, sized):
     return min(1.0, max(0.0, base + 0.1 * n_missing))
 
 
-def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
-                    margin=MARGIN_DEFAULT, lsh_bands=LSH_BANDS_DEFAULT,
-                    lsh_rows=LSH_ROWS_DEFAULT, min_nodes=MIN_NODES_DEFAULT):
-    """Match target sfp docs against the corpus. Findings sorted by score desc."""
+def build_index(corpus, lsh_bands=LSH_BANDS_DEFAULT, lsh_rows=LSH_ROWS_DEFAULT):
+    """Pairs, missing-guard rules and the LSH buckets of a corpus; build once,
+    reuse across many match_documents calls (self_test, MCP, batch scans)."""
     pairs = []
     for doc in corpus:
         for f in doc.get("files", []) or []:
@@ -213,7 +212,6 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
                 pairs.append((doc, f, fn, before, after))
     pairs.sort(key=lambda p: (str(p[0].get("project", "")), str(p[0].get("advisory_id", "")),
                               str(p[1].get("path", "")), str(p[2].get("name", ""))))
-
     # LSH index over the corpus "before" minhashes: a target function is only
     # compared with pairs sharing at least one band (pairs without a usable
     # minhash are always compared). Avoids target x corpus cosine products.
@@ -227,8 +225,20 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
             continue
         for b in range(lsh_bands):
             buckets.setdefault((b, tuple(mh[b * lsh_rows:(b + 1) * lsh_rows])), []).append(i)
-
     rules = [guard_rules(p[3], p[4], p[2].get("delta", {})) for p in pairs]
+    return {"pairs": pairs, "buckets": buckets, "unindexed": unindexed, "rules": rules,
+            "bands": lsh_bands, "rows": lsh_rows}
+
+
+def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
+                    margin=MARGIN_DEFAULT, lsh_bands=LSH_BANDS_DEFAULT,
+                    lsh_rows=LSH_ROWS_DEFAULT, min_nodes=MIN_NODES_DEFAULT, index=None):
+    """Match target sfp docs against the corpus. Findings sorted by score desc."""
+    if index is None or (index["bands"], index["rows"]) != (lsh_bands, lsh_rows):
+        index = build_index(corpus, lsh_bands, lsh_rows)
+    pairs, buckets, unindexed, rules = (index["pairs"], index["buckets"],
+                                        index["unindexed"], index["rules"])
+    width = lsh_bands * lsh_rows
 
     def candidates(tfn):
         mh = tfn.get("minhash")
@@ -372,6 +382,7 @@ def self_test(corpus):
         return {"after_flagged_rate": 0.0, "before_recall": 0.0, "pairs": 0}
     flagged_after = 0
     found_before = 0
+    index = build_index(corpus)
     for doc, f, fn in items:
         adv = doc.get("advisory_id", "")
         lang = f.get("language", "c")
@@ -379,7 +390,7 @@ def self_test(corpus):
             fn_obj = fn.get(side)
             tdoc = {"schema": "ksm-sfp/1", "file": f"selftest/{adv}/{fn.get('name', 'fn')}.c",
                     "language": lang, "coverage": "OK", "functions": [dict(fn_obj)]}
-            got = match_documents([tdoc], corpus)
+            got = match_documents([tdoc], corpus, index=index)
             hit_own = any(m.get("advisory_id") == adv and m.get("path") == f.get("path")
                           and m.get("function") == fn.get("name")
                           for g in got for m in g.get("matches", []))

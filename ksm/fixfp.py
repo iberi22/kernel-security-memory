@@ -56,6 +56,10 @@ EXT_TO_LANG = {
 
 
 RATE_LIMIT_STATUSES = (403, 429)
+# A fix commit that touches more functions than this is a refactor or release
+# commit, not a focused fix: its function fingerprints are dropped (coverage
+# TOO_BROAD) so they neither bloat the corpus nor produce unrelated rules.
+MAX_FUNCTIONS_PER_FIX = 60
 COMMIT_API_FILE_LIMIT = 300
 
 
@@ -185,6 +189,17 @@ def slim_function(fn):
 
 def format_ranges(ranges):
     return ",".join(f"{s}-{e}" for s, e in ranges)
+
+
+def apply_breadth_limit(doc, limit=MAX_FUNCTIONS_PER_FIX):
+    """Drop function fingerprints of overly broad fix commits (in place)."""
+    touched = sum(len(f.get("functions", [])) for f in doc.get("files", []))
+    if touched > limit:
+        doc["coverage"] = "TOO_BROAD"
+        doc["functions_touched"] = touched
+        for f in doc.get("files", []):
+            f["functions"] = []
+    return doc
 
 
 def compute_delta(before_fn, after_fn):
@@ -545,6 +560,7 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
         "coverage": coverage,
         "files": doc_files,
     }
+    apply_breadth_limit(doc)
     out_fp = Path(out_dir) / project / (candidate["advisory_id"] + ".json")
     atomic_write_json(out_fp, doc, compact=True)
     return doc, repo_used
