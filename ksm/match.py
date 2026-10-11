@@ -9,6 +9,14 @@ MARGIN_DEFAULT = 0.05
 LSH_BANDS_DEFAULT = 16
 LSH_ROWS_DEFAULT = 4
 LSH_JACCARD_MIN = 0.3
+# Tiny functions (getters, wrappers) look alike structurally; they never
+# produce a structural hit on their own.
+MIN_NODES_DEFAULT = 40
+# Missing-guard rules: the fix's new guard must sit at most this many lines
+# before the protected call, and variables passed to at least HANDLE_CALLEES
+# distinct callees are treated as context handles and never form a rule.
+GUARD_WINDOW = 8
+HANDLE_CALLEES = 3
 
 
 def load_corpus(fingerprints_dir):
@@ -77,6 +85,17 @@ def is_candidate(t_fn, b_fn, lsh_bands=16, lsh_rows=4):
     return est_jaccard(tm, bm) >= LSH_JACCARD_MIN
 
 
+def _guard_near(guards, var, call_line, callee):
+    """A precondition guard on `var` at most GUARD_WINDOW lines before the call.
+
+    A guard that names the callee itself checks the call's result
+    (`if (f(x) == NULL)`), not a precondition, and does not count.
+    """
+    return any(var in (g.get("vars", []) or []) and callee not in (g.get("vars", []) or [])
+               and 0 < call_line - int(g.get("line", 0)) <= GUARD_WINDOW
+               for g in guards or [])
+
+
 def _guard_has_var(guards, var, before_line=None):
     for g in guards or []:
         if var in (g.get("vars", []) or []):
@@ -85,49 +104,69 @@ def _guard_has_var(guards, var, before_line=None):
     return False
 
 
-def find_missing_guards(t_fn, b_fn, delta):
-    """Missing-guard hits: fix added a guard on B's arg var, T lacks it.
+def guard_rules(before, after, delta):
+    """Guarded call positions the fix introduced: {(callee, arg_index)}.
 
-    For every call in T whose callee is in B's calls: for each argument
-    position where B's variable is covered by an added guard, check T has a
-    guard on its own argument variable before the call line.
+    A rule holds when, in the fixed version, a call's argument variable is
+    checked by a guard the fix added (delta.added_guards) on an earlier line,
+    and in the vulnerable version the same callee's argument at that position
+    has no guard before the call. Derived from both versions, so the fixed
+    function never violates its own rule and the vulnerable one always does.
     """
+    if not before or not after:
+        return set()
+    added = {(g.get("kind", ""), tuple(g.get("vars", []) or []))
+             for g in (delta or {}).get("added_guards", []) or []}
+    if not added:
+        return set()
+    new_guards = [g for g in after.get("guards", []) or []
+                  if (g.get("kind", ""), tuple(g.get("vars", []) or [])) in added]
+    # Context handles (curl's `data`, a `ctx`) are passed to many callees and
+    # appear in unrelated guards; they say nothing about this call.
+    callees_by_var = {}
+    for c in after.get("calls", []) or []:
+        for v in c.get("args", []) or []:
+            if v:
+                callees_by_var.setdefault(v, set()).add(c.get("callee", ""))
+    rules = set()
+    for c in after.get("calls", []) or []:
+        line = int(c.get("line", 0))
+        for i, v in enumerate(c.get("args", []) or []):
+            if (v and len(callees_by_var.get(v, ())) < HANDLE_CALLEES
+                    and _guard_near(new_guards, v, line, c.get("callee", ""))):
+                rules.add((c.get("callee", ""), i))
+    out = set()
+    for callee, i in rules:
+        for bc in before.get("calls", []) or []:
+            args = bc.get("args", []) or []
+            if (bc.get("callee", "") == callee and i < len(args) and args[i]
+                    and not _guard_has_var(before.get("guards", []), args[i],
+                                           int(bc.get("line", 0)))):
+                out.add((callee, i))
+                break
+    return out
+
+
+def find_missing_guards(t_fn, rules):
+    """Calls in T matching a rule whose argument variable has no earlier guard."""
     out = []
     seen = set()
-    b_calls = (b_fn or {}).get("calls", []) or []
-    t_calls = (t_fn or {}).get("calls", []) or []
-    added = (delta or {}).get("added_guards", []) or []
-    guarded_vars = set()
-    for g in added:
-        for v in g.get("vars", []) or []:
-            guarded_vars.add(v)
-    if not guarded_vars or not b_calls or not t_calls:
+    if not rules:
         return out
-    b_callees = {}
-    for c in b_calls:
-        b_callees.setdefault(c.get("callee", ""), []).append(c)
-    for tc in t_calls:
+    for tc in (t_fn or {}).get("calls", []) or []:
         callee = tc.get("callee", "")
-        if callee not in b_callees:
-            continue
-        t_args = tc.get("args", []) or []
-        t_line = int(tc.get("line", 0))
-        for bc in b_callees[callee]:
-            b_args = bc.get("args", []) or []
-            for i, b_var in enumerate(b_args):
-                if not b_var or b_var not in guarded_vars:
-                    continue
-                if i >= len(t_args):
-                    continue
-                t_var = t_args[i]
-                if not t_var:
-                    continue
-                if _guard_has_var((t_fn or {}).get("guards", []), t_var, t_line):
-                    continue
-                key = (t_line, t_var, callee)
-                if key not in seen:
-                    seen.add(key)
-                    out.append({"line": t_line, "variable": t_var, "callee": callee})
+        args = tc.get("args", []) or []
+        line = int(tc.get("line", 0))
+        for c, i in sorted(rules):
+            if c != callee or i >= len(args) or not args[i]:
+                continue
+            var = args[i]
+            if _guard_has_var((t_fn or {}).get("guards", []), var, line + 1):
+                continue
+            key = (line, var, callee)
+            if key not in seen:
+                seen.add(key)
+                out.append({"line": line, "variable": var, "callee": callee})
     out.sort(key=lambda e: (e["line"], e["variable"], e["callee"]))
     return out
 
@@ -145,7 +184,7 @@ def _pair_score(s_b, s_a, n_missing):
 
 def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
                     margin=MARGIN_DEFAULT, lsh_bands=LSH_BANDS_DEFAULT,
-                    lsh_rows=LSH_ROWS_DEFAULT):
+                    lsh_rows=LSH_ROWS_DEFAULT, min_nodes=MIN_NODES_DEFAULT):
     """Match target sfp docs against the corpus. Findings sorted by score desc."""
     pairs = []
     for doc in corpus:
@@ -172,6 +211,8 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
         for b in range(lsh_bands):
             buckets.setdefault((b, tuple(mh[b * lsh_rows:(b + 1) * lsh_rows])), []).append(i)
 
+    rules = [guard_rules(p[3], p[4], p[2].get("delta", {})) for p in pairs]
+
     def candidates(tfn):
         mh = tfn.get("minhash")
         if not mh or len(mh) != width:
@@ -194,14 +235,18 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
                     continue
                 s_b = cosine(t_kg, before.get("kgrams", {}) or {})
                 s_a = cosine(t_kg, (after or {}).get("kgrams", {}) or {}) if after else 0.0
-                structural = s_b >= min_before and s_b >= s_a + margin
-                missing = find_missing_guards(tfn, before, fn.get("delta", {}) or {})
+                structural = (s_b >= min_before and s_b >= s_a + margin
+                              and int(tfn.get("node_count", min_nodes)) >= min_nodes
+                              and int(before.get("node_count", min_nodes)) >= min_nodes)
+                missing = find_missing_guards(tfn, rules[i])
                 if not structural and not missing:
                     continue
                 score = _pair_score(s_b, s_a, len(missing))
                 matches.append({
                     "advisory_id": doc.get("advisory_id", ""),
                     "project": doc.get("project", ""),
+                    "path": f.get("path", ""),
+                    "function": fn.get("name", ""),
                     "cwe": doc.get("cwe"),
                     "fix_sha": doc.get("fix_sha", ""),
                     "repo": doc.get("repo", ""),
@@ -306,7 +351,8 @@ def self_test(corpus):
             tdoc = {"schema": "ksm-sfp/1", "file": f"selftest/{adv}/{fn.get('name', 'fn')}.c",
                     "language": lang, "coverage": "OK", "functions": [dict(fn_obj)]}
             got = match_documents([tdoc], corpus)
-            hit_own = any(m.get("advisory_id") == adv
+            hit_own = any(m.get("advisory_id") == adv and m.get("path") == f.get("path")
+                          and m.get("function") == fn.get("name")
                           for g in got for m in g.get("matches", []))
             if key == "before" and hit_own:
                 found_before += 1

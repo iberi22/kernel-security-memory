@@ -137,6 +137,49 @@ def changed_ranges(hunks):
     return _merge_ranges(old_nums), _merge_ranges(new_nums)
 
 
+def hunk_spans(hunks):
+    """(old_spans, new_spans): each hunk's full extent on each side.
+
+    A fix that only adds lines has no changed line on the old side, so the
+    vulnerable function would never be fingerprinted from changed lines alone.
+    The hunk span (changed lines plus context) locates it on both sides.
+    """
+    old, new = [], []
+    for h in hunks:
+        old.append((max(1, h["old_start"]), max(1, h["old_start"] + max(h["old_len"], 1) - 1)))
+        new.append((max(1, h["new_start"]), max(1, h["new_start"] + max(h["new_len"], 1) - 1)))
+    return _merge_ranges_pairs(old), _merge_ranges_pairs(new)
+
+
+def _merge_ranges_pairs(pairs):
+    out = []
+    for a, b in sorted(pairs):
+        if out and a <= out[-1][1] + 1:
+            out[-1] = (out[-1][0], max(out[-1][1], b))
+        else:
+            out.append((a, b))
+    return out
+
+
+def _overlaps(fn, ranges):
+    a, b = int(fn.get("start_line", 0)), int(fn.get("end_line", 0))
+    return any(a <= e and s <= b for s, e in ranges)
+
+
+TEST_DIRS = {"test", "tests", "testsuite", "unittests", "unit-tests"}
+
+
+def is_test_path(path):
+    return any(part in TEST_DIRS for part in path.split("/")[:-1])
+
+
+def slim_function(fn):
+    """Corpus copy of an sfp function: `vars` are only needed for target reports."""
+    if fn is None:
+        return None
+    return {k: v for k, v in fn.items() if k != "vars"}
+
+
 def format_ranges(ranges):
     return ",".join(f"{s}-{e}" for s, e in ranges)
 
@@ -174,15 +217,17 @@ def compute_delta(before_fn, after_fn):
     }
 
 
-def dumps(obj):
+def dumps(obj, compact=False):
+    if compact:
+        return json.dumps(obj, sort_keys=True, ensure_ascii=True, separators=(",", ":")) + "\n"
     return json.dumps(obj, indent=1, sort_keys=True, ensure_ascii=True) + "\n"
 
 
-def atomic_write_json(path, obj):
+def atomic_write_json(path, obj, compact=False):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(dumps(obj), encoding="utf-8")
+    tmp.write_text(dumps(obj, compact=compact), encoding="utf-8")
     os.replace(tmp, path)
 
 
@@ -378,7 +423,7 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
             path = f.get("filename", "")
             status = f.get("status", "modified")
             lang = language_for_path(path)
-            if not lang:
+            if not lang or is_test_path(path):
                 skipped += 1
                 continue
             patch = f.get("patch")
@@ -389,6 +434,7 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
                 continue
             hunks = parse_hunks(patch)
             old_ranges, new_ranges = changed_ranges(hunks)
+            old_spans, new_spans = hunk_spans(hunks)
             try:
                 if status == "added":
                     before_bytes = None
@@ -411,12 +457,12 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
                     bf = tmpdir / ("before_" + path.replace("/", "_"))
                     bf.parent.mkdir(parents=True, exist_ok=True)
                     bf.write_bytes(before_bytes)
-                    before_doc = run_fingerprint(str(bf), lang, format_ranges(old_ranges))
+                    before_doc = run_fingerprint(str(bf), lang, format_ranges(old_spans))
                 if after_bytes is not None:
                     af = tmpdir / ("after_" + path.replace("/", "_"))
                     af.parent.mkdir(parents=True, exist_ok=True)
                     af.write_bytes(after_bytes)
-                    after_doc = run_fingerprint(str(af), lang, format_ranges(new_ranges))
+                    after_doc = run_fingerprint(str(af), lang, format_ranges(new_spans))
             except FetchError:
                 raise
             except Exception as exc:
@@ -427,7 +473,11 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
                 parser_skipped += 1
             b_fns = {fn.get("name", ""): fn for fn in ((before_doc or {}).get("functions", []) or [])}
             a_fns = {fn.get("name", ""): fn for fn in ((after_doc or {}).get("functions", []) or [])}
-            names = sorted(set(b_fns) | set(a_fns))
+            # Touched = a changed line falls inside the function on either side;
+            # functions that only appear in the hunk context are dropped.
+            touched = ({n for n, fn in b_fns.items() if _overlaps(fn, old_ranges)}
+                       | {n for n, fn in a_fns.items() if _overlaps(fn, new_ranges)})
+            names = sorted(touched)
             if not names:
                 skipped += 1
                 continue
@@ -436,8 +486,8 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
                 bf, af = b_fns.get(name), a_fns.get(name)
                 fns.append({
                     "name": name,
-                    "before": bf,
-                    "after": af,
+                    "before": slim_function(bf),
+                    "after": slim_function(af),
                     "delta": compute_delta(bf, af),
                 })
             fns.sort(key=lambda x: x["name"])
@@ -476,7 +526,7 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
         "files": doc_files,
     }
     out_fp = Path(out_dir) / project / (candidate["advisory_id"] + ".json")
-    atomic_write_json(out_fp, doc)
+    atomic_write_json(out_fp, doc, compact=True)
     return doc, repo_used
 
 

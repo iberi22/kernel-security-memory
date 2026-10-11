@@ -6,6 +6,7 @@ from ksm.match import (
     cosine,
     est_jaccard,
     find_missing_guards,
+    guard_rules,
     is_candidate,
     load_corpus,
     match_documents,
@@ -19,7 +20,7 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures" / "fingerprints"
 
 def fn(name, kgrams, calls=(), guards=(), start=1, end=50, mh=None):
     return {"name": name, "start_line": start, "end_line": end,
-            "node_count": 10, "kgrams": dict(kgrams),
+            "node_count": 100, "kgrams": dict(kgrams),
             "minhash": list(mh) if mh is not None else [5] * 64,
             "calls": list(calls), "guards": list(guards), "vars": []}
 
@@ -123,7 +124,8 @@ class TestMissingGuards(unittest.TestCase):
         before = fn("copy_stuff", {"aa": 2, "bb": 1}, mh=[7] * 64,
                     calls=[{"callee": "memcpy", "line": 10, "args": ["dst", "src", "n"]}])
         after = fn("copy_stuff", {"cc": 2}, mh=[7] * 64,
-                   calls=[{"callee": "memcpy", "line": 12, "args": ["dst", "src", "n"]}])
+                   calls=[{"callee": "memcpy", "line": 12, "args": ["dst", "src", "n"]}],
+                   guards=[{"kind": "if", "line": 11, "vars": ["n"]}])
         delta = {"added_kgrams": {}, "removed_kgrams": {}, "added_calls": [],
                  "removed_calls": [],
                  "added_guards": [{"kind": "if", "vars": ["n"]}]}
@@ -158,15 +160,30 @@ class TestMissingGuards(unittest.TestCase):
     def test_wrong_argument_position_no_hit(self):
         before = fn("f", {"aa": 1}, mh=[7] * 64,
                     calls=[{"callee": "memcpy", "line": 3, "args": ["dst", "src", "n"]}])
-        t = fn("f", {"aa": 1}, mh=[7] * 64,
-               calls=[{"callee": "memcpy", "line": 9, "args": ["n", "src", "dst"]}])
-        # guard covers B's position-2 var "n"; T has "n" at position 0 instead
-        delta = {"added_kgrams": {}, "removed_kgrams": {}, "added_calls": [],
-                 "removed_calls": [], "added_guards": [{"kind": "if", "vars": ["src"]}],
-                 }
-        # T guards nothing; B pos1 var is "src", T pos1 var is "src" too -> hit on src
-        hits = find_missing_guards(t, before, delta)
-        self.assertEqual([(h["variable"], h["line"]) for h in hits], [("src", 9)])
+        after = fn("f", {"aa": 1}, mh=[7] * 64,
+                   calls=[{"callee": "memcpy", "line": 5, "args": ["dst", "src", "n"]}],
+                   guards=[{"kind": "if", "line": 4, "vars": ["n"]}])
+        delta = {"added_guards": [{"kind": "if", "vars": ["n"]}]}
+        rules = guard_rules(before, after, delta)
+        self.assertEqual(rules, {("memcpy", 2)})
+        # T passes its size at position 0, not 2: position 2 holds "dst".
+        t = fn("f", {"aa": 1}, calls=[{"callee": "memcpy", "line": 9, "args": ["n", "src", "dst"]}])
+        hits = find_missing_guards(t, rules)
+        self.assertEqual([(h["variable"], h["line"]) for h in hits], [("dst", 9)])
+
+    def test_rule_requires_the_added_guard_before_the_call_in_the_fix(self):
+        before = fn("f", {"aa": 1}, calls=[{"callee": "memcpy", "line": 3, "args": ["d", "s", "n"]}])
+        # The added guard comes after the call: it does not protect it.
+        after = fn("f", {"aa": 1}, calls=[{"callee": "memcpy", "line": 3, "args": ["d", "s", "n"]}],
+                   guards=[{"kind": "if", "line": 8, "vars": ["n"]}])
+        self.assertEqual(guard_rules(before, after, {"added_guards": [{"kind": "if", "vars": ["n"]}]}),
+                         set())
+
+    def test_fixed_version_never_flags_its_own_rule(self):
+        corpus = self._corpus()
+        after = corpus[0]["files"][0]["functions"][0]["after"]
+        findings = match_documents([tdoc("fixed.c", [after])], corpus)
+        self.assertEqual(findings, [])
 
 
 class TestOrderingAndRender(unittest.TestCase):

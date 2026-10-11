@@ -222,7 +222,38 @@ class TestBuildOne(unittest.TestCase):
         fp = self.out / "curl" / "CVE-2030-9001.json"
         text = fp.read_text(encoding="utf-8")
         self.assertTrue(text.endswith("\n"))
-        self.assertEqual(text, dumps(json.loads(text)))  # sorted keys, indent 1
+        self.assertEqual(text, dumps(json.loads(text), compact=True))  # sorted keys, compact
+        self.assertNotIn("vars", fn["before"])
+
+    def test_addition_only_fix_keeps_vulnerable_version(self):
+        # The fix only inserts a guard: no old-side line changes, yet the
+        # vulnerable function must be fingerprinted (via the hunk span).
+        self.before["start_line"], self.before["end_line"] = 5, 12
+        self.after["start_line"], self.after["end_line"] = 5, 13
+        neighbour = sfp_fn("helper", {"zz": 1}, start=13, end=30)
+        cand = {"project": "curl", "advisory_id": "CVE-2030-9004", "fix_sha": FIX, "cwe": None}
+        commit = fake_commit([fake_file(
+            "lib/socks.c", "@@ -9,4 +9,5 @@ f\n ctx\n ctx\n+guard\n ctx\n ctx\n")])
+        fc, fb, _ = self._fakes(commit)
+
+        def run_fp(path, lang, ranges):
+            self.seen.setdefault("ranges", []).append(ranges)
+            if os.path.basename(path).startswith("before_"):
+                return sfp_doc([self.before, neighbour])
+            return sfp_doc([self.after, dict(neighbour, start_line=14, end_line=31)])
+        doc, _ = build_one(cand, self.out, fetch_commit=fc, fetch_blob=fb, run_fingerprint=run_fp)
+        self.assertEqual(self.seen["ranges"], ["9-12", "9-13"])
+        fns = doc["files"][0]["functions"]
+        self.assertEqual([f["name"] for f in fns], ["do_SOCKS5"])  # context-only neighbour dropped
+        self.assertIsNotNone(fns[0]["before"])
+        self.assertIsNotNone(fns[0]["after"])
+
+    def test_test_directories_skipped(self):
+        cand = {"project": "curl", "advisory_id": "CVE-2030-9005", "fix_sha": FIX, "cwe": None}
+        commit = fake_commit([fake_file("tests/unit/unit1.c", "@@ -1 +1 @@\n-a\n+b\n")])
+        fc, fb, rf = self._fakes(commit)
+        doc, _ = build_one(cand, self.out, fetch_commit=fc, fetch_blob=fb, run_fingerprint=rf)
+        self.assertEqual(doc["files"], [])
 
     def test_repo_map_used(self):
         cand = {"project": "linux-cna", "advisory_id": "CVE-2030-9002",
