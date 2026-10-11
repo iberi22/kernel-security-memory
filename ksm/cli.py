@@ -532,6 +532,8 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 def _cmd_mcp(args: argparse.Namespace) -> int:
     from ksm.mcp import run_server
     return run_server(data_dir=args.data_dir)
+
+
 def _cmd_setup(args: argparse.Namespace) -> int:
     from ksm.setup import cmd_setup
     return cmd_setup(args)
@@ -540,6 +542,29 @@ def _cmd_setup(args: argparse.Namespace) -> int:
 def _cmd_doctor(args: argparse.Namespace) -> int:
     from ksm.setup import cmd_doctor
     return cmd_doctor(args)
+
+
+def _cmd_deps(args: argparse.Namespace) -> int:
+    from ksm.deps import DepsError, NoLockfileError, format_human, run_deps
+
+    try:
+        findings = run_deps(args.path, data_dir=args.data_dir, refresh=args.refresh)
+    except NoLockfileError as exc:
+        sys.stderr.write(f"Error: {exc}\n")
+        return 2
+    except DepsError as exc:
+        sys.stderr.write(f"Error: {exc}\n")
+        return 2
+
+    if args.json:
+        print(json.dumps(findings, indent=2, sort_keys=True))
+    else:
+        print(format_human(findings))
+
+    if args.strict and findings:
+        return 1
+    return 0
+
 
 def build_parser() -> argparse.ArgumentParser:
     """Construct top-level argument parser."""
@@ -597,6 +622,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_audit.add_argument("--data-dir", help="Path to KSM data directory")
     p_audit.add_argument("--json", action="store_true", help="Output evidence chain as JSON")
 
+    # deps
+    p_deps = subparsers.add_parser(
+        "deps", help="List known vulnerabilities in locked dependencies (OSV)"
+    )
+    p_deps.add_argument("path", help="Path to the repository to inspect")
+    p_deps.add_argument("--strict", action="store_true", help="Exit 1 on findings")
+    p_deps.add_argument("--data-dir", help="KSM data directory (OSV cache location)")
+    p_deps.add_argument("--refresh", action="store_true", help="Bypass the OSV disk cache")
+    p_deps.add_argument("--json", action="store_true", help="Output findings as JSON")
+
     # scan
     p_scan = subparsers.add_parser("scan", help="Scan code files with code-graph and match fingerprints")
     p_scan.add_argument("path", help="Path to scan")
@@ -638,6 +673,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "related": _cmd_related,
         "search": _cmd_search,
         "audit": _cmd_audit,
+        "deps": _cmd_deps,
         "scan": _cmd_scan,
         "mcp": _cmd_mcp,
         "setup": _cmd_setup,
