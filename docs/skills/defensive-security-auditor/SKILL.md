@@ -1,8 +1,8 @@
 ---
 name: defensive-security-auditor
-description: Defensive Security Specialist Auditor for SWAL agents (Jules, Hermes, Antigravity). Enforces pre-commit and pre-PR defensive contracts before writing sensitive C, Rust, Python, or shell code. Audits code against CVE pattern clusters, requires deterministic evidence chain hashes, and blocks vulnerable code with fail-closed gating.
+description: Defensive Security Specialist Auditor for any coding agent. Enforces pre-commit and pre-PR defensive contracts before writing sensitive C, Rust, Python, or shell code. Audits code against CVE pattern clusters, requires deterministic evidence chain hashes, and blocks vulnerable code with fail-closed gating.
 version: 1.2.0
-author: SWAL Kernel Security Memory Team
+author: Kernel Security Memory contributors
 languages:
   - C
   - Rust
@@ -13,7 +13,7 @@ languages:
 # Defensive Security Specialist Auditor
 
 ## Overview
-The **Defensive Security Specialist Auditor** acts as an automated, non-repudiable security verification gate for all code written or modified by autonomous agents in SWAL (**Jules**, **Hermes**, **Antigravity**).
+The **Defensive Security Specialist Auditor** acts as an automated, non-repudiable security verification gate for all code written or modified by autonomous coding agents. For quick repository checks (dependencies, patterns, fingerprints) start with the generic `skills/ksm/SKILL.md`; this skill is the deep reference for the regex auditor and its evidence gate.
 
 It grounds vulnerability detection directly in empirical evidence from the **Kernel Security Memory (KSM)** corpus and Top-30 open-source catalog studies (`pattern_clusters.json`).
 
@@ -33,7 +33,7 @@ Per-family triggers, checks and verified fix citations: `references/guardrails.m
 
 ## Explicit Language Triggers
 
-Any autonomous agent (`Jules`, `Hermes`, `Antigravity`) modifying code in the following languages MUST activate this skill before writing or staging changes:
+Any autonomous coding agent modifying code in the following languages MUST activate this skill before writing or staging changes:
 
 ### 1. C (`.c`, `.h`)
 - **Triggers**: Memory allocation/deallocation (`malloc`, `kmalloc`, `kzalloc`, `free`, `kfree`), string manipulation (`strcpy`, `strcat`, `sprintf`, `snprintf`), pointer arithmetic, array indexing, lock acquisition/release (`spin_lock`, `spin_unlock`, `mutex_lock`), parsing untrusted network/file formats.
@@ -63,7 +63,7 @@ All autonomous agents must abide by the following non-negotiable protocol:
 3. **Evidence Generation**: The audit MUST emit a structured evidence record with a deterministic `evidence_chain_hash`.
 
 ### Pre-PR Contract
-1. **Evidence Citation**: Any Pull Request opened by Jules, Hermes, or Antigravity MUST include in its PR description:
+1. **Evidence Citation**: Any Pull Request opened by an autonomous agent MUST include in its PR description:
    - The computed `evidence_chain_hash` (64-char lowercase SHA256).
    - The audited files count and verdict (`PASS`).
    - Statement that zero HIGH/CRITICAL patterns were introduced.
