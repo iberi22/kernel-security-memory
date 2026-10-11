@@ -19,7 +19,7 @@ concurrency:
 env:
   AUTOMATION_BRANCH: automation/fingerprints
   # Xavier commit whose `code-graph fingerprint` produces ksm-sfp/1.
-  XAVIER_REV: XAVIER_REV_PLACEHOLDER
+  XAVIER_REV: c4ff349c1dab96403d73b98de27388f248c70275
 
 jobs:
   build:
@@ -73,7 +73,7 @@ jobs:
           export KSM_CODE_GRAPH="$RUNNER_TEMP/code-graph/bin/code-graph"
           "$KSM_CODE_GRAPH" --version || true
           python3 scripts/fingerprints/build_fix_fingerprints.py \
-            --max-commits "$MAX_COMMITS" | tee "$RUNNER_TEMP/fingerprints.log"
+            --max-commits "$MAX_COMMITS" --tool "code-graph@${XAVIER_REV:0:8}" | tee "$RUNNER_TEMP/fingerprints.log"
           python3 scripts/fingerprints/match.py \
             --fingerprints docs/studies/fingerprints --self-test | tee -a "$RUNNER_TEMP/fingerprints.log"
           python3 -m unittest discover -s tests -p "test_*.py"
