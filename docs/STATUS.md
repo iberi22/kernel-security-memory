@@ -15,8 +15,8 @@ Date: 2026-10-11 UTC (vulnerability atlas).
 | Agent guardrails | 6 CWE families, 16 citations, every fix commit verified upstream | `docs/skills/defensive-security-auditor/references/guardrails.md` |
 | OSS Scanner integration | `scripts/oss_scanner/threat_model.py` writes an OSS-Scanner `threat_model.md` from a human context file plus KSM evidence; `enroll.py` writes `project.yaml` and validates it with the upstream `tools/validate.py`; selection manifest of the 23 enrolled projects (17 with OSV GIT data) | `docs/OSS-SCANNER.md`, `docs/studies/selection/oss-scanner-projects.json` |
 | Vulnerability Atlas | Static UI (`site/`) over generated site data: 18,434 CVEs in 12 projects (evidence-pack CVEs missing from catalogs included), CWE names from MITRE, top-10 related CVEs per CVE by TF-IDF over shared metadata. `ksm` CLI (`pyproject.toml`). Before/after code is fetched live from GitHub | `scripts/site/build_site_data.py`, `ksm/` |
-| Fix fingerprints | 100 fix commits (60 curl, 40 OpenSSL), 195 changed functions, 178 with both versions, produced by Xavier `code-graph fingerprint`; no source text. Matcher self-test: fixed versions flagged against their own pair 1.7%, vulnerable versions found 14.6%. `ksm scan` of curl 7.50.0: 11 of 12 findings with score >= 0.9 matched fixes released after that version | `docs/studies/fingerprints/`, `ksm/match.py` |
-| Tests | 773 run, 4 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| Fix fingerprints | 397 fix commits (curl 189, OpenSSL 169, SQLite 17, git 10, systemd 10, PostgreSQL 2), 0 failed, produced by Xavier `code-graph fingerprint`; no source text. Matcher self-test over 905 before/after pairs: fixed versions flagged against their own pair 1.1%. Five old releases (27,948 functions): 47 of 51 strong findings (score >= 0.9) matched a later fix of the same project (curl 7.50.0 30/31, OpenSSL 1.0.1 12/15, git 2.0.0 5/5, systemd 230 and SQLite 3.8.0 none); 0 strong findings from other projects' fixes | `docs/studies/fingerprints/`, `scripts/fingerprints/evaluate_release.py` |
+| Tests | 776 run, 4 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 
@@ -33,5 +33,5 @@ No LLM is used anywhere in extraction or enrichment.
 - `--offline --check` of snapshot catalogs, the CWE overlay and fragments needs their gitignored local caches; CI recomputes from the network.
 - Kernel test fixtures under `tests/fixtures/` are GPL-2.0-only excerpts carrying SPDX and provenance headers.
 - "Related CVEs" vectors are deterministic TF-IDF over metadata and fingerprint features, not neural embeddings. Until more CVEs carry fingerprints, most neighbours share only CWE and project.
-- Fingerprint matching is measured only within a project (patch presence across versions); detection across different projects is unmeasured.
+- Fingerprint matching finds missing patches within a project; across projects it raised no strong finding in 27,948 functions, so it neither produces noise nor, yet, finds the same bug in unrelated code. systemd and SQLite releases produced no strong finding (few fingerprinted fixes: 10 and 17).
 - Not implemented: neural embeddings, follow-up/revert tracking, native Xavier mount/unmount.

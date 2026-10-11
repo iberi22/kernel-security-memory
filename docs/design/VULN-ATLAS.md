@@ -180,17 +180,21 @@ score, the reasons in plain words ("fix added a check on `len` before `memcpy`;
 this function calls `memcpy(buf, p, n)` with no check on `n`"). Findings are
 hypotheses to review, never verdicts.
 
-Measured on 100 real fix commits (60 curl, 40 OpenSSL; 178 before/after
-pairs, 2026-10-11): fixed versions flagged against their own pair 1.7%, vulnerable
-versions found 14.6% (margin 0.05; 24% at 0.02, 33% at 0.01). Most fixes change
-too little structure to separate the versions; the margin stays conservative.
+Measured on 397 real fix commits (905 before/after pairs, 2026-10-11): fixed
+versions flagged against their own pair 1.1%, vulnerable versions found 19.5%
+(margin 0.05). Most fixes change too little structure to separate the versions;
+the margin stays conservative. On five old releases
+(`scripts/fingerprints/evaluate_release.py`, 27,948 functions) 47 of 51 strong
+findings matched a later fix of the same project and other projects' fixes gave
+none. ALL_CAPS names are macro constants and never form missing-guard rules; a
+target closer to the fixed version than to the vulnerable one gets no similarity
+credit.
 
 The self-test compares each corpus function with its own pair, so it mostly
 checks that the scoring rules hold (a fixed version never violates its own
 missing-guard rule; tiny functions never score on similarity) rather than
 detection quality. Detection is measured by scanning real older releases
-(curl 7.50.0: 11 of 12 findings with score >= 0.9 matched fixes released after
-that version). Similarity only counts toward the score when both functions have
+(five releases: 47 of 51 strong findings matched later fixes). Similarity only counts toward the score when both functions have
 at least 40 named nodes; a target guard counts as a precondition only on an
 earlier line and when it does not name the callee (a check of the call's result).
 

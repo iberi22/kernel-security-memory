@@ -20,7 +20,7 @@ ksm audit path/to/code          # regex rules of the defensive auditor
 ksm scan path/to/code           # structural match against fix fingerprints
 ```
 
-`ksm scan` needs Xavier's `code-graph` with the `fingerprint` subcommand (`KSM_CODE_GRAPH` or `PATH`): `cargo install --locked --git https://github.com/iberi22/xavier --rev <XAVIER_REV from .github/workflows/fingerprints.yml> code-graph`. It reports functions that look more like the vulnerable version of a known fix than the fixed one, and calls missing a check that the fix added, with file, line and variable. Findings are hypotheses to review. On curl 7.50.0, 11 of 12 findings with score >= 0.9 matched fixes released after that version; matching across different projects is not measured yet.
+`ksm scan` needs Xavier's `code-graph` with the `fingerprint` subcommand (`KSM_CODE_GRAPH` or `PATH`): `cargo install --locked --git https://github.com/iberi22/xavier --rev <XAVIER_REV from .github/workflows/fingerprints.yml> code-graph`. It reports functions that look more like the vulnerable version of a known fix than the fixed one, and calls missing a check that the fix added, with file, line and variable. Findings are hypotheses to review. Measured on five old releases (curl 7.50.0, OpenSSL 1.0.1, git 2.0.0, systemd 230, SQLite 3.8.0; 27,948 functions): 47 of 51 findings with score >= 0.9 matched a fix of the same project published after the release, and fixes of other projects produced no strong finding. Matching is therefore useful for missing patches of a known project; it does not yet find the same bug in unrelated code.
 
 Prebuilt Linux binary in the [releases page](https://github.com/iberi22/kernel-security-memory/releases) (`code-graph-<rev>` tags), verify with the .sha256 file.
 

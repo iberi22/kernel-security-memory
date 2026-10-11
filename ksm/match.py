@@ -2,6 +2,7 @@
 against the ksm-fixfp/1 corpus. Deterministic, stdlib only."""
 import json
 import math
+import re
 from pathlib import Path
 
 MIN_BEFORE_DEFAULT = 0.55
@@ -17,6 +18,8 @@ MIN_NODES_DEFAULT = 40
 # distinct callees are treated as context handles and never form a rule.
 GUARD_WINDOW = 8
 HANDLE_CALLEES = 3
+# ALL_CAPS names are macro constants (SSL3_RANDOM_SIZE): nothing to check.
+CONSTANT_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 
 def load_corpus(fingerprints_dir):
@@ -132,7 +135,7 @@ def guard_rules(before, after, delta):
     for c in after.get("calls", []) or []:
         line = int(c.get("line", 0))
         for i, v in enumerate(c.get("args", []) or []):
-            if (v and len(callees_by_var.get(v, ())) < HANDLE_CALLEES
+            if (v and not CONSTANT_RE.match(v) and len(callees_by_var.get(v, ())) < HANDLE_CALLEES
                     and _guard_near(new_guards, v, line, c.get("callee", ""))):
                 rules.add((c.get("callee", ""), i))
     out = set()
@@ -167,7 +170,7 @@ def find_missing_guards(t_fn, rules):
         args = tc.get("args", []) or []
         line = int(tc.get("line", 0))
         for c, i in sorted(rules):
-            if c != callee or i >= len(args) or not args[i]:
+            if c != callee or i >= len(args) or not args[i] or CONSTANT_RE.match(args[i]):
                 continue
             var = args[i]
             if _precondition_guard((t_fn or {}).get("guards", []), var, line, callee):
@@ -187,10 +190,12 @@ def commit_url(project, repo, fix_sha):
 
 
 def _pair_score(s_b, s_a, n_missing, sized):
-    """Contract score; similarity only counts when both functions are large
-    enough (tiny functions look alike), so a tiny function scores 0.1 per
-    missing guard at most."""
-    base = s_b - max(0.0, s_a - s_b) if sized else 0.0
+    """Score: similarity to the vulnerable version when both functions are large
+    enough (tiny functions look alike) and the target is at least as close to the
+    vulnerable version as to the fixed one, plus 0.1 per missing guard."""
+    # A function closer to the fixed version than to the vulnerable one gets no
+    # similarity credit; a missing guard alone then stays a weak finding.
+    base = s_b if sized and s_b >= s_a else 0.0
     return min(1.0, max(0.0, base + 0.1 * n_missing))
 
 
@@ -313,9 +318,10 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
     return findings
 
 
-# Score at or above which a finding is reported as strong. Measured on curl
-# 7.50.0 against 60 curl fix fingerprints: 11 of 12 findings >= 0.9 matched a
-# fix released after that version; 5 of 14 below 0.7 did.
+# Score at or above which a finding is reported as strong. Measured on five old
+# releases (scripts/fingerprints/evaluate_release.py, 397 fix fingerprints):
+# 47 of 51 strong findings matched a fix of that project published after the
+# release, and none came from another project's fixes.
 STRONG_SCORE = 0.9
 
 

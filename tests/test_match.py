@@ -213,6 +213,30 @@ class TestReviewRegressions(unittest.TestCase):
         got = match_documents([tdoc("t.c", [t])], self._rule_corpus())
         self.assertEqual([(g["line"], g["variable"]) for g in got[0]["lines"]], [(9, "len")])
 
+    def test_macro_constants_never_form_or_trigger_rules(self):
+        before = fn("f", {"aa": 1}, calls=[{"callee": "memcpy", "line": 3, "args": ["p", "s", "RANDOM_SIZE"]}])
+        after = fn("f", {"aa": 1}, calls=[{"callee": "memcpy", "line": 5, "args": ["p", "s", "RANDOM_SIZE"]}],
+                   guards=[{"kind": "if", "line": 4, "vars": ["RANDOM_SIZE", "len"]}])
+        delta = {"added_guards": [{"kind": "if", "vars": ["RANDOM_SIZE", "len"]}]}
+        self.assertEqual(guard_rules(before, after, delta), set())
+        t = fn("g", {"qq": 1}, calls=[{"callee": "memcpy", "line": 9, "args": ["d", "s", "MAX_LEN"]}])
+        self.assertEqual(find_missing_guards(t, {("memcpy", 2)}), [])
+
+    def test_closer_to_fixed_version_is_never_strong(self):
+        before = fn("f", {"aa": 10, "cc": 1}, mh=[7] * 64,
+                    calls=[{"callee": "memcpy", "line": 3, "args": ["d", "s", "n"]}])
+        after = fn("f", {"aa": 10, "bb": 1}, mh=[7] * 64,
+                   calls=[{"callee": "memcpy", "line": 5, "args": ["d", "s", "n"]}],
+                   guards=[{"kind": "if", "line": 4, "vars": ["n"]}])
+        corpus = [pair_doc(before=before, after=after,
+                           delta={"added_guards": [{"kind": "if", "vars": ["n"]}]})]
+        # Structurally the fixed version (s_after 1.0 > s_before 0.99), one unchecked call.
+        t = fn("f", {"aa": 10, "bb": 1}, mh=[7] * 64,
+               calls=[{"callee": "memcpy", "line": 9, "args": ["d", "s", "len"]}])
+        got = match_documents([tdoc("t.c", [t])], corpus)
+        self.assertEqual(len(got), 1)  # the unchecked memcpy is still reported
+        self.assertLess(got[0]["score"], 0.9)
+
     def test_non_object_corpus_file_is_ignored(self):
         import json
         import tempfile
