@@ -438,7 +438,9 @@ def run_scan(
         collected_files = collected_files[: max_files]
 
     # Resolve code-graph binary
-    code_graph_bin = os.environ.get("KSM_CODE_GRAPH") or shutil.which("code-graph")
+    from ksm.scanner import resolve_code_graph_bin, verify_code_graph_bin
+
+    code_graph_bin = resolve_code_graph_bin(data_dir)
     if not code_graph_bin:
         raise RuntimeError(
             "Error: 'code-graph' executable not found.\n"
@@ -446,6 +448,12 @@ def run_scan(
             "Prebuilt Linux binary: https://github.com/iberi22/kernel-security-memory/releases "
             "(asset code-graph-x86_64-linux.tar.gz)\n"
             "Or build from source via the cargo command in README."
+        )
+
+    if not verify_code_graph_bin(code_graph_bin):
+        raise RuntimeError(
+            f"Error: {code_graph_bin} has no `fingerprint` subcommand (an old or unrelated "
+            "code-graph). Run `ksm setup`, or set KSM_CODE_GRAPH."
         )
 
     target_docs = []
@@ -467,7 +475,7 @@ def run_scan(
         raise RuntimeError(
             f"Error: {code_graph_bin} produced no ksm-sfp/1 output for any of "
             f"{len(collected_files)} files. It needs the `fingerprint` subcommand "
-            "(Xavier code-graph, see docs/design/VULN-ATLAS.md); set KSM_CODE_GRAPH."
+            "Run `ksm setup`, or set KSM_CODE_GRAPH."
         )
     if failed:
         sys.stderr.write(f"Warning: {failed} of {len(collected_files)} files could not be fingerprinted.\n")
@@ -524,7 +532,14 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 def _cmd_mcp(args: argparse.Namespace) -> int:
     from ksm.mcp import run_server
     return run_server(data_dir=args.data_dir)
+def _cmd_setup(args: argparse.Namespace) -> int:
+    from ksm.setup import cmd_setup
+    return cmd_setup(args)
 
+
+def _cmd_doctor(args: argparse.Namespace) -> int:
+    from ksm.setup import cmd_doctor
+    return cmd_doctor(args)
 
 def build_parser() -> argparse.ArgumentParser:
     """Construct top-level argument parser."""
@@ -594,6 +609,15 @@ def build_parser() -> argparse.ArgumentParser:
     # mcp
     p_mcp = subparsers.add_parser("mcp", help="Run MCP server over stdio")
     p_mcp.add_argument("--data-dir", help="Path to KSM data directory")
+    # setup
+    p_setup = subparsers.add_parser("setup", help="Install code-graph scanner binary")
+    p_setup.add_argument("--from-cargo", action="store_true", help="Build code-graph from source using cargo")
+    p_setup.add_argument("--data-dir", help="Destination data directory")
+
+    # doctor
+    p_doctor = subparsers.add_parser("doctor", help="Check KSM data and scanner readiness")
+    p_doctor.add_argument("--data-dir", help="Path to KSM data directory")
+    p_doctor.add_argument("--json", action="store_true", help="Output status as JSON")
 
     return parser
 
@@ -616,6 +640,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "audit": _cmd_audit,
         "scan": _cmd_scan,
         "mcp": _cmd_mcp,
+        "setup": _cmd_setup,
+        "doctor": _cmd_doctor,
     }
 
     handler = dispatch.get(args.subcommand)
