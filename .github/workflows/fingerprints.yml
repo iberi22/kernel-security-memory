@@ -19,7 +19,7 @@ concurrency:
 env:
   AUTOMATION_BRANCH: automation/fingerprints
   # Xavier commit whose `code-graph fingerprint` produces ksm-sfp/1.
-  XAVIER_REV: c4ff349c1dab96403d73b98de27388f248c70275
+  XAVIER_REV: 229aa969aaac293ea9a4dee6f3999d19b178b4ce
 
 jobs:
   build:
