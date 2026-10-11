@@ -27,10 +27,21 @@ CONSTANT_RE = re.compile(r"^[A-Z]")
 DELETED_MIN_BEFORE = 0.9
 
 
+# Trait-implementation boilerplate (Display/Debug, Clone, PartialEq, Hash,
+# Default, From/Into, AsRef/Deref) looks the same in every crate: a match on
+# these names says nothing about a vulnerability.
+BOILERPLATE_FUNCTIONS = frozenset({
+    "fmt", "clone", "clone_from", "eq", "ne", "cmp", "partial_cmp", "hash",
+    "default", "from", "into", "try_from", "try_into", "as_ref", "as_mut",
+    "deref", "deref_mut", "borrow", "borrow_mut", "to_string", "from_str",
+})
+
+
 def is_test_function(name):
-    """Unit tests: fix commits add them and every project has them, so they
-    only ever match each other."""
-    return name.startswith("test_") or name.endswith("_test") or name.startswith("check_")
+    """Unit tests and trait boilerplate: fix commits add tests and every project
+    has both, so they only ever match each other."""
+    return (name.startswith("test_") or name.endswith("_test") or name.startswith("check_")
+            or name in BOILERPLATE_FUNCTIONS)
 
 
 def load_corpus(fingerprints_dir):

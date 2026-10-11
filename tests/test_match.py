@@ -247,6 +247,12 @@ class TestReviewRegressions(unittest.TestCase):
         self.assertEqual([f["matches"][0]["advisory_id"] for f in same], ["CVE-2030-0009"])
         self.assertGreaterEqual(same[0]["score"], 0.9)
 
+    def test_trait_boilerplate_never_matches(self):
+        corpus = [pair_doc(before=fn("fmt", {"aa": 5}, mh=[7] * 64), after=None)]
+        corpus[0]["files"][0]["functions"][0]["name"] = "fmt"
+        corpus[0]["files"][0]["functions"][0]["after"] = None
+        self.assertEqual(match_documents([tdoc("e.rs", [fn("fmt", {"aa": 5}, mh=[7] * 64)])], corpus), [])
+
     def test_capitalized_names_never_form_or_trigger_rules(self):
         before = fn("f", {"aa": 1}, calls=[{"callee": "Ok", "line": 3, "args": ["Self"]}])
         after = fn("f", {"aa": 1}, calls=[{"callee": "Ok", "line": 5, "args": ["Self"]}],
