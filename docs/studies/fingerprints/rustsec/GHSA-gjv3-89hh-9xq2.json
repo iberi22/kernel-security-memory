@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-gjv3-89hh-9xq2","coverage":"PARTIAL","cwe":"CWE-159","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"3bbac859c7132b21ba5fdf2d47f1dd52e7e73d98","parent_sha":"c8c18e215e33d4e27f530aebbfd0d04373265717","project":"rustsec","repo":"risc0/risc0-ethereum","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

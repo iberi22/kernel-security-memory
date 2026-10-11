@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2018-0011","coverage":"PARTIAL","cwe":"CWE-119","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"a5256f3e5e23b83eaad69699e0b04653aba04fb8","parent_sha":"cdd0c10b8ebc7b3378ce23e45769554aa42033b0","project":"rustsec","repo":"arrayfire/arrayfire-rust","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

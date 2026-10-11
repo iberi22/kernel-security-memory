@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2025-0000","coverage":"PARTIAL","cwe":"CWE-682","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"ce3b67f801446387972ff120e907ca828a9f1207","parent_sha":"260037c4c7013a54d4cca216f1cfe136d8eb7a0d","project":"rustsec","repo":"matrix-org/matrix-rust-sdk","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0058","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"e1e347d2725b9c9dd4a70b63eb08532ca9687652","parent_sha":"95501ae7198dee5d847aa43549b03b24ee4e5ef3","project":"rustsec","repo":"dtolnay/inventory","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

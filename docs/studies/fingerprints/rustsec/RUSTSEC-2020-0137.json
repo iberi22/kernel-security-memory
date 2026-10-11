@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0137","coverage":"PARTIAL","cwe":"CWE-362","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"4a4cca61cdb25061967d58522229e147483007b1","parent_sha":"339ae8208ef6be7c4ea8a9a7ad375f153488fa53","project":"rustsec","repo":"vertexclique/lever","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

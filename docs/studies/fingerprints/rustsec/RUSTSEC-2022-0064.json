@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2022-0064","coverage":"PARTIAL","cwe":"CWE-120","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"4a31c14f31e1a08c18893a37e304dd1dd4b7daa3","parent_sha":"cbbb491cc1fbf7f1848fcfcc02c94aa32a513252","project":"rustsec","repo":"alexcrichton/openssl-src-rs","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

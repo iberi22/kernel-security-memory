@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2024-0334","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"e1fdc92ca69ffd254824ab80fbad5660f4aac911","parent_sha":"6768dcdf2842ece58cb149599ab644240fdf7ee4","project":"rustsec","repo":"comit-network/rust-libp2p-tokio-socks5","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

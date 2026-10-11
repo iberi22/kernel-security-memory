@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2021-0032","coverage":"PARTIAL","cwe":"CWE-119","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"a535678377de12bc6bc22620c5f59bcc1369f76f","parent_sha":"9c41996e55bc91557edd6fa6f6a1c07a48c55731","project":"rustsec","repo":"wwylele/byte-struct-rs","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

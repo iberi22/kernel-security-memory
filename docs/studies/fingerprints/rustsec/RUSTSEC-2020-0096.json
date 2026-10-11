@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0096","coverage":"PARTIAL","cwe":"CWE-662","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"0b3a7b228b0fe70446393f55c8b893f349f3f6bd","parent_sha":"9c2726ad5d2917cc5e1b963ffc796b8d19a99ee7","project":"rustsec","repo":"bodil/im-rs","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2024-0411","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"508a69b63a3c5bf73790e0e59101a955847f30d6","parent_sha":"123b8d785bdb8e360d359a78d96da871667cffae","project":"rustsec","repo":"gtk-rs/gtk3-rs","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

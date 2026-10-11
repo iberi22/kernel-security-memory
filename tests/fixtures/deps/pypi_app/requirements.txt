@@ -1,0 +1,13 @@
+# pinned core
+leftpad==0.3.1
+Some.Pkg_Name==2.0
+uvicorn[standard]==0.30.0
+
+# not pins, must be skipped
+unpinned>=1.0.0
+requests
+
+# options and includes, must be skipped
+--index-url https://pypi.org/simple
+-e .
+-r other.txt

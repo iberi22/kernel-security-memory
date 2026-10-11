@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2024-0423","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"094c356273f209e04bf481fb404dc17990ae76e0","parent_sha":"4d2af947a7983b576b6aa295697a1fa3f2646eba","project":"rustsec","repo":"pentamassiv/gtk-layer-shell-gir","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

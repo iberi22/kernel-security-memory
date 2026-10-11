@@ -270,7 +270,18 @@ class TestBuildOne(unittest.TestCase):
                   for i in range(299)]
         fc, fb, rf = self._fakes(fake_commit(files))
         doc, _ = build_one(cand, self.out, fetch_commit=fc, fetch_blob=fb, run_fingerprint=rf)
-        self.assertEqual(doc["coverage"], "PARTIAL")
+        # 300 touched functions: never "OK"; the breadth limit labels it TOO_BROAD.
+        self.assertEqual(doc["coverage"], "TOO_BROAD")
+
+    def test_broad_commit_keeps_no_function_fingerprints(self):
+        from ksm.fixfp import apply_breadth_limit
+        fn = {"name": "f", "before": {}, "after": {}, "delta": {}}
+        doc = {"coverage": "OK", "files": [{"path": "a.rs", "functions": [dict(fn)] * 61}]}
+        apply_breadth_limit(doc)
+        self.assertEqual((doc["coverage"], doc["functions_touched"], doc["files"][0]["functions"]),
+                         ("TOO_BROAD", 61, []))
+        small = {"coverage": "OK", "files": [{"path": "a.rs", "functions": [dict(fn)] * 60}]}
+        self.assertEqual(apply_breadth_limit(small)["coverage"], "OK")
 
     def test_test_directories_skipped(self):
         cand = {"project": "curl", "advisory_id": "CVE-2030-9005", "fix_sha": FIX, "cwe": None}
@@ -410,6 +421,16 @@ class TestIndexResume(unittest.TestCase):
         build_all(self.cat, self.out, max_commits=1, fetch_commit=fetch_commit,
                   fetch_blob=fb, run_fingerprint=run_fp)
         self.assertEqual(ranges_seen, [])
+
+    def test_advisory_commit_link_is_a_labelled_candidate(self):
+        write_catalog(self.cat, "rustsec", [
+            {"advisory_id": "RUSTSEC-2030-0001", "fix_shas": [], "repo": "o/crate",
+             "reference_commit_shas": ["d" * 40], "cwe": None, "published": "2030-01-01"},
+            {"advisory_id": "RUSTSEC-2030-0002", "fix_shas": [], "repo": None,
+             "reference_commit_shas": [], "cwe": None, "published": "2030-01-01"}])
+        cands = [c for c in load_candidates(self.cat) if c["project"] == "rustsec"]
+        self.assertEqual([(c["advisory_id"], c["fix_sha"], c["repo"], c["fix_evidence"]) for c in cands],
+                         [("RUSTSEC-2030-0001", "d" * 40, "o/crate", "advisory-commit-link")])
 
     def test_save_index_sorted(self):
         save_index(self.out, {"done": [

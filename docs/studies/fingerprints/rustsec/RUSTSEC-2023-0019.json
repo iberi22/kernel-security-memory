@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0019","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"f92e4c047fdc30619555da282ac7ccce1d313aa6","parent_sha":"22004a8b5b499baa86bdde0a25e1e6320254fd32","project":"rustsec","repo":"kuchiki-rs/kuchiki","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

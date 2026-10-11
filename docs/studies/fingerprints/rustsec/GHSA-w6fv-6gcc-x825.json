@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-w6fv-6gcc-x825","coverage":"PARTIAL","cwe":"CWE-783","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"01d8e89f799e6ba21bdf7dc668abce23bd0d8f78","parent_sha":"2e3828d559ca395a150df5aaa4af8813cd0da160","project":"rustsec","repo":"coreos/zincati","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

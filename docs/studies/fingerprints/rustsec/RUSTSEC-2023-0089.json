@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0089","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"48e55c166684f37af0b00fbee5a0809b1a2bae8e","parent_sha":"aeb80b3638e96f8e3bf29b4f4ca4a03a2d2eafab","project":"rustsec","repo":"embassy-rs/atomic-polyfill","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

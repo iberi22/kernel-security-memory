@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0029","coverage":"PARTIAL","cwe":"CWE-347","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"9bacb86a480803ece9d1a45aa443081cf1eb815c","parent_sha":"50cb9531b36cd2aae57426be1a944d5253aaaba5","project":"rustsec","repo":"nats-io/nats.rs","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

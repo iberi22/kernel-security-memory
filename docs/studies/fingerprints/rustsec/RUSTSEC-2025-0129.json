@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2025-0129","coverage":"PARTIAL","cwe":"CWE-345","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"60e0ada5291e771d5649793329d99edd32285e72","parent_sha":"8e279363a84b72632d22cf14151f877223bc8737","project":"rustsec","repo":"LFDT-Lockness/cggmp21","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

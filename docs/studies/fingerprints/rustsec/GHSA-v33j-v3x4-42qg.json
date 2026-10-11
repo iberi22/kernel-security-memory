@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-v33j-v3x4-42qg","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"248ac41cfa1797c52241c6ef756490d90027cdf2","parent_sha":"7dcdbd1796785392b1e829d1f07c6687b9a8f27d","project":"rustsec","repo":"Orange-OpenSource/hurl","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-3qx3-6hxr-j2ch","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"47c9b90368c49117ba42760bd58acafa3362cbd4","parent_sha":"708f7be887055ff45d7849d6d730bdecc920822f","project":"rustsec","repo":"eza-community/eza","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

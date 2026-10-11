@@ -39,6 +39,7 @@ CANDIDATE_SOURCES = [
     ("sqlite", ["sqlite-upstream", "sqlite"]),
     ("systemd", ["systemd-upstream", "systemd"]),
     ("postgres", ["postgres-upstream", "postgresql", "postgres"]),
+    ("rustsec", ["rustsec"]),
     ("linux-cna", ["linux-cna"]),
 ]
 
@@ -55,6 +56,10 @@ EXT_TO_LANG = {
 
 
 RATE_LIMIT_STATUSES = (403, 429)
+# A fix commit that touches more functions than this is a refactor or release
+# commit, not a focused fix: its function fingerprints are dropped (coverage
+# TOO_BROAD) so they neither bloat the corpus nor produce unrelated rules.
+MAX_FUNCTIONS_PER_FIX = 60
 COMMIT_API_FILE_LIMIT = 300
 
 
@@ -186,6 +191,17 @@ def format_ranges(ranges):
     return ",".join(f"{s}-{e}" for s, e in ranges)
 
 
+def apply_breadth_limit(doc, limit=MAX_FUNCTIONS_PER_FIX):
+    """Drop function fingerprints of overly broad fix commits (in place)."""
+    touched = sum(len(f.get("functions", [])) for f in doc.get("files", []))
+    if touched > limit:
+        doc["coverage"] = "TOO_BROAD"
+        doc["functions_touched"] = touched
+        for f in doc.get("files", []):
+            f["functions"] = []
+    return doc
+
+
 def compute_delta(before_fn, after_fn):
     """Delta between paired sfp function objects (either may be None)."""
     b_kg = (before_fn or {}).get("kgrams", {}) or {}
@@ -261,15 +277,25 @@ def load_candidates(catalog_dir, only_project=None):
             rows = sorted(rows, key=lambda r: str(r.get("advisory_id", "")), reverse=True)
         for r in rows:
             shas = r.get("fix_shas", []) or []
+            evidence = "fix-reference"
+            if not shas:
+                # Advisory databases that never type links as FIX (RustSec):
+                # a commit linked from the advisory is a fix candidate.
+                shas = r.get("reference_commit_shas", []) or []
+                evidence = "advisory-commit-link"
             if not shas:
                 continue
-            out.append({
+            cand = {
                 "project": project,
                 "advisory_id": r.get("advisory_id", ""),
                 "fix_sha": shas[0],
+                "fix_evidence": evidence,
                 "cwe": r.get("cwe"),
                 "published": r.get("published"),
-            })
+            }
+            if r.get("repo"):
+                cand["repo"] = r["repo"]
+            out.append(cand)
     return out
 
 
@@ -400,7 +426,7 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
 
     project = candidate["project"]
     fix_sha = candidate["fix_sha"]
-    repo = REPO_MAP.get(project, project)
+    repo = candidate.get("repo") or REPO_MAP.get(project, project)
 
     try:
         commit = fetch_commit(repo, fix_sha)
@@ -527,12 +553,14 @@ def build_one(candidate, out_dir, code_graph_bin="code-graph", tool="code-graph@
         "project": project,
         "repo": repo_used,
         "fix_sha": fix_sha,
+        "fix_evidence": candidate.get("fix_evidence", "fix-reference"),
         "parent_sha": parent_sha,
         "cwe": candidate.get("cwe"),
         "tool": tool,
         "coverage": coverage,
         "files": doc_files,
     }
+    apply_breadth_limit(doc)
     out_fp = Path(out_dir) / project / (candidate["advisory_id"] + ".json")
     atomic_write_json(out_fp, doc, compact=True)
     return doc, repo_used

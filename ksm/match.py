@@ -18,8 +18,19 @@ MIN_NODES_DEFAULT = 40
 # distinct callees are treated as context handles and never form a rule.
 GUARD_WINDOW = 8
 HANDLE_CALLEES = 3
-# ALL_CAPS names are macro constants (SSL3_RANDOM_SIZE): nothing to check.
-CONSTANT_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+# Names starting with a capital are macro constants (SSL3_RANDOM_SIZE) in C and
+# types, enum variants or `Self` in Rust (Ok, Some, Self): nothing to check.
+CONSTANT_RE = re.compile(r"^[A-Z]")
+
+
+# Similarity required to a function the fix deleted (see match_documents).
+DELETED_MIN_BEFORE = 0.9
+
+
+def is_test_function(name):
+    """Unit tests: fix commits add them and every project has them, so they
+    only ever match each other."""
+    return name.startswith("test_") or name.endswith("_test") or name.startswith("check_")
 
 
 def load_corpus(fingerprints_dir):
@@ -199,21 +210,19 @@ def _pair_score(s_b, s_a, n_missing, sized):
     return min(1.0, max(0.0, base + 0.1 * n_missing))
 
 
-def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
-                    margin=MARGIN_DEFAULT, lsh_bands=LSH_BANDS_DEFAULT,
-                    lsh_rows=LSH_ROWS_DEFAULT, min_nodes=MIN_NODES_DEFAULT):
-    """Match target sfp docs against the corpus. Findings sorted by score desc."""
+def build_index(corpus, lsh_bands=LSH_BANDS_DEFAULT, lsh_rows=LSH_ROWS_DEFAULT):
+    """Pairs, missing-guard rules and the LSH buckets of a corpus; build once,
+    reuse across many match_documents calls (self_test, MCP, batch scans)."""
     pairs = []
     for doc in corpus:
         for f in doc.get("files", []) or []:
             for fn in f.get("functions", []) or []:
                 before, after = fn.get("before"), fn.get("after")
-                if before is None:
+                if before is None or is_test_function(fn.get("name", "")):
                     continue
                 pairs.append((doc, f, fn, before, after))
     pairs.sort(key=lambda p: (str(p[0].get("project", "")), str(p[0].get("advisory_id", "")),
                               str(p[1].get("path", "")), str(p[2].get("name", ""))))
-
     # LSH index over the corpus "before" minhashes: a target function is only
     # compared with pairs sharing at least one band (pairs without a usable
     # minhash are always compared). Avoids target x corpus cosine products.
@@ -227,8 +236,20 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
             continue
         for b in range(lsh_bands):
             buckets.setdefault((b, tuple(mh[b * lsh_rows:(b + 1) * lsh_rows])), []).append(i)
-
     rules = [guard_rules(p[3], p[4], p[2].get("delta", {})) for p in pairs]
+    return {"pairs": pairs, "buckets": buckets, "unindexed": unindexed, "rules": rules,
+            "bands": lsh_bands, "rows": lsh_rows}
+
+
+def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
+                    margin=MARGIN_DEFAULT, lsh_bands=LSH_BANDS_DEFAULT,
+                    lsh_rows=LSH_ROWS_DEFAULT, min_nodes=MIN_NODES_DEFAULT, index=None):
+    """Match target sfp docs against the corpus. Findings sorted by score desc."""
+    if index is None or (index["bands"], index["rows"]) != (lsh_bands, lsh_rows):
+        index = build_index(corpus, lsh_bands, lsh_rows)
+    pairs, buckets, unindexed, rules = (index["pairs"], index["buckets"],
+                                        index["unindexed"], index["rules"])
+    width = lsh_bands * lsh_rows
 
     def candidates(tfn):
         mh = tfn.get("minhash")
@@ -244,6 +265,8 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
         tfile = tdoc.get("file", "")
         for tfn in tdoc.get("functions", []) or []:
             tname = tfn.get("name", "")
+            if is_test_function(tname):
+                continue
             t_kg = tfn.get("kgrams", {}) or {}
             matches = []
             for i in candidates(tfn):
@@ -254,11 +277,17 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
                 s_a = cosine(t_kg, (after or {}).get("kgrams", {}) or {}) if after else 0.0
                 sized = (int(tfn.get("node_count", min_nodes)) >= min_nodes
                          and int(before.get("node_count", min_nodes)) >= min_nodes)
-                structural = sized and s_b >= min_before and s_b >= s_a + margin
+                # A function the fix deleted (vulnerable code removed) has no
+                # fixed version to compare with: only near-identical code counts.
+                if after is None:
+                    structural = sized and s_b >= DELETED_MIN_BEFORE
+                else:
+                    structural = sized and s_b >= min_before and s_b >= s_a + margin
                 missing = find_missing_guards(tfn, rules[i])
                 if not structural and not missing:
                     continue
-                score = _pair_score(s_b, s_a, len(missing), sized)
+                score = _pair_score(s_b, s_a, len(missing),
+                                    sized and (after is not None or s_b >= DELETED_MIN_BEFORE))
                 matches.append({
                     "advisory_id": doc.get("advisory_id", ""),
                     "project": doc.get("project", ""),
@@ -320,7 +349,7 @@ def match_documents(target_docs, corpus, *, min_before=MIN_BEFORE_DEFAULT,
 
 # Score at or above which a finding is reported as strong. Measured on five old
 # releases (scripts/fingerprints/evaluate_release.py, 397 fix fingerprints):
-# 47 of 51 strong findings matched a fix of that project published after the
+# 43 of 47 strong findings matched a fix of that project published after the
 # release, and none came from another project's fixes.
 STRONG_SCORE = 0.9
 
@@ -372,6 +401,7 @@ def self_test(corpus):
         return {"after_flagged_rate": 0.0, "before_recall": 0.0, "pairs": 0}
     flagged_after = 0
     found_before = 0
+    index = build_index(corpus)
     for doc, f, fn in items:
         adv = doc.get("advisory_id", "")
         lang = f.get("language", "c")
@@ -379,7 +409,7 @@ def self_test(corpus):
             fn_obj = fn.get(side)
             tdoc = {"schema": "ksm-sfp/1", "file": f"selftest/{adv}/{fn.get('name', 'fn')}.c",
                     "language": lang, "coverage": "OK", "functions": [dict(fn_obj)]}
-            got = match_documents([tdoc], corpus)
+            got = match_documents([tdoc], corpus, index=index)
             hit_own = any(m.get("advisory_id") == adv and m.get("path") == f.get("path")
                           and m.get("function") == fn.get("name")
                           for g in got for m in g.get("matches", []))

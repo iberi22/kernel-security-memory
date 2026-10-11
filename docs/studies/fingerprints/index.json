@@ -1851,6 +1851,3636 @@
    "project": "postgres"
   },
   {
+   "advisory_id": "GHSA-239g-2685-54x3",
+   "fix_sha": "b5bbabc18a1121908848d836f869a4e98eb63886",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-253q-9q78-63x4",
+   "fix_sha": "b65ae6e9b8019bed5407771e21f89ddff17c5a71",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2625-rw7m-5q5x",
+   "fix_sha": "5a5c275ffa45f342459b7d3e977926da643bde50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-264v-m8fm-76jm",
+   "fix_sha": "6ff0800e8e031363e787c827d8d033e5694e4e6a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-27vq-hv74-7cqp",
+   "fix_sha": "2f9a58f830c24f107b4783da1f0704a502bc7734",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-27w2-87xv-37c6",
+   "fix_sha": "807ee8e99a7ccdc604d49971f292854bfa36754d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-27wg-99g8-2v4v",
+   "fix_sha": "d8991ec727ad0fb64fe9957a3cd307387a6701e4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-29c2-65rj-h343",
+   "fix_sha": "277061867eb7d2766fa6737c8bf00684fc2462a6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2cv4-cqwr-gwf7",
+   "fix_sha": "67169645278ce082638d619beefa6d062540843b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2cxp-xq3c-mjxx",
+   "fix_sha": "eb25ec328b226d8fbbaa4058bf9187165bf06d51",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2f9f-gq7v-9h6m",
+   "fix_sha": "d5152211af61f850ec393604316804096dd4632e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2ff4-xfpr-m32r",
+   "fix_sha": "a7e37704600ee7c737dbb02db08814dd2d15389d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2hvr-h6gw-qrxp",
+   "fix_sha": "2b68d3c07a4a056264dc006ecb9f1354a0679cd3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2j3p-gqw5-g59j",
+   "fix_sha": "5293957b119e55212dce2c6dcbaf1d7eb794602a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2jx3-ff3v-j7jj",
+   "fix_sha": "25efa375572efcfbe880a263ee3b0932d4b61a24",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2m67-cxxq-c3h8",
+   "fix_sha": "bf004a20d3687a0c1a9e052ec79536e30d6de134",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2pgj-5cv2-6xxw",
+   "fix_sha": "9c97c2bf782626b35ba48e154f210f91c847a513",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2q97-m5rc-p3gp",
+   "fix_sha": "0e70bd83119b02f99a2c0397f0913e0803750fd9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2rcp-jvr4-r259",
+   "fix_sha": "8b166e9bf82e69ddb3200a3a825614980bd8d433",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2vh6-hw4j-32ww",
+   "fix_sha": "4bef04ae8a261634200b3a6faabdd77e25aeb8c1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2w8r-9xj7-69j5",
+   "fix_sha": "eb25ec328b226d8fbbaa4058bf9187165bf06d51",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2x3r-hwv5-p32x",
+   "fix_sha": "0d1beed2e3633d71d5e288e0382b85be361ec13d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-2xpx-vcmq-5f72",
+   "fix_sha": "6049687006ea5b26eeac927964b5fcc80d7bde50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3227-r97m-8j95",
+   "fix_sha": "da7904c04f82e1cb43cc42eaf6a1dba072b5c921",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-32jf-h775-g29h",
+   "fix_sha": "8eac3bc6dc37a6d7667ed6c1a895c224e3ff47e1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-333v-68xh-8mmq",
+   "fix_sha": "6b2eebee1d07399ef02c0863bd515b4412a5a560",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-33f5-2c5q-wgwj",
+   "fix_sha": "c1a8b29ff2cc45e7820b900dae42cbb4958089ec",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-35g8-35p8-c8fw",
+   "fix_sha": "a282af361ac99bc76b80876d1aae128e89dbf66b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3763-qp59-59vf",
+   "fix_sha": "a530b2434ebca6e3716f07c73079786fcc6f2e41",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-37wc-h8xc-5hc4",
+   "fix_sha": "e118c6eec569f4340421f86ee0686714010c63e9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-37xq-q42p-rv3p",
+   "fix_sha": "927952a440176a18f3ded132eb831ae7f7ac5c00",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-38c5-483c-4qqp",
+   "fix_sha": "be213bd3528727148bef2d523c89e95d1fd9c072",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3999-5ffv-wp2r",
+   "fix_sha": "460baf2ccb7d5982b266cb3cb9c0bdf75b4fb779",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3g92-f9ch-qjcm",
+   "fix_sha": "5c1dc1d64c0516a8911bbf3ea40f173c21d6ae47",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3j43-9v8v-cp3f",
+   "fix_sha": "ab6675a63174715ea6ff50881fc957831d4e9564",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3jvj-v6w2-h948",
+   "fix_sha": "1f06693b708020c5c3a3752bd2f1c6006a75e9bc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3p6w-gv5g-xjw9",
+   "fix_sha": "21ed6aeeea386628621b36a6af2a1a248cc87dcf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3pv8-6f4r-ffg2",
+   "fix_sha": "bab14dd84b411ac16ecb56d4f2d2f7bfb88a9838",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3qx3-6hxr-j2ch",
+   "fix_sha": "47c9b90368c49117ba42760bd58acafa3362cbd4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3v2x-9xcv-2v2v",
+   "fix_sha": "f515c91363ee735aa1bc08580d9e7fa0de6e736f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3w94-vq2x-v5wr",
+   "fix_sha": "2dd9d1d5d0936ec7350093ff3a5a7169a349db77",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3wfc-mgpm-9rq6",
+   "fix_sha": "75f45e87e52ed95840494963ab9a28651165d56e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3wgq-wrwc-vqmv",
+   "fix_sha": "036fdecc85c52458ace92dc9e02e9cef90684e75",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-3whf-vgf2-9w6g",
+   "fix_sha": "428822509bc722eb9727681752686ede9bc87e77",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-443g-gwgp-49x4",
+   "fix_sha": "8981a1b95d4807cad99e5bb3b94fc8bc723ac033",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-459f-x8vq-xjjm",
+   "fix_sha": "308f0d26ceb9c2c8bd219315d0f53914763357f2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-45x7-px36-x8w8",
+   "fix_sha": "7279fbd6ef4d0c8bdd6a90af4ada2899d786eec0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-46q5-g3j9-wx5c",
+   "fix_sha": "bf004a20d3687a0c1a9e052ec79536e30d6de134",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-46wq-28cx-mhw4",
+   "fix_sha": "41d35acee1b5cf3bc34ec3ddc1abbc03604e791e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-472w-7w45-g3w5",
+   "fix_sha": "436a5f1e4c08989b58dbba2b0ffa423458016c2d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-475v-pq2g-fp9g",
+   "fix_sha": "73e66b066de4940d129dbf33d91c39170eb4c38d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-47hw-gvq5-r2gm",
+   "fix_sha": "3430fd26ecafc0dc3705210f5f39a9119fa22774",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4855-q42w-5vr4",
+   "fix_sha": "da37cf167736cbd4d7804b1ed7ceb572468298e0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-48m6-486p-9j8p",
+   "fix_sha": "ae6c1e92342e72f80fd12accbe66ee80dd6802ac",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4c7q-4928-8445",
+   "fix_sha": "413055b378fa6fe2299c5e5f538c8e6e841ab810",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4chv-4c6w-w254",
+   "fix_sha": "e92a3933e5f92dc09da3c740cf6a360d55709a2b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4g74-7cff-xcv8",
+   "fix_sha": "5886c91073b9be748bd8d5aed49c4a820548030a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4j5m-wc25-pvh7",
+   "fix_sha": "c9267b2c96e2542be7e7b557d67318e81b733585",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4jwq-572w-4388",
+   "fix_sha": "19ade858c430ab13eb562764a870ac9f8506f8dd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4m82-p8cx-f94j",
+   "fix_sha": "6cc48412c975d51b47617708ec44abc11ca5a89a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4mq4-7rw3-vm5j",
+   "fix_sha": "4d63febf9d8b257b0531963b85df48d45d0dbf3c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4rjr-3gj2-5crq",
+   "fix_sha": "9e8782b1bb1104e5399c073b553719c262d4463c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4v76-cw68-4vc9",
+   "fix_sha": "af835eb199ad2327a04c42101d11aff21fce7e47",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4vgr-h27g-cf9p",
+   "fix_sha": "2f53e6e86d1b87e38300e714cfd7aede1abe4c3d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4w32-2493-32g7",
+   "fix_sha": "b1aae09d60c0bd6a5915a5448f4e8cbc5174db53",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4wm2-cwcf-wwvp",
+   "fix_sha": "9c0593c33af52cd9e00ec784d15f63efebdf039c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-4x34-chg5-mwjj",
+   "fix_sha": "abd581f62e97d0b147306ac40eac13af71c6fbba",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-52h2-m2cf-9jh6",
+   "fix_sha": "a44f152da4f38c538ed492b1efa8515be2047db2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-52xf-5p2m-9wrv",
+   "fix_sha": "114ccab0ff2cde491203ac841837d0d39b767412",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-532v-xp3f-837c",
+   "fix_sha": "483f13e91830c468262aa1e010e753d6ae99c898",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-55f3-3qvg-8pv5",
+   "fix_sha": "b9483d022c602b994103f78ecfe46f017f8ac662",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-57fm-592m-34r7",
+   "fix_sha": "d950ac1239817d17324c035e5c4769ee71fc197d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5844-q3fc-56rh",
+   "fix_sha": "428517fef5b901db7275d9f5a75eda89a4c28e08",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5873-6fwq-463f",
+   "fix_sha": "83adad0f5b1cda693c7ba8524d395add8077865f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-58j9-j2fj-v8f4",
+   "fix_sha": "87859158d3750b03564613de70b5ec4ae090549d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5frw-4rwq-xhcr",
+   "fix_sha": "de23e3b60b066481cc390f459497d5bef42a899b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5gc2-7c65-8fq8",
+   "fix_sha": "7f1791488463d4e9c5adcd543962173e2f6cbd34",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5hq8-qhww-jm7q",
+   "fix_sha": "212f3774af048e2cecfb2e6b1e08477685e52b22",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5j98-2g5x-46v6",
+   "fix_sha": "92f93c0b889f6a292bc943304d88c4c6561fe1b9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5p2p-6g2c-hf7m",
+   "fix_sha": "277cec542466b75cf5a8c532581243fd4b7b9713",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5pv5-xh52-hvrp",
+   "fix_sha": "76b2f7877f558f3bfa78e3d4f49f022460f509b7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5qfp-32cf-69jh",
+   "fix_sha": "fd800fc7c55afcdc97057d18cf7cb7f83557e702",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5qr2-v392-m9g8",
+   "fix_sha": "e1877b44bdac8abc9fd51e984d584f40f6999832",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5r3x-p7xx-x6q5",
+   "fix_sha": "9ff5f8df0ac951f5742d22a72c39b89a15f56639",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5rg2-xv9j-gv5p",
+   "fix_sha": "eabfc3e21731b0628c3f933163a0f1e1864217bf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5v93-9mqw-p9mh",
+   "fix_sha": "6720fcd92f44e5f204741b04fdef3b67b0fcf6bc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5vmp-m5v2-hx47",
+   "fix_sha": "0eeb60aefe27f00b65730634b788a1aafb8bf3c6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5w4j-f78p-4wh9",
+   "fix_sha": "747e342d2026fbf3a395db3e2a491ebef00082f1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5wp8-q9mx-8jx8",
+   "fix_sha": "68916c3e4f3af107f11940b27854fc7ef517058b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5x2r-hc65-25f9",
+   "fix_sha": "400961412be2e2ab787942cf30e0a9b66b37a54a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-5xvq-cp9x-6p6r",
+   "fix_sha": "a7fc1eb5717264e31c3c5f7dd849b73989a08f3d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-624c-2h52-gf7f",
+   "fix_sha": "93439858d1c44294a7b377f775c4fc897a370bb2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-62f5-cp2p-vq95",
+   "fix_sha": "43563356b98c6b993085554da82e77370160a31c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-64f8-pjgr-9wmr",
+   "fix_sha": "b7583a653a2c495a60630dffd663f506426db330",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-65rj-r9fh-jp2v",
+   "fix_sha": "899967e6a9cf064c88a4bc4b35ea7e2da28a6411",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6698-mhxx-r84g",
+   "fix_sha": "1e55780c890b027fa51e361e188a7743a0bf473f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-66fx-fqv6-5wwx",
+   "fix_sha": "9654e4abaf24449ef2279e9a16963edb5c8b8fef",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-66r2-5gwj-gxm2",
+   "fix_sha": "1e4c3d743e1591f14f340cb627e56d98b6bd7fd7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-67fv-9r7g-432h",
+   "fix_sha": "308d07a11d3bff0d230f685a6320292181e5a445",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-67hm-27mx-9cg7",
+   "fix_sha": "d44011a69e0674acfa9c59bd7ad7f0523eb61d42",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-67hp-f6hq-2h6g",
+   "fix_sha": "e6a3bb596f149628ba973eec3d099f3bb69f2464",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6973-8887-87ff",
+   "fix_sha": "d02059053181ed8ddad6b59a0adfd661ef5cd823",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6f2x-v7q7-m7m5",
+   "fix_sha": "4689fc8d3ddd3e3f99ec1b7be4e2e9e78afd2e6b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6fgx-x7m2-74qm",
+   "fix_sha": "0dbe63214c8686df5bb62dbe6142cce27868ecff",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6g2r-675j-hx59",
+   "fix_sha": "200cadb1a442c7f6cd9747e7d4297379b6b74200",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6g9v-7gq3-p2c6",
+   "fix_sha": "0aaa332c79195e4c40275eb5224aed3d52f5cf90",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6gcw-w7cp-94g9",
+   "fix_sha": "b9372e509ea9b278fe13763237067a261bb8c946",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6jrf-4jv4-r9mw",
+   "fix_sha": "1aabcfe6a3c0678db22097543f7f7a662f0db34b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6mv3-wm7j-h4w5",
+   "fix_sha": "14d567f7ecb25a6d1024cf3d796f86aee89d0dd4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6q4w-9x56-rmwq",
+   "fix_sha": "55fac9f5ead6d30996400e8597c969b675c5a22b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6r8p-hpg7-825g",
+   "fix_sha": "f838da248e3854e4250e5187a3a67507cb7efaaa",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6v2g-fpxh-pmmh",
+   "fix_sha": "26de44a8bd5051f8f944ea60b2c37ae1d2b7d25e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6vg3-hgrw-p5gf",
+   "fix_sha": "1fcb19040bfffba92b3f69edb9b707d469e0027b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6w6g-hm98-mhgm",
+   "fix_sha": "0848d2e9e4183499343318a690d6dd5e48bc21c1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6wqw-vhfr-9999",
+   "fix_sha": "6bcc55c9c0494a0d4d36821019b54459f7162af7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-6xx4-9wp6-65p7",
+   "fix_sha": "c14bdc2eddcf26633ab1dcc0b2d5c0ff42c72a3e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7259-cwhx-3xx3",
+   "fix_sha": "0bfbbc00c7895c0fb6ea94987b4aab99e3d7ee52",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-725g-w329-g7qr",
+   "fix_sha": "8cbd8217ee505e6b37c63ef835ff095cfa8ab318",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-753p-wrj5-g8fj",
+   "fix_sha": "0c07fa8badbf44f67d3ff1571df31ca54e5228c0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7587-4wv6-m68m",
+   "fix_sha": "38efa49ce18b3821649de9cd8dea88a959b833a5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-75jp-vq8x-h4cq",
+   "fix_sha": "f7b3200e9f3dc9e2cbca966cb255c228453c792f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-75m2-jhh5-j5g2",
+   "fix_sha": "ab6675a63174715ea6ff50881fc957831d4e9564",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-76g3-38jv-wxh4",
+   "fix_sha": "9b400e1c8b7d6b9ab8009104fa7fe5884db05f18",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-779w-xvpm-78jx",
+   "fix_sha": "74d13ddca35f8f0816f4933c229da1fd95c0350a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-78p6-6878-8mj6",
+   "fix_sha": "085b7bee647029bd189e1375203418205006bcab",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-78wx-jg4j-5j6g",
+   "fix_sha": "1017466c143fc93a82b286a1ba35e53334cdf8e2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-794x-2rpg-rfgr",
+   "fix_sha": "350da7d013773377aec0d3a4bf4374d3c941460e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-799f-29jm-gr6c",
+   "fix_sha": "cc5a1d54bbbffd1ea975bd2ee87d5f7b3b30bbf1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-79rc-qpw3-jv92",
+   "fix_sha": "42b2ad83cdcf6e959ecb378c5040c60d9c64becf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7c4j-2m43-2mgh",
+   "fix_sha": "e10eaebcd7774e5da6d0ff5e88ed13503474f0ff",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7cr3-h577-g38j",
+   "fix_sha": "5e5968cdbc6618acd6c2402a8a98b503f278835e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7gcf-g7xr-8hxj",
+   "fix_sha": "c8a1d820ea25df01692b367058d587343e199389",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7gf7-jv65-wjmh",
+   "fix_sha": "0f084d45aa53e4a27476961785f59f2bd7d59a9f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7h24-c332-p48c",
+   "fix_sha": "aa1bf64c5e7f1c471395f9f29175ffc1b16a1079",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7j5w-7r7x-9v27",
+   "fix_sha": "9a34b5034d29f05d1f28fa61b04719ca6a741020",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7mg7-m5c3-3hqj",
+   "fix_sha": "6a6c367a0c25f86f998fa315ea90c328f685b194",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7v42-g35v-xrch",
+   "fix_sha": "5533f596c650377e02f4aa9e3eb8dba591b87370",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7vm2-j586-vcvc",
+   "fix_sha": "d81169a06b89f0c588134ddf2d62eeb8d5e8fd0c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7vm6-qwh5-9x44",
+   "fix_sha": "9a4028ec6484f50a320281271a41a5040ddb1ba8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7w2g-9mf9-324m",
+   "fix_sha": "ed91c894c2cf11704422010554037e3ba70b446e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-7w8p-chxq-2789",
+   "fix_sha": "2959e083912420988066a001c2b2d6732a1b562f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-838h-jqp6-cf2f",
+   "fix_sha": "fcfce1bb869fddc629e6d889d6ba1328b80b0dcf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-848m-r628-vrxw",
+   "fix_sha": "0938f88d196dc4eb11a82af343df3fffe9c195e2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-84m6-5m72-45fp",
+   "fix_sha": "ab6675a63174715ea6ff50881fc957831d4e9564",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-84x2-2qv6-qg56",
+   "fix_sha": "c5eb5478b635cea2ccef8676cf97692cd38293c3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-853p-5678-hv8f",
+   "fix_sha": "f1407ee9f87e5f64d467a22d26ee88f61db7f3db",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-857q-xmph-p2v5",
+   "fix_sha": "e8ca8911c5b2f2361687dec1467c45cd54d00b3f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-862g-9h5m-m3qv",
+   "fix_sha": "2a36405339c87b16ed6c76e91ad5b76638fbdb0c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-88ch-q68x-36v7",
+   "fix_sha": "ebc08af9c34138f474b32ea0ef34bed3b086a3ed",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8c75-8mhr-p7r9",
+   "fix_sha": "718d07ff8ff7be417d5b7a6a0047f1607520b3b6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8ffr-xgwf-xj56",
+   "fix_sha": "8f0882046c467981ba5b4fd91a10befa96bd262f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8h58-w33p-wq3g",
+   "fix_sha": "e82f2c7494ba277d62fd372d69b2c008473bbef8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8hqf-xjwp-p67v",
+   "fix_sha": "ce795b7f471b01589f842dc09af38b025701178d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8m24-3cfx-9fjw",
+   "fix_sha": "79884ffb1a2d10bfd2c272f864033577a052468a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8m29-fpq5-89jj",
+   "fix_sha": "1f605eca5c55e3b65229fa01a97d9aa84fd37447",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8m49-2xj8-67v9",
+   "fix_sha": "0b620a09605afb815c6d8d8953bbb7a10a8c0575",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8r76-fr72-j32w",
+   "fix_sha": "c18591a7ce9bb561940cb94df4b7c35ef9cc0f57",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8rw6-p7m8-63jp",
+   "fix_sha": "8f89b260bb9692e5b0d58930793d482a8207eedc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8vrf-r662-2w2v",
+   "fix_sha": "e6a3bb596f149628ba973eec3d099f3bb69f2464",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-8x3w-qj7j-gqhf",
+   "fix_sha": "91ec049ffc2fa3766110223aa2aabe0303837af8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-94hh-jmq8-2fgp",
+   "fix_sha": "ab6675a63174715ea6ff50881fc957831d4e9564",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-95q8-x6r6-672m",
+   "fix_sha": "637151121a8e27b2b8c95e98d6f86966b31b4a6d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-96xm-fv9w-pf3f",
+   "fix_sha": "3890521426d71bb4d892b21f5a283a1e836cfa38",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9722-9j67-vjcr",
+   "fix_sha": "439ab99e15314ec5cf87047bf58246db646e3f8c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-98f8-j56x-2hh4",
+   "fix_sha": "d81169a06b89f0c588134ddf2d62eeb8d5e8fd0c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-98fx-66cf-fc7c",
+   "fix_sha": "500f4060349580b9cbb9c07b8112a487551c4616",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9c48-w39g-hm26",
+   "fix_sha": "2926c91bef7cb14a7ccd42220a698cf4b1b692f7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9g45-5xwm-f3wc",
+   "fix_sha": "496902b9cf2c8a947454718da31829ae776b969b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9ggc-845v-gcgv",
+   "fix_sha": "71136e44c03c79f80d6d1a2446673bc4d53a2067",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9gqx-53gp-c8g3",
+   "fix_sha": "413055b378fa6fe2299c5e5f538c8e6e841ab810",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9pj6-vhgr-3mwh",
+   "fix_sha": "dfa7fd6f9309deab60bea230b041be9a3fcda846",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9pwq-gcrx-wghh",
+   "fix_sha": "7dcf50a1a40eca6ed8d6c6dd59f4310aa0d68b0e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9qmm-4mfr-r3wj",
+   "fix_sha": "e61e045f8c244de978401d186dcfd50838817297",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-9v25-r5q2-2p6w",
+   "fix_sha": "e6b3aff603ac06236bf77c2ec21ead93c6836dce",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-c6mw-8xh8-gpq6",
+   "fix_sha": "9a34b5034d29f05d1f28fa61b04719ca6a741020",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-c827-hfw6-qwvm",
+   "fix_sha": "31fd98ca723b93cc6101a3e29843ea5cf094e159",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-c8jx-96c9-8xrp",
+   "fix_sha": "0c6dd021bb55b32a78a553c72bb9c0cdd414825f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-c978-wq47-pvvw",
+   "fix_sha": "0e3d3837aec3ee9fb5dcb8bfe11e8adb367f58f4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-c9pr-q8gx-3mgp",
+   "fix_sha": "9cf0390a52497e273db1a1b613a0e26827aa327c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-c9xm-49cp-xcr9",
+   "fix_sha": "eb435c6f51864df74926ef115befce55c16b01ba",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-cgqf-3cq5-wvcj",
+   "fix_sha": "9e9527c73c8f34fc8438b09066163cd42520f413",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-cjcg-cxmh-9wcr",
+   "fix_sha": "2bb7b29d6992fc2d8045628475912d734e6bee97",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-cjg2-2fjg-fph4",
+   "fix_sha": "8a93fdc6c9f4eb1d2f2a11b7ff1d12d70bf5a664",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-cqjc-rmpq-xprq",
+   "fix_sha": "8912512371820167a12a0a638bd666856ce458ad",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-cqvm-j2r2-hwpg",
+   "fix_sha": "45d2d82930bf4a675bd57abfafec8fe4065befcd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-cwv4-h3j5-w3cf",
+   "fix_sha": "89ddff578fd78bbebec99482d7030f28c07757a3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f26g-jm89-4g65",
+   "fix_sha": "6a2e6a436f76c8bbf2487f9967413a51356667a0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f2wx-xjfw-xjv6",
+   "fix_sha": "7247a8b6ee59fc99bbb69ca6b3ca4bfd8c809ead",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f3h7-gpjj-wcvh",
+   "fix_sha": "b3db535c9edb72278d4db3a201f0ed214e561354",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f45q-w629-wr25",
+   "fix_sha": "5a5c275ffa45f342459b7d3e977926da643bde50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f5v4-2wr6-hqmg",
+   "fix_sha": "6c3c80a9b6d60763d6227d60fa8310e57172a4d1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f632-vm87-2m2f",
+   "fix_sha": "32b7fdfb7f542624ecd1f7c8d3e2b13c4e36a2c1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f77q-r5qm-w4m8",
+   "fix_sha": "8600d4aa63184ce3df7ccd30c79ac0388eacca52",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f82j-v89j-mf86",
+   "fix_sha": "79aef90d9baf56147d21f6dcea7a59189ade0eb3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-f9qc-qg88-7pq5",
+   "fix_sha": "278fa43fcff661d4ee6bd83b75955a153d4281fc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fc6g-2gcp-2qrq",
+   "fix_sha": "b4ba62fa3300b5b258fdc0da141481e3be7ea960",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fcmm-54jp-7vf6",
+   "fix_sha": "5af12e94d7dfc8a0208a290643a800f55de7b219",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-ff9q-rm55-q7qr",
+   "fix_sha": "18f2c861c51b4a5f23a20bd749eba13737b9e4aa",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fhr3-xh3q-69w6",
+   "fix_sha": "358063f3367cb23a1e5db314cfdbfeb607749b3d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fmj9-77q8-g6c4",
+   "fix_sha": "e309c9bb5a48c1304ff69c88b7eabdd08c26bf45",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fmq6-4w57-2w3v",
+   "fix_sha": "526c1251b64e6e9fdc0d40c768ae46cd20338594",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fpf5-4jw8-67x8",
+   "fix_sha": "57f5fb4a2a8611d58dbcc1a9221349206dd99c3c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fpxg-5xmv-922m",
+   "fix_sha": "56a7a1540d9228f82fd6284c258344e8dcb690fd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-fwg2-gr34-q3w8",
+   "fix_sha": "bd043d73dad583219d7df2b91f81ab0054c53730",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g29h-pfmp-qp9r",
+   "fix_sha": "57f3c89471e27ac4032d9791f6885e5d4408c381",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g2p6-hh5v-7hfm",
+   "fix_sha": "ceb20d3593fc4a8a951a7e99d8fa2344f8250a8c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g3qg-6746-3mg9",
+   "fix_sha": "006d86c363b16d2b2ac42d32d832a209ff8ab4c9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g4mp-vgx3-xrvm",
+   "fix_sha": "5d566989ebabfdebfe6b33243d31765a0812260b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g4v2-cjqp-rfmq",
+   "fix_sha": "0e6f0d2a8325602c58d6a53ce1c0e6045eb6a490",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g5jh-57wm-p79m",
+   "fix_sha": "aa109bbd6743abd7027e589cc4b871dd2dce7d50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g6xm-f9xp-qq35",
+   "fix_sha": "f8fd0b11a393364dc7f01a182482d86adafdd653",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g8jh-vg5j-4h3f",
+   "fix_sha": "78e4b20a2fc26cc5f141aa47992ed85375266a2b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g8vq-v3mg-7mrg",
+   "fix_sha": "15147cea8e42f6569a11603d661d71122f6a02dc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-g9hv-x236-4qp3",
+   "fix_sha": "a7fc1eb5717264e31c3c5f7dd849b73989a08f3d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gcwr-5mrf-fvch",
+   "fix_sha": "36f0a41a69b551172c7d1d13b1e8dbbd868e2ead",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-ggc5-46rg-mr4v",
+   "fix_sha": "30239e69a328e76d2377f2a0bc02fbde61c34280",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gh9f-6xm2-c4j2",
+   "fix_sha": "492f8378d57968dbdf5e63fad41b6ff59bba0b80",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-ghm9-cr32-g9qj",
+   "fix_sha": "826c3888b77add418b394770e2b2e3a72d9f92fe",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gjv3-89hh-9xq2",
+   "fix_sha": "3bbac859c7132b21ba5fdf2d47f1dd52e7e73d98",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gpcg-h6x2-c26p",
+   "fix_sha": "2d3aebce6712841bc08b9b94e9078be50a25fc10",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gprj-6m2f-j9hx",
+   "fix_sha": "14ec96864eabaf1d7d809d5da0186a8856261eeb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gpwf-4h98-v82q",
+   "fix_sha": "77c5d185c71d0ea8103da0e6cf4cd50677ffacd2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gw2x-q739-qhcr",
+   "fix_sha": "eb33e82b56ed11fd12bb39416359d8d60737dc7a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gwm6-q8ch-hcfr",
+   "fix_sha": "0c41299975f3c1e21cf5ca968d42cad55ceb42a1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-gx45-xrj5-g6c4",
+   "fix_sha": "43563356b98c6b993085554da82e77370160a31c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h37v-hp6w-2pp8",
+   "fix_sha": "10f4ff04cb43ef2b789ee06e885f11cd054b1335",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h395-gr6q-cpjc",
+   "fix_sha": "abbc3076742c4161347bc6b8bf4aa5eb86e1dc01",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h3mf-4fwp-59c7",
+   "fix_sha": "a803271fcce75b7c151e92aa099dfa546db4adc5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h444-6j9x-p8vh",
+   "fix_sha": "9654e4abaf24449ef2279e9a16963edb5c8b8fef",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h539-c7r8-3xq4",
+   "fix_sha": "26de44a8bd5051f8f944ea60b2c37ae1d2b7d25e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h5rc-j5f5-3gcm",
+   "fix_sha": "0eb5e406780890e21ff71dd25d731b30676478e5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h6gg-fvf5-qgwf",
+   "fix_sha": "f7d120a3b724d06a7b623d0a4306acf8f78cb4f0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h6hf-9846-xwrq",
+   "fix_sha": "9ffe586dafac1a46acf17edf90e0165e5503b2f1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h6xw-mghq-7523",
+   "fix_sha": "b4e6dc76f4845ab03104187a42ac6d1bbc1e0021",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-h9cc-w26m-j342",
+   "fix_sha": "3bc449a8138960c4de6bfd506bad1730c621d4de",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hc4m-q9jh-xw4j",
+   "fix_sha": "db07375031642f089d549b4f7b9abece87e39f87",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hff2-gcpx-8f4p",
+   "fix_sha": "a72e759bcdeef93fcd3dc928cf3c1f4bbebdcc65",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hfpq-x728-986j",
+   "fix_sha": "3b49ea7b38bdea134b7f03256f2e13f44ce73bb1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hhjv-jq77-cmvx",
+   "fix_sha": "68916c3e4f3af107f11940b27854fc7ef517058b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hj49-h7fq-px5h",
+   "fix_sha": "091047f7f10cae082716f3738ad59a583835f7b6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hj9r-8pfm-rmjj",
+   "fix_sha": "9bbb58b746c41802278b0cba738eebbf21517cf7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hjqq-29pw-96wj",
+   "fix_sha": "ae3c791068f2f76c67cd5483501f09de3fd8cc0b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hmh4-3xvx-q5hr",
+   "fix_sha": "9132ad958c83a0d0b199de12b69b877f63edab4c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hpcx-3pw8-g3j2",
+   "fix_sha": "2820cf12f2e08645fd6d1f15b4a90a54d6082a81",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hppc-g8h3-xhp3",
+   "fix_sha": "1d109020d98fff2fb2e45c39a373af3dff99b24c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hw4v-5x4h-c3xm",
+   "fix_sha": "0b962f218f0cdd796dadfe26c3f09e68f7861b26",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hwhf-8p2f-45wr",
+   "fix_sha": "b9372e509ea9b278fe13763237067a261bb8c946",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-hxq4-mx37-fqvg",
+   "fix_sha": "4b1d417e9de7eafaf5350553c5fcb9264dfa32f5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-j26p-6wx7-f3pw",
+   "fix_sha": "0d9b4f2aa5ceaf988f3eb568711d2acf0a4ace37",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-j3xp-wfr4-hx87",
+   "fix_sha": "d78bbf4bde3c6b95caca7512f537c6f9721426ff",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-j57r-4qw6-58r3",
+   "fix_sha": "42718c1b757c1dfabb80621f2f48b8268f7fa24e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-j8x2-777p-23fc",
+   "fix_sha": "c5ee1718e630fdedc5676bf71b5bef10e4c7f91c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-j99g-7rqw-q9jg",
+   "fix_sha": "6f5511309c199d84b012fe6b9aba7e5582892c50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-j9xq-69pf-pcm8",
+   "fix_sha": "e60e99167a9a2b187ebe80c994c5204b0fdaf4ab",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-jc97-h3h9-7xh6",
+   "fix_sha": "cf06a7c7e672880e1b38598fe445e2c50b4a9d06",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-jf2r-x3j4-23m7",
+   "fix_sha": "68da4b50c033da5603517064aa0a08e1bbf70a01",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-jm4v-58r5-66hj",
+   "fix_sha": "618a4d1b422df0d12772532bb2c195f830b40399",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-jmxc-hhwx-gvv3",
+   "fix_sha": "637151121a8e27b2b8c95e98d6f86966b31b4a6d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-jpv7-p47h-f43j",
+   "fix_sha": "43207cd77580410d97165d1e3c07361ba6f3558c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-jqq4-c7wq-36h7",
+   "fix_sha": "3f00e1fa0159599c1601e788021f2169d1f0a4dc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-jvxv-2jjp-jxc3",
+   "fix_sha": "f47a03f56d1797bceab5f34b6f624c91cecd5871",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m24x-r6q3-2vp9",
+   "fix_sha": "a70ddb2e2aed2453730b81781e426486247609cb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m26v-hjq3-x245",
+   "fix_sha": "0c41299975f3c1e21cf5ca968d42cad55ceb42a1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m2gf-x3f6-8hq3",
+   "fix_sha": "8a0990ccd37bafd8768176ca64b906ba2da2d822",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m2pg-c7m6-77pj",
+   "fix_sha": "593f5b191e8b9c87e4292955999c2d0b5cbcce69",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m3c3-78fh-w3w7",
+   "fix_sha": "4b317d850c7dabaee228144423741097232f7955",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m4f9-c775-wg56",
+   "fix_sha": "6a2e6a436f76c8bbf2487f9967413a51356667a0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m4pq-fv2w-6hrw",
+   "fix_sha": "78d430103a8f6931154ddbbe19d36f3b8630286d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m589-mv4q-p7rj",
+   "fix_sha": "431b5139e274b7e456bea27e768aaa121b97be4c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m65r-rprj-r5rg",
+   "fix_sha": "7c5659f8cf6f6f2f9989d12dba0ebf49dc50a171",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-m8f5-rh7h-vgg3",
+   "fix_sha": "2ac6a177b11212d392bf1e7dc77aaf14e4768aa8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-mc22-5q92-8v85",
+   "fix_sha": "1a2efcdbe68e5e7fd0a05836ac32d2cde78a0b2e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-mj6p-44ch-cq69",
+   "fix_sha": "037b9583bc03d814e8516df54ebcda6f681fe1f8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-mjjp-xjfg-97wg",
+   "fix_sha": "81bd5d7ea0c390563f1c4c017c9019d154802978",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-mjvm-mhgc-q4gp",
+   "fix_sha": "fff8cc43b7756ce3979a38fc473f38e6e24ac451",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-mw3q-r9wh-h2ff",
+   "fix_sha": "0fb8766adea91e038af00e635a6eb92756e50172",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-mx2j-7cmv-353c",
+   "fix_sha": "2b7f2faa57a1efc8207455c37f87f1eee6035a27",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-p4jg-pccf-h82c",
+   "fix_sha": "e661a4940df78fbb7b52c622ac4ae6a3a7f7d8aa",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-p4v8-jgcv-9g75",
+   "fix_sha": "b5c6ad13f4eece80e59c6ebeafd787ba1519f5f6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-p6rv-2qpm-fwvg",
+   "fix_sha": "2d3aebce6712841bc08b9b94e9078be50a25fc10",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-p7h3-7q52-72w8",
+   "fix_sha": "0bfbbc00c7895c0fb6ea94987b4aab99e3d7ee52",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-p7x2-g5cq-fhmq",
+   "fix_sha": "9c1a90a8f9206b965e727d134846fb42df4980a7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-p8qx-h547-fjw9",
+   "fix_sha": "2885385abfee279092a41d80c6cb6ac367353159",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-pf4j-pf3w-95f9",
+   "fix_sha": "e7f0ab7d2115e17d6e5548ddc60f10df1a5d645f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-pjrj-h4fg-6gm4",
+   "fix_sha": "a32783374f2682e6949fdb713910b1b9f103d3ed",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-pmfc-4wjj-gmhx",
+   "fix_sha": "483f13e91830c468262aa1e010e753d6ae99c898",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-pq29-69jg-9mxc",
+   "fix_sha": "ab752458ce431c6397175d167beee2ea00507d3e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-pqf5-4pqq-29f5",
+   "fix_sha": "09b425e5f59a2466d806e71a83a9a449c914c596",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-pr39-8257-fxc2",
+   "fix_sha": "d909cdebacc4747e972de4a7e5f19c8f79480361",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q428-6v73-fc4q",
+   "fix_sha": "8423fd986c3fa58b357f238c0db5e54baca5255d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q537-8fr5-cw35",
+   "fix_sha": "4ae8532b17bc35755240b7f55d4a5b7665351599",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q669-2vfg-cxcg",
+   "fix_sha": "adf8f0d08bc058383a0df658ea2c2ef6e7950335",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q6r9-r9pw-4cf7",
+   "fix_sha": "3345151a87c358d1ce43aeb7e8b3ebea5ebdbab4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q729-696q-g9pq",
+   "fix_sha": "1bd9826f477f4089134460dc5574b6f4e6916973",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q73f-w3h7-7wcc",
+   "fix_sha": "01eb5b2ecadf7e421b117d6c013e182978746e2f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q7pg-9pr4-mrp2",
+   "fix_sha": "fc095b6ce6043bb808f5d9c4379cf697899cb458",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q8qp-67f9-wr3f",
+   "fix_sha": "61d509b766afdf67cc26d8203fd7dc583c8d77aa",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-q9p4-hw9m-fj2v",
+   "fix_sha": "ff9f666598cd17661880fe7fc6e9c9611316e529",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-qhp6-635j-x7r2",
+   "fix_sha": "7bf0fd425eb10dac9bf9ef5febce12c4dd039ce1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-qjrv-v6qp-x99x",
+   "fix_sha": "709d6efe901dbf3e207b4fc2ebc30775595efc16",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-qq26-84mh-26j9",
+   "fix_sha": "1ab2268c0bcbf9b0468e0e36963f77f8c31c73ec",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-qqc3-94qv-7fw3",
+   "fix_sha": "5a5c275ffa45f342459b7d3e977926da643bde50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-qqwr-j9mm-fhw6",
+   "fix_sha": "0f1ef3efbf16194730a29d93dcb9c02f6c490942",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-qr9h-x63w-vqfm",
+   "fix_sha": "c73a074c804b30bec8284ac1e69a71b01db982ea",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-qxrw-f6fh-34r7",
+   "fix_sha": "4afff1699d08920b9a9023e81b229d772b894d91",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-r344-xw3p-2frj",
+   "fix_sha": "b917b8c117b46a2d508428c0856f4927dfcfc341",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-r38m-44fw-h886",
+   "fix_sha": "d1d749ba57e38e65b0e037cd744d0b17f7254037",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-r3r5-jhw6-4634",
+   "fix_sha": "f70b99dd575fab79d8a942111a6980431f006818",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-r56q-vv3c-6g9c",
+   "fix_sha": "1809b9bd1106d78a51fbea3071aa97a3530bac9a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-r64r-5h43-26qv",
+   "fix_sha": "bc32b408b523b9b64aa57b8e47748f96cce0dae5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-r9hw-mj3w-phcq",
+   "fix_sha": "42b2ad83cdcf6e959ecb378c5040c60d9c64becf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-r9rv-9mh8-pxf4",
+   "fix_sha": "760d447c8b600df0539debe80b1625836fc72819",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-rfhg-rjfp-9q8q",
+   "fix_sha": "73a814240c5db6fae261a6e4ab567b0b094a35db",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-rfj2-q3h3-hm5j",
+   "fix_sha": "15f1e4b0bf4b4fc20369e0a85d9b77957c4dd52a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-rp9h-rf7g-hwgr",
+   "fix_sha": "493b77167dc367c394de23cfe78a029298e2a254",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-rpcf-rmh6-42xr",
+   "fix_sha": "068abc869b736a03a947b5419c102da73830e882",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-rv9v-r4vm-gj8x",
+   "fix_sha": "5b0f5e3417f027a22b066debf825dbe6644b575b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-rx8h-33gr-vhj9",
+   "fix_sha": "75f45e87e52ed95840494963ab9a28651165d56e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-rxf6-323f-44fc",
+   "fix_sha": "ee1d928785cff80cbdbedde29fbf5210654410f0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-v24v-f45g-w7jf",
+   "fix_sha": "b5bbabc18a1121908848d836f869a4e98eb63886",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-v33j-v3x4-42qg",
+   "fix_sha": "248ac41cfa1797c52241c6ef756490d90027cdf2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-v4wr-j3w6-mxqc",
+   "fix_sha": "598111f88105a707ee68b0fa06c52da7176ea96a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-v653-r55g-hcmg",
+   "fix_sha": "da659fee4898a73dbc75070f3e82d49f745e4628",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-v762-x3cf-5mfg",
+   "fix_sha": "5e5968cdbc6618acd6c2402a8a98b503f278835e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-v83q-83hj-rw38",
+   "fix_sha": "10a103b471dae25ac598140df0c195b6531bf716",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vc34-39q2-m6q3",
+   "fix_sha": "4d01946f0b3d6c6e31786f91cdfb3eb902908da0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vf87-345h-9qhx",
+   "fix_sha": "037b9583bc03d814e8516df54ebcda6f681fe1f8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vf95-55w6-qmrf",
+   "fix_sha": "5886c91073b9be748bd8d5aed49c4a820548030a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vg2r-rmgp-cgqj",
+   "fix_sha": "992e998dfe436cdc9325232759af8be92f11739b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vghx-352f-93jm",
+   "fix_sha": "8e8b0abdb1b66f5e9b25b3833879f05c173a5596",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vgvv-x7xg-6cqg",
+   "fix_sha": "f660ea3f64b86d11d19e33076012069f02431e55",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vhj5-x93p-67jw",
+   "fix_sha": "142c28b82eb59b67445a859a2a9b75e01a9964ee",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vj62-g63v-f8mf",
+   "fix_sha": "146bb48849e5393004be5c88beefe76fdf009aba",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vmqh-5232-v43r",
+   "fix_sha": "108e7dcbf9c21df0fa83f355ad3a7355d7f220cb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vp6q-mv9j-j428",
+   "fix_sha": "abd581f62e97d0b147306ac40eac13af71c6fbba",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vr8j-hgmm-jh9r",
+   "fix_sha": "7725e7bfe6f2ce8146b6552b44e0d226be7638e7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vvp9-h8p2-xwfc",
+   "fix_sha": "adff9d9d0f09569203709d5687e5a7dc8e1ad0a3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-vx9m-xjwf-8cqm",
+   "fix_sha": "d2b9550fe821a9a10bf0cec057509211357363f1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-w3g8-fp6j-wvqw",
+   "fix_sha": "4781762f23ff22ab34763410f648128055c93731",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-w3jg-pjxf-73p4",
+   "fix_sha": "8da8967f196472576b1565d518a0ed60fce60f0c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-w3vp-jw9m-f9pm",
+   "fix_sha": "ea7ecf39ae28ab24cf1785c1674dc2e8a076f9ca",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-w6fv-6gcc-x825",
+   "fix_sha": "01d8e89f799e6ba21bdf7dc668abce23bd0d8f78",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-w6xc-g9qj-vp32",
+   "fix_sha": "30239e69a328e76d2377f2a0bc02fbde61c34280",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-w7wx-5q49-r59w",
+   "fix_sha": "26de44a8bd5051f8f944ea60b2c37ae1d2b7d25e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-w8vq-3hf9-xppx",
+   "fix_sha": "b295c103dd86c57c848397d32e8094edfa8502aa",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wfgq-w7cq-qj7j",
+   "fix_sha": "74793379649febc758b6a0d4b71aa6aeabc80f9c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wgq8-vr6r-mqxm",
+   "fix_sha": "379ef689c733b3d9c80fd409071d4f3af4dafed2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-whwg-vh4f-pmmf",
+   "fix_sha": "500f4060349580b9cbb9c07b8112a487551c4616",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wjjj-24cx-f28g",
+   "fix_sha": "1537ec4fbd789c61a5b43b648a854577dbe31a34",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wmff-grcw-jcfm",
+   "fix_sha": "066c09a6ea06f42f550d090715e06beb65cd5564",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wp87-mgvq-5j93",
+   "fix_sha": "f3ee3bd55533c14f1fa3e69ce18fc8904c1ce3f9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wq63-vh5h-pr5p",
+   "fix_sha": "394c4b17f2f382b4be9f54389bcb79028de02f39",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wrj3-vj8c-784f",
+   "fix_sha": "57f3c89471e27ac4032d9791f6885e5d4408c381",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wrqv-pf6j-mqjp",
+   "fix_sha": "3e9fb8aafd9834ebacd27734cea4310caaf794c6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wrrj-h57r-vx9p",
+   "fix_sha": "9835622853f08be9a4b58ebe29dcec8f43b64b33",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wv33-5pxh-r7j7",
+   "fix_sha": "9bbb58b746c41802278b0cba738eebbf21517cf7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wx3m-whqv-xv47",
+   "fix_sha": "827fff5c0698dd9e48e777d5907cf7bc19b91aca",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wxhm-2mq7-7697",
+   "fix_sha": "88ac9948d7d37995edbb2f6d36913436626c39e1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-wxwx-9fh7-5mrw",
+   "fix_sha": "9df9822d81d91a3ce0fc9f712f4574a659247be3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x2hw-px52-wp4m",
+   "fix_sha": "082424b30bf22ea7fb8c79f16ccd135e0ae9f3db",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x33c-7c2v-mrj9",
+   "fix_sha": "75ca43ecb9d38423b63d09896702f9da425cc754",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x3r5-q6mj-m485",
+   "fix_sha": "1809b9bd1106d78a51fbea3071aa97a3530bac9a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x57h-xx53-v53w",
+   "fix_sha": "1f840013c3e2fca0321fb844b048afa01d10dda6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x5m4-43jf-hh65",
+   "fix_sha": "c9233f7094198a49ed66a4d75786a8a3755c936a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x6p3-76f2-xxvh",
+   "fix_sha": "77b0aeea318503582818c708518c601fedc43557",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x6xq-whh3-gg32",
+   "fix_sha": "7a9c020608a62dcaa306b72ed0f6980f15923b14",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x7m9-mv49-fv73",
+   "fix_sha": "20d9e885bfcd7df7828d92c6e59ed5fe7b40a879",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-x96g-95fq-4xv4",
+   "fix_sha": "d9bb160a7c1e7f0a2308a7282622b91bc27d448c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xcr2-h8hv-6227",
+   "fix_sha": "15479a45ffa3b955485ae516696f7e933a8cce8a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xhg9-xwch-vr7x",
+   "fix_sha": "0c5733a84c41e9e178adc866b11ce59ac264f5af",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xmgf-hq76-4vx2",
+   "fix_sha": "5af6895c907773699f37f583f409b862284062b1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xqqc-c5gw-c5r5",
+   "fix_sha": "5c32f31b97ac3172775699fe0d4ba6003ca4fb18",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xqxc-x6p3-w683",
+   "fix_sha": "2f0fae9d9071dcaf0a689bc7097584b1b9ebc8db",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xr9w-x6gw-c9mj",
+   "fix_sha": "cf06a7c7e672880e1b38598fe445e2c50b4a9d06",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xx7m-69ff-9crp",
+   "fix_sha": "2b0389b92398d9ecff4632cd51bbf8303832a988",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "GHSA-xxmq-4vph-956w",
+   "fix_sha": "70f97f3ea4eae30ffbd1b94c764a3de2f1c41d2a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2016-0002",
+   "fix_sha": "01160abd92956e5f995cc45790df7a2b86c8989f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2017-0001",
+   "fix_sha": "24c7a5550807ac8a09648b5878f19d14c3a69135",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2017-0004",
+   "fix_sha": "24ead980daf11ba563e4fb2516187a56a71ad319",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2017-0005",
+   "fix_sha": "ee18b79fbf0903b73da525d302b09448009e0050",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0002",
+   "fix_sha": "54651a87ae6ba7d81fcc72ffdee2ea7eca2c7e85",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0004",
+   "fix_sha": "8f28ec275e412dd3af4f3cda460605512faf332c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0005",
+   "fix_sha": "b93aff6e904cffbbfd1f421b82f6dcc5ca19a4fd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0006",
+   "fix_sha": "d61b49cb90391fc4f7f72a1abe597476c8651a07",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0011",
+   "fix_sha": "a5256f3e5e23b83eaad69699e0b04653aba04fb8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0013",
+   "fix_sha": "a134e06d740f9d7c287f74c0af2cd06206774364",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0014",
+   "fix_sha": "0a5c0d4ad4adc90a54ee04a427389acf2e157275",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0016",
+   "fix_sha": "0bc164366315801f0c6b31f4081b7df9fc894076",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0018",
+   "fix_sha": "e64afc8c473d43e375ab42bd33db2d0d4ac4e41b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2018-0020",
+   "fix_sha": "9e31c82d71749619387cb9d0c9698134d05b28c9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0009",
+   "fix_sha": "c20cfa8584e649f00dc0767ab6fad63a3f59a296",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0010",
+   "fix_sha": "ffeff7c65deac5a6f886db2a59bcae4e420e4706",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0016",
+   "fix_sha": "9e9f1fb44114078c000c78c72e691eeb9e7ac260",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0017",
+   "fix_sha": "afcca95a05240ebd931ab20998c946f77ef1e284",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0022",
+   "fix_sha": "7466df019f6739732fd91401017942c22364ef61",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0023",
+   "fix_sha": "d91dac0cfe42512526879cdfaac0b81beff54089",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0025",
+   "fix_sha": "1aec4f9d71855dbfb223fa61ca60260400cc5d5f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0026",
+   "fix_sha": "38490723927f230498adf795153e6cd3cb08b6a8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0027",
+   "fix_sha": "11ba23a9766a5079918cd9f515bc100bc8164b50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0038",
+   "fix_sha": "7fd282aef7787577c385aed88cb25d004b85f494",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2019-0040",
+   "fix_sha": "058ac7e1a7d732076da9d8a37baa66bcb67758d8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0002",
+   "fix_sha": "04091d3e745c27590a5f1b7f581793e4159486b5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0014",
+   "fix_sha": "3c6b57fe1b2cc87e7ebecde43dd836ffb1c4ea5c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0016",
+   "fix_sha": "3350e3819adf151709047e93f25583a5df681091",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0024",
+   "fix_sha": "2977188139d065ff3356c3cb4aec60c582b57e0e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0025",
+   "fix_sha": "7e71521a61b009afc94c91135353102658550d42",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0031",
+   "fix_sha": "623b87397a569729c4bcabae747823c5668cce94",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0039",
+   "fix_sha": "5e0524c1db836e2192e1cd818848d96937c0b587",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0041",
+   "fix_sha": "3ae48bd463c1af41c24b96b84079946f51f51e3c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0042",
+   "fix_sha": "369e55736f9bd29c37b1712afc2923f4028148c6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0045",
+   "fix_sha": "0dca1a705ad1ff4885b3491ecb809a808e1de66c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0046",
+   "fix_sha": "a67e38b4a07c92a3c81fa833f9eb1e91e74e39b7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0049",
+   "fix_sha": "c41b5d8dd4235ccca84d0b687996615c0c64d956",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0070",
+   "fix_sha": "7de94f95f519d8281cb48457964065b463d26736",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0073",
+   "fix_sha": "5cbe1e6767d11aff3f14c7ad69a06b04e8d583c7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0074",
+   "fix_sha": "8f81f595dd770b586c7ca7195b42004a6c976eb9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0075",
+   "fix_sha": "7da3274bd99b05dce9c3f9b4b129d0145c71820b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0081",
+   "fix_sha": "152e0751f0be1c9b0cbd6778645b76bcb0eba93c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0082",
+   "fix_sha": "c55cda301c943270b7eb2b4765bedbcce56edb90",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0089",
+   "fix_sha": "5ba218ac29df4786b002d7d12b47fa0c04a331f2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0094",
+   "fix_sha": "6dd7ca0d50f2464df708975cdafcfaeeb6d41c66",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0096",
+   "fix_sha": "0b3a7b228b0fe70446393f55c8b893f349f3f6bd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0115",
+   "fix_sha": "b0d2bd20eb40b9cbc2958b981ba2dcd9e6f9396e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0116",
+   "fix_sha": "6a6c367a0c25f86f998fa315ea90c328f685b194",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0117",
+   "fix_sha": "1e462c32e7933821ddb26dc49fd4ffa5aeca97b8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0118",
+   "fix_sha": "c7919199a0f6d1ce0e3c33499d1b37f862c990e4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0119",
+   "fix_sha": "a986a9335d591fa5c826157d1674d47aa525357f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0127",
+   "fix_sha": "18847c50e5d36561cc91c996c3539ddb1eacf6c7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0135",
+   "fix_sha": "719df35f55b6cab4ca2a7f840347a06ecbd8aac6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0137",
+   "fix_sha": "4a4cca61cdb25061967d58522229e147483007b1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0142",
+   "fix_sha": "15b282877d1e576de2b337d8162bbf43ed1a0f2d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0150",
+   "fix_sha": "0be7aed40adbac51a50a3b95c815349a40d79ca6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0151",
+   "fix_sha": "f7d120a3b724d06a7b623d0a4306acf8f78cb4f0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0152",
+   "fix_sha": "0a1da873ddb29bca926bad8301f8d7ab8aa97c52",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0156",
+   "fix_sha": "11ba23a9766a5079918cd9f515bc100bc8164b50",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0161",
+   "fix_sha": "01940637dd8f3bfeeee3faf9639fa9ae52f19f4d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0162",
+   "fix_sha": "56c720ea3c74efa8f39e36c24e609628222b16a1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2020-0166",
+   "fix_sha": "11c3b0491b70449fb790056585ad3251b0e23acb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0001",
+   "fix_sha": "32abeef088e98327ca0dfccdad92e84afa9d2e9b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0003",
+   "fix_sha": "5757ac500d4e544485d796b542e4e589749c291b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0008",
+   "fix_sha": "aabf5562f8c6374ab30f615b28e0cff9b5c79e5f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0012",
+   "fix_sha": "0e6006de464caa331643f86cd2d9ba3b32b09833",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0013",
+   "fix_sha": "91b676eecd01f2163e2984215e2c0ac89e30ce75",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0020",
+   "fix_sha": "8f93123efef5c1361086688fe4f34c83c89cec02",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0026",
+   "fix_sha": "b3efbb6e427bcd33bb14db45753ad4fd98e0f5bf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0028",
+   "fix_sha": "ced70c172486fb4827c172cd8238053df3d1dcdb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0031",
+   "fix_sha": "6b83f9d0708337a9f8b709c1624a8587021ceba2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0032",
+   "fix_sha": "a535678377de12bc6bc22620c5f59bcc1369f76f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0033",
+   "fix_sha": "2a4d53809e3000f40085f2b229b6b1a33759881d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0043",
+   "fix_sha": "39d62c6c1f809022c903180471c10fde6ecd12d1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0044",
+   "fix_sha": "b53a906a8e170fe9b151381c66a76a872c419f9e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0051",
+   "fix_sha": "dd59b3066e616a08e756f72de8dc3ab11b7036c4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0054",
+   "fix_sha": "9c65ae9c2c67dd949b5c3aba9b8eba6da802ab7e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0062",
+   "fix_sha": "5d921f579e0c2b9960d472cf377b8487d97fbcec",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0063",
+   "fix_sha": "b72340cabe4749952530b4fb6b4fcc706bc973e5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0067",
+   "fix_sha": "95559c01aaa7c061088a433040f31e8291fb09d0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0068",
+   "fix_sha": "3c607a003e03b773108401d109167d1840487dce",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0069",
+   "fix_sha": "8bfc20506cc5e098fe6eb3d1cafe3bea791215ce",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0070",
+   "fix_sha": "a803271fcce75b7c151e92aa099dfa546db4adc5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0073",
+   "fix_sha": "59f2a7311dd6540696bfd0145f5281ce495f4385",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0075",
+   "fix_sha": "47ddbaa411afe7c499311a248a38135e5a192b67",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0078",
+   "fix_sha": "1fb719e0b61a4f3d911562a436a2ff05fd7cb759",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0081",
+   "fix_sha": "e965d8298f421e9c89fe98b1300b8361e948c324",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0083",
+   "fix_sha": "9803f31fbd1717d482d848f041044d061fca6da7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0086",
+   "fix_sha": "14b7440271c9d2316fab52c745e21087559364f6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0090",
+   "fix_sha": "2c98b6f384a017de031698bd623551a45f24c8f9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0105",
+   "fix_sha": "f01846bd443aaf92fdd5ac20f461beac3f6ee3fd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0106",
+   "fix_sha": "bf2b2df9c9e218e35e5a38ce3d03cffb7c363956",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0110",
+   "fix_sha": "398a73f0dd862dbe703212ebae8e34036a18c11c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0111",
+   "fix_sha": "1a2efcdbe68e5e7fd0a05836ac32d2cde78a0b2e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0112",
+   "fix_sha": "cdff034e6d93cdfdafd13d8c6956e22fa5a57b79",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0125",
+   "fix_sha": "d7d39d709577710e9dc8833ee57d200eef366db8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0128",
+   "fix_sha": "30f8c8c502675011603c4d066396bf317fd49e71",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0131",
+   "fix_sha": "223d80cfbec8fd346e32906c732c8ede21f0cea6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0134",
+   "fix_sha": "213671ab3aab3452efd7e2290c6bb714ee327014",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0137",
+   "fix_sha": "5bb1dfd2578539b89ffb0cbea25f21f00cfb963e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0143",
+   "fix_sha": "1b05eab57e484cd7d576d4357b9cda7fdc57df8c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0146",
+   "fix_sha": "e99b3c718df1117ad7f54c33f6540c8f46cc17dd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0155",
+   "fix_sha": "7c7757c772fb709c61b1442bcc1e1fbee97bf4a8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2021-0156",
+   "fix_sha": "17c7ba0a19f31793f1c807a58afaf9504342aac5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0003",
+   "fix_sha": "6c7bf22907a75d1bbaed52e4f7dd9716f5e6f737",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0008",
+   "fix_sha": "afe32525c22209aa8f632a0f4ad607863b51796a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0010",
+   "fix_sha": "b824e232f2fb47837740070096ac253df8e80dfc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0013",
+   "fix_sha": "ae70b41d4f46641dbc45c7a4f87954aea356283e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0016",
+   "fix_sha": "666c2554ea0e1728c35aa41178cf235920db888a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0017",
+   "fix_sha": "d5b63f72090f3809c21ac28f9cfd84f12559bf7d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0018",
+   "fix_sha": "1f1e1a6fe722deb1656f483b1367ea4be978db5b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0024",
+   "fix_sha": "9cf94d75316ef441033ce4c80def7c1a8c7643fe",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0030",
+   "fix_sha": "60aa2dc03a22d69c8800fec81f99c96958a11363",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0031",
+   "fix_sha": "fac6d58b25c6f9f8c0a6cdc4dec75b37b219f1d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0035",
+   "fix_sha": "cbf6e9983e839d2ecad86de8cd1b3f20ed43390b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0037",
+   "fix_sha": "521769b80039fc8043d1c9883e3d6e5b57359072",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0038",
+   "fix_sha": "2b609ee057be950e3454b69fadc431d120e407bb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0039",
+   "fix_sha": "f9e5f77fac0a6328f9759e6e0f9e10c16509aebb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0052",
+   "fix_sha": "1bc7f71d40de069727993a18fdada33eb0b4c94f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0063",
+   "fix_sha": "013b0758643943e8df5b17bbb495460ff47e8bbf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0064",
+   "fix_sha": "4a31c14f31e1a08c18893a37e304dd1dd4b7daa3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0065",
+   "fix_sha": "4a31c14f31e1a08c18893a37e304dd1dd4b7daa3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0066",
+   "fix_sha": "4d225a53206505d39438ec6694e15f49c038baff",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0067",
+   "fix_sha": "b633bf265e41c60dfce3be7eac4e4dd5e18d06cf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0068",
+   "fix_sha": "25d34c67863fd960af34fc4f82a7ca3362ee74b9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0069",
+   "fix_sha": "1e40e31d64bc6b32e595d24074092dcf84410b2b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0072",
+   "fix_sha": "f12cadc6666c6f555d29725f5bc45da2103f24ea",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0075",
+   "fix_sha": "2614f2e9d2d36805ead8a8da0fa0c6e0d9e428a0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0076",
+   "fix_sha": "e60c3742904ccbb3e26da201c9221c38a4981d72",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0082",
+   "fix_sha": "0074a0a3e98786509259bfe3821d3b3f094257aa",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0085",
+   "fix_sha": "093fb5d0aa21c0b5eaea6ec96b477f1075271cbb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0086",
+   "fix_sha": "4923fb7d458ed28c0302244c54cb4df0acee7ee6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0087",
+   "fix_sha": "65ef9fac4f39c4e171e2952a6cf029bb0d059a89",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0088",
+   "fix_sha": "bb178829086e80916f9be190f02d83bc25802799",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0089",
+   "fix_sha": "e4553f7d74fce682d802f8fb073943387796df29",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0096",
+   "fix_sha": "2ba4bce5cc719e5a74e571a534424614e62ecc41",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0097",
+   "fix_sha": "087d9d7becf7422b3f872a3bcd5d97bb7ce7ff36",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2022-0100",
+   "fix_sha": "2ba4bce5cc719e5a74e571a534424614e62ecc41",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0003",
+   "fix_sha": "87934f87d36753ed702792ec063be7246444a8e1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0004",
+   "fix_sha": "90c9c182cd5a5ebc75810aebd89b347a7bdf590b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0018",
+   "fix_sha": "7247a8b6ee59fc99bbb69ca6b3ca4bfd8c809ead",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0019",
+   "fix_sha": "f92e4c047fdc30619555da282ac7ccce1d313aa6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0029",
+   "fix_sha": "9bacb86a480803ece9d1a45aa443081cf1eb815c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0030",
+   "fix_sha": "a57a051ba006cfa3b41a0532f484df759e008d47",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0046",
+   "fix_sha": "e030188895096fd8d91d48753877729f4d37dd24",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0052",
+   "fix_sha": "30a108e0802fd09585e0d071013f24b8272d139b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0053",
+   "fix_sha": "4ea052366f342a06344aab589565179b59b342d3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0056",
+   "fix_sha": "aff1dd4a5259f7deba56692840f7a2d9ca34c9c8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0057",
+   "fix_sha": "b853350a3800e38d2cb9950355b80bc8b8d3959c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0058",
+   "fix_sha": "e1e347d2725b9c9dd4a70b63eb08532ca9687652",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0060",
+   "fix_sha": "902bc9190331343b2017211debcec8d2ab87e17a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0062",
+   "fix_sha": "4da91c3fd853e3d466d8581cf1d82b7f3255de56",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0065",
+   "fix_sha": "8b3ecd3cc0008145ab4bc8d0657c39d09db8c7e2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0068",
+   "fix_sha": "1b6392173ce35db4736a94b62b2d2973f9a71441",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0069",
+   "fix_sha": "bfdbda22968e3de43fa8246cab1681cfd5d5493d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0072",
+   "fix_sha": "cf9681a55cabd4cb9f1475bde17b5079f2a0384e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0073",
+   "fix_sha": "b233dbc2d2bcc79c9fc574dd5968269df680b073",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0075",
+   "fix_sha": "7755559145c9cf5573639bfecc557893d4a46b0d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0077",
+   "fix_sha": "93439858d1c44294a7b377f775c4fc897a370bb2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0078",
+   "fix_sha": "20a1762b3fd5f1fafead198fd18e469c68683721",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0079",
+   "fix_sha": "b5c6ad13f4eece80e59c6ebeafd787ba1519f5f6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0080",
+   "fix_sha": "c4bcd39fabca9a31a401d0cc42d4090869b5a37a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0082",
+   "fix_sha": "2dd44be94539c051b4dee55d1d9d349bd7bedde6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0085",
+   "fix_sha": "d669282924a95311599e9e7dd53869ee96b3a2f5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0089",
+   "fix_sha": "48e55c166684f37af0b00fbee5a0809b1a2bae8e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0090",
+   "fix_sha": "63fb30e4b4415455d47b3da5a19d79c12f4f2d1f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0091",
+   "fix_sha": "8d7eda15b0badcbea83a7aac2d08f80788b59240",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0092",
+   "fix_sha": "0977952dcd9d482bff7c288868ccb52769b3a92e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0093",
+   "fix_sha": "5dc2bbccbb363e474d2c9a1b8e38a89a43bbd5d1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0094",
+   "fix_sha": "8a8814e7cc97d44f4d194586b3e9deb904c99488",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2023-0095",
+   "fix_sha": "c1bc4ed71dcc9842b7dc1ea26f278f105074bbaa",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0001",
+   "fix_sha": "bb661f29e0d88968c495a4ea4dc63ff0e2c2c11a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0002",
+   "fix_sha": "30172fca2a8e0a38667d934ee56682247e13f167",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0003",
+   "fix_sha": "59570e11ccddbec85f67a0c7aa353f7730c68854",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0007",
+   "fix_sha": "22e0609591a2c08930f52a0e6bc860f02a0e88c0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0008",
+   "fix_sha": "16a42b3f8378a3fa4e61ece3e3e37e6a530df51d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0010",
+   "fix_sha": "958821bd3b956d1436af65f70a0964d4ffb7daf6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0011",
+   "fix_sha": "12e8ae55547ae297d5f70599e5c884ea891303eb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0012",
+   "fix_sha": "a9a9b9bf243862bd2afbf6853fca97f30dc4f620",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0013",
+   "fix_sha": "9e57876be78924c1e5f3f268bb599e3981fe58bb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0017",
+   "fix_sha": "ae054dc8044eac9c2c7ae2b1ab154b53ca7f8df7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0018",
+   "fix_sha": "c2fde19caf6149d91faa504263f0bc5cafc35de5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0019",
+   "fix_sha": "90d4fe00df870acd3d38f3dc4face9aacab8fbb9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0020",
+   "fix_sha": "d6ee13ed9e818aa51b8d86d95e8009a376289a40",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0021",
+   "fix_sha": "770ac3fa1435eae3b166a4b072053360e38a0575",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0334",
+   "fix_sha": "e1fdc92ca69ffd254824ab80fbad5660f4aac911",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0336",
+   "fix_sha": "2123576840aa31043a31b0770e6572136fbe0c2d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0338",
+   "fix_sha": "607e7fc710fb9441096e8edbaa12879b552c8f65",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0341",
+   "fix_sha": "d5a7655d6ea9e53ab57c3013092c5576da964bc4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0342",
+   "fix_sha": "297548cad4016ce448c4b5007c54db7ee39489d9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0343",
+   "fix_sha": "a9022772b2f1ce38929b5b81eccc670ac9d3ab23",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0344",
+   "fix_sha": "415892acf1cdf9161bd6a4c99bc2f4cb8fae5e6a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0354",
+   "fix_sha": "734b6c6948d4b2bdee3dd8b4efa591d93a61d272",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0356",
+   "fix_sha": "76a7052149bb8f722df12da915b3a06d19a6695a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0357",
+   "fix_sha": "aef36e0f3950653148d6644309ee41ccf16e02bb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0358",
+   "fix_sha": "4978e32654235f569062f2cad6c7361e410f1254",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0359",
+   "fix_sha": "884aaa1646132bc3a27ba058197d6ef039bec294",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0361",
+   "fix_sha": "5bef1c588933bd60a04bb70099150cf84b69e144",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0362",
+   "fix_sha": "4790c47518024bd391bbd6815b00f501bad76a15",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0365",
+   "fix_sha": "9eccd7d6d705ac53618bfd478152e32ec3b4536c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0369",
+   "fix_sha": "b792151b17fc90231c232a23935830c2266f3203",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0371",
+   "fix_sha": "650a1b5cf25e086197cc55a68525a411e1c28031",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0372",
+   "fix_sha": "bd17d57a7b8ca59665fea5fad6143ca02724d03b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0373",
+   "fix_sha": "e01609ccd8738bd438d86fa7185a0f85598cb58f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0376",
+   "fix_sha": "a4472a86f3290e60c7c01348b7e6a8164d6e7e48",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0377",
+   "fix_sha": "339efb90fdb980920a5e8829008abc1114f4bfdd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0406",
+   "fix_sha": "4f6b8ae521884833498bae26369c353c10f28ea7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0410",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0411",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0412",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0413",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0414",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0415",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0416",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0417",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0418",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0419",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0420",
+   "fix_sha": "508a69b63a3c5bf73790e0e59101a955847f30d6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0422",
+   "fix_sha": "094c356273f209e04bf481fb404dc17990ae76e0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0423",
+   "fix_sha": "094c356273f209e04bf481fb404dc17990ae76e0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0424",
+   "fix_sha": "f70a16a09a8096d3c50159dd8a912a75c2af157c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0432",
+   "fix_sha": "703152ecfa86f27952a35b57dd525ed39396a227",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0435",
+   "fix_sha": "474e3b01a884366cdb7d704f7456ef692e992232",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0437",
+   "fix_sha": "f06992f46771c0a092593b9ebf7afd48740b3ed6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0439",
+   "fix_sha": "0ebe54d05f0e1f6c64b7c8bb48c9e9f6c95cacba",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0440",
+   "fix_sha": "0ebe54d05f0e1f6c64b7c8bb48c9e9f6c95cacba",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0441",
+   "fix_sha": "7f57d0bb0948fa56cc950278d0db230ed10e8664",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0442",
+   "fix_sha": "b5e31a5c33725ab8a7dfbe8505c56b5cf282ffed",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0443",
+   "fix_sha": "62b47060d7fb8cc0e92e522ee54948edf5aab556",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0444",
+   "fix_sha": "69ea2f52ed976934bff588d6b566bae01be313f7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0445",
+   "fix_sha": "dcc3818039761331fbeacbb3a40c542b65b5ebf7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2024-0446",
+   "fix_sha": "cfc58161e0ec595db90af686ad77a73df6d44d74",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0000",
+   "fix_sha": "ce3b67f801446387972ff120e907ca828a9f1207",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0004",
+   "fix_sha": "f014afb230de4d77bc79dea60e7e58c2f47b60f2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0005",
+   "fix_sha": "c8219563bc91615dd4a27884a5c63f09db8d03bb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0008",
+   "fix_sha": "3a822fff0b4c9a984622ca2b179fe8898ac54b14",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0009",
+   "fix_sha": "ec2d3cf1d91f148c84e4806b4f0b3c98f6df3b38",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0015",
+   "fix_sha": "8447ed86bf3f24629abd7022b94104bf3cd64453",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0016",
+   "fix_sha": "108f540ea8acb6073751a1aa386085c1cdc4fd1e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0018",
+   "fix_sha": "57685c35512a57269086314a42a70441af4ef451",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0021",
+   "fix_sha": "f253f02a6658b3b7612a50d56c71f5ae4da4ca21",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0022",
+   "fix_sha": "87085bd67896b7f92e6de35d081f607a334beae4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0026",
+   "fix_sha": "41dc296c786e5943d3238535e45e1df60b258050",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0037",
+   "fix_sha": "fda3317ec822678564d641e7cf1c9b77ee3759ff",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0041",
+   "fix_sha": "13c1d2048286bbabf5e7bc6b015aafee98f04d55",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0043",
+   "fix_sha": "d0c01006e4808db5eb96ad5c496416f284d8bd3c",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0047",
+   "fix_sha": "2d65c514bc964b192bab212ddf3c1fcea4ae96b8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0050",
+   "fix_sha": "fab6922b955b5a2986dfff2ccb341628faec30ed",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0051",
+   "fix_sha": "da830976870c1174e3b33eb0643177be3991c002",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0054",
+   "fix_sha": "728fe1bdffb04896d218e962d989a2ae6bf1ea92",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0062",
+   "fix_sha": "e6e16d5a97e6258ffbedbae1bde65b45c60f242f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0071",
+   "fix_sha": "de0297111a3a1273275b670960bcd47a0481718e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0073",
+   "fix_sha": "7823e9af8c20e9fcfb5360f5eafd891c457ebccf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0106",
+   "fix_sha": "4a4007a1aaff25cd417853c76163883a7110e276",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0107",
+   "fix_sha": "1bdaa14da68a6e8207f9e81359116f53139800f2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0110",
+   "fix_sha": "22b3f884adb7a2adf1d3a8d03469533f5cbc8318",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0112",
+   "fix_sha": "192f2fcdadfec9d0cf6b58548a85a7307450cbf5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0114",
+   "fix_sha": "4b3fe27190f20602dc3d9dbfcf36f72ca8b2c538",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0115",
+   "fix_sha": "4b3fe27190f20602dc3d9dbfcf36f72ca8b2c538",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0116",
+   "fix_sha": "4b3fe27190f20602dc3d9dbfcf36f72ca8b2c538",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0117",
+   "fix_sha": "4b3fe27190f20602dc3d9dbfcf36f72ca8b2c538",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0118",
+   "fix_sha": "9ebb6934f00d58b92fb68ed0e0b16c0ae828ca10",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0125",
+   "fix_sha": "28860d4a38286609cb884c13b5b7941edc2390e5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0126",
+   "fix_sha": "94a286f87e88f431913d19668246de9006790125",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0127",
+   "fix_sha": "9d98157e151596573cb071da59d27a4e0ac9b8dc",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0129",
+   "fix_sha": "60e0ada5291e771d5649793329d99edd32285e72",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0132",
+   "fix_sha": "98f0e4fff9678c841ed33f3b8a46322f6163c32a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0133",
+   "fix_sha": "8d10f45631afd1d93fabb2278dbb388a075b5608",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0135",
+   "fix_sha": "4ea0418abefab2aa93f8851a4d39c723e703e6b0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0138",
+   "fix_sha": "31a97803995bd94629528ba841b2418d3ca01860",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0139",
+   "fix_sha": "8e0b565e7876a83b0e1cfbacb8af39dadfdcc500",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0140",
+   "fix_sha": "76376ef5e97c63e108db0c9fe2eb096f4bfe70f7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0142",
+   "fix_sha": "61929d11c13b6cc4f864840a586fd48c6fd20ad9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0143",
+   "fix_sha": "7b981f4c75a975c80444cd38729bcdf12bf3eabf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0144",
+   "fix_sha": "035d9eef98486ecd00a8bf418c7817eb14dd6558",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0149",
+   "fix_sha": "10e73a21d67baa2cd613ee92ce999cda145e1a83",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0162",
+   "fix_sha": "ce02c19ec35e5ee84c00ec5005be9d6d44599b5f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0164",
+   "fix_sha": "13e0e9f4d5333e3a815191e5f6f402641997f91b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0165",
+   "fix_sha": "a948b891cf159233bfed5b16bf185268fd9e1985",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0166",
+   "fix_sha": "02b947afdeeb1be95ec0888354aa76afdd9d0357",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0168",
+   "fix_sha": "a2e062f37066c3b12860a32eb1cb44856cfb7afe",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0169",
+   "fix_sha": "a649e8cb4e7c9859279d1dc85051df5e7a4932f7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0170",
+   "fix_sha": "2b30bdf227f39b1c9ed7af16ea0cc3957f88da18",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2025-0172",
+   "fix_sha": "2950ec98d33b6e752b4f0976d67d89feb6f4acde",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0003",
+   "fix_sha": "55977257e7c82a309d5e8abfdd380a774f0f9778",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0004",
+   "fix_sha": "3a045d636e97bb2eb628671db0001aa665c19dd8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0005",
+   "fix_sha": "d1a1506010bc48962634807d0dcca682af4f50ba",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0006",
+   "fix_sha": "728fa07184f8da2a046f48ef9b61f869dce133a6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0007",
+   "fix_sha": "d0293b0e35838123c51ca5dfdf468ecafee4398f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0008",
+   "fix_sha": "9e160f15bd056f82143109bb330573381e5de719",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0009",
+   "fix_sha": "1c63dc7985b8fa26bd8c689423cc56b7a03841ee",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0012",
+   "fix_sha": "7ac1920198ebb7d0192e6d2c3581e15b38a6e0e5",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0013",
+   "fix_sha": "75abd8602896b350fd8c778e52e0a74b4644ccca",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0021",
+   "fix_sha": "301dc7162cca51def19131019af1187f45901c0a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0022",
+   "fix_sha": "9e51c0d9a240a9613d279c061f82286bd11383fd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0023",
+   "fix_sha": "4d6f5d3c2542b6179a6474dec8cfb8b8ddf31a84",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0041",
+   "fix_sha": "055502ee5d297ecd6bf448ac91c055c7f6df9b6d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0066",
+   "fix_sha": "e5e0139cae4577eeedf5fc16b65e690bf988ce52",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0067",
+   "fix_sha": "17b1fd84e632071cb8eef9d3709bf347bd266446",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0068",
+   "fix_sha": "de1a5870e603758f430073688691165f21a33946",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0069",
+   "fix_sha": "1c247b5c9aeca602ad2971c9bd49817fe2c308e6",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0122",
+   "fix_sha": "5828cf5c27b664eb4432c4a93d4769e12e5e42fb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0140",
+   "fix_sha": "8e22aa2de28df5a285eed87c11cd89bf15fa90d3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0141",
+   "fix_sha": "f5efffc88360dbdbfcef80f465e42d5bce68ca35",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0146",
+   "fix_sha": "26ef36968a62e28a1f028e7adae4806af30c747d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0152",
+   "fix_sha": "643a24b30914068416dff9021a069c12c865a316",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0153",
+   "fix_sha": "a2d48a71fe93d18cbd666c8d53d0882f5ce110c4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0154",
+   "fix_sha": "a2d48a71fe93d18cbd666c8d53d0882f5ce110c4",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0172",
+   "fix_sha": "1bc2ea46d9840e8d9af844239d3c84f37fe7d84b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0178",
+   "fix_sha": "7a00ffa9ad4d951ec0a4564b52f1780fa9d353c1",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0179",
+   "fix_sha": "d40097a36a85068ea50a3afbf0ce154ba439e7f0",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0180",
+   "fix_sha": "a7cf84b5c46431cbca9d8ff50508c23f446efa7d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0182",
+   "fix_sha": "100bfe27253d2ce5154ddddf66d06e30f3fa6824",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0185",
+   "fix_sha": "fed0321a9a672819662caab37f5662f1ad91308e",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0194",
+   "fix_sha": "07f3db8343cf152f5bc3483ef5b3164582489bea",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0195",
+   "fix_sha": "7ca25266e94987210daa864889ab15c9332c8a2a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0199",
+   "fix_sha": "f5f1ee2862c1198a85afe3c2f8cd80835162b7e9",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0213",
+   "fix_sha": "9394bd81179e756cb911314deabd943f1a9c8989",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0216",
+   "fix_sha": "73bdd677b872641d57a2ebcc5afc23ee0e5f0d2d",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0217",
+   "fix_sha": "34c7df2c9bd2a36583e09b52f3e6319bf23102e8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0219",
+   "fix_sha": "b24619346f666d08ef7fefe27f033b8bc871697f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0223",
+   "fix_sha": "3ebfbe5af4927c157d6fcaca42b8dbb6d17b73fb",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0224",
+   "fix_sha": "02a88bd5688de058bfba8aa9fb4612441a384eff",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0225",
+   "fix_sha": "2bc5fa2c270bb87b397d381909053f12ee734d44",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0226",
+   "fix_sha": "2b6d6227cd884c1acb200bffa66a3f402b02a176",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0227",
+   "fix_sha": "89dc1a77eaa774174588c5a38b6324c502948830",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0228",
+   "fix_sha": "25e4e9ce66a533d9d7f5071f6c1dae992476cf83",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0229",
+   "fix_sha": "fd69825a3aa83c4a99f0d620fafba66c765db96b",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0230",
+   "fix_sha": "29182657bc54ac18564597e4414f08c3e4e9aa0a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0231",
+   "fix_sha": "6eb8766caa25f03803f178861be054f3bca718d7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0232",
+   "fix_sha": "4b67f9b45909d2e35f34c30c084c0ab66e599a9f",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0233",
+   "fix_sha": "3c9d07fbff5949261bef38d00ab160b129bd9d3a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0234",
+   "fix_sha": "3c9d07fbff5949261bef38d00ab160b129bd9d3a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0235",
+   "fix_sha": "3c9d07fbff5949261bef38d00ab160b129bd9d3a",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0238",
+   "fix_sha": "c99cc86f0ee353010cd202cbcd2c310371b0bbb8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0239",
+   "fix_sha": "c99cc86f0ee353010cd202cbcd2c310371b0bbb8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0240",
+   "fix_sha": "c99cc86f0ee353010cd202cbcd2c310371b0bbb8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0242",
+   "fix_sha": "c99cc86f0ee353010cd202cbcd2c310371b0bbb8",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0257",
+   "fix_sha": "31d1b924885551c0e553909d27c738ca6958a0f3",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0275",
+   "fix_sha": "7a0e20c1e002ce06da0f3ec8795ef1529862ea97",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0276",
+   "fix_sha": "a9c05fec2d36a750c30e797291a0557f230c8faf",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0277",
+   "fix_sha": "ff0dd152ecfccb3bf00e15cc92bd4d57e485c854",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0279",
+   "fix_sha": "ac6941f05483b0875fda52c7664cd42033db7fa2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0283",
+   "fix_sha": "5916d6260acbad8a34290dba137f39963f13f467",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0285",
+   "fix_sha": "5046bdf8a612b35a2c1a9e168054c1d5c65e7dd7",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0298",
+   "fix_sha": "4f1492a266824f8aa66fd6b27fa6188bf826bdfd",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0312",
+   "fix_sha": "da661f8ecee820e05d089a76ecb654ff52a2c987",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0317",
+   "fix_sha": "fb70d62c88ca906284703c8071e51951c6ab43e2",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0318",
+   "fix_sha": "01b45b51299821ab03fecf46741392780f118d49",
+   "project": "rustsec"
+  },
+  {
+   "advisory_id": "RUSTSEC-2026-0334",
+   "fix_sha": "e8accbe7d39f48f030e44f333b4796e28f6aad80",
+   "project": "rustsec"
+  },
+  {
    "advisory_id": "CVE-2019-19242",
    "fix_sha": "57f7ece78410a8aae86aa4625fb7556897db384c",
    "project": "sqlite"
@@ -1986,5 +5616,12 @@
    "project": "systemd"
   }
  ],
- "failed": []
+ "failed": [
+  {
+   "advisory_id": "RUSTSEC-2020-0001",
+   "fix_sha": "8b9eab05795fdc098976262853b2498055c7a8f3",
+   "project": "rustsec",
+   "reason": "commit API 422 for bluejekyll/trust-dns@8b9eab05795fdc098976262853b2498055c7a8f3"
+  }
+ ]
 }

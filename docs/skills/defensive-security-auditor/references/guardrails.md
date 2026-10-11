@@ -29,7 +29,7 @@ The gate exits non-zero with verdict `STALE` when the stored `evidence_chain_has
 
 ## CWE-78 — CWE Family CWE-78
 
-Cluster `CWE-78` "CWE Family CWE-78": **4** advisories, **2** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-78` "CWE Family CWE-78": **13** advisories, **2** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 ### SEC-CWE-78-COMMAND-INJECTION-C (CRITICAL, C)
 
@@ -76,7 +76,7 @@ Cluster `CWE-78` "CWE Family CWE-78": **4** advisories, **2** with a fix SHA (`d
 
 ## CWE-120 — Classic Buffer Overflow
 
-Cluster `CWE-120` "Classic Buffer Overflow": **59** advisories, **55** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-120` "Classic Buffer Overflow": **72** advisories, **55** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 Preconditions recorded in the cluster: Untrusted buffer length or unbounded string processing.
 
@@ -102,7 +102,7 @@ Preconditions recorded in the cluster: Untrusted buffer length or unbounded stri
 
 ## CWE-190 — Integer Overflow or Wraparound
 
-Cluster `CWE-190` "Integer Overflow or Wraparound": **135** advisories, **127** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-190` "Integer Overflow or Wraparound": **164** advisories, **127** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 ### SEC-CWE-190-INTEGER-OVERFLOW-C (MEDIUM, C)
 
@@ -138,7 +138,7 @@ Cluster `CWE-190` "Integer Overflow or Wraparound": **135** advisories, **127** 
 
 ## CWE-362 — Concurrent Execution using Shared Resource (Race Condition)
 
-Cluster `CWE-362` "Concurrent Execution using Shared Resource (Race Condition)": **405** advisories, **397** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-362` "Concurrent Execution using Shared Resource (Race Condition)": **459** advisories, **397** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 Preconditions recorded in the cluster: Multithreaded / interrupt context without adequate lock barrier.
 
@@ -187,7 +187,7 @@ Preconditions recorded in the cluster: Multithreaded / interrupt context without
 
 ## CWE-416 — Use After Free
 
-Cluster `CWE-416` "Use After Free": **1380** advisories, **1372** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-416` "Use After Free": **1430** advisories, **1372** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 Preconditions recorded in the cluster: Asynchronous lifecycle, double free, or aliased pointer reuse.
 
@@ -225,7 +225,7 @@ Preconditions recorded in the cluster: Asynchronous lifecycle, double free, or a
 
 ## CWE-476 — NULL Pointer Dereference
 
-Cluster `CWE-476` "NULL Pointer Dereference": **2078** advisories, **2063** with a fix SHA (`docs/studies/pattern_clusters.json`).
+Cluster `CWE-476` "NULL Pointer Dereference": **2097** advisories, **2063** with a fix SHA (`docs/studies/pattern_clusters.json`).
 
 Preconditions recorded in the cluster: Unchecked return value from allocator or lookup function.
 

@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2019-0040","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"058ac7e1a7d732076da9d8a37baa66bcb67758d8","parent_sha":"58405ab1607636d35a0409a9ee511a014210360b","project":"rustsec","repo":"stbuehler/rust-boxfnonce","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

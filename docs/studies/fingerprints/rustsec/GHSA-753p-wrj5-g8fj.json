@@ -1,0 +1,1 @@
+{"advisory_id":"GHSA-753p-wrj5-g8fj","coverage":"PARTIAL","cwe":"CWE-1240","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"0c07fa8badbf44f67d3ff1571df31ca54e5228c0","parent_sha":"96a017870e9eb7f9ea1b956312b7b26136dec4e3","project":"rustsec","repo":"rustpq/pqcrypto","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

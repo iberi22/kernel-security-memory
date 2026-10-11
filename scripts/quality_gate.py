@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Quality Gate for KSM and Xavier Publication.
+"""Quality Gate for KSM Publication.
 
 Enforces strict verification of defensive security audit evidence chains
-before granting authorization to publish memories or guardrails to Xavier
+before granting authorization to publish memories or guardrails to a memory store
 under the prefix ``ksm-guardrail/``.
 
 Verification criteria:
@@ -42,7 +42,8 @@ from defensive_auditor import (
     load_pattern_clusters,
 )
 
-DEFAULT_XAVIER_PREFIX = "ksm-guardrail/"
+DEFAULT_PREFIX = "ksm-guardrail/"
+DEFAULT_XAVIER_PREFIX = DEFAULT_PREFIX
 DEFAULT_KSM_PACK_REF = "kernel-security-memory-bootstrap-v0"
 
 
@@ -220,11 +221,12 @@ def evaluate_quality_gate(
     clusters_path=None,
     reproducibility_runs=2,
     strict=True,
-    xavier_prefix=DEFAULT_XAVIER_PREFIX,
+    prefix=DEFAULT_PREFIX,
+    xavier_prefix=None,
     evidence_path=None,
     repo_root=None,
 ):
-    """Evaluate quality gate criteria for Xavier publication.
+    """Evaluate quality gate criteria for memory store publication.
 
     ``evidence_path`` (the file ``evidence_data`` was read from) anchors relative
     targets to the repository root instead of the current working directory.
@@ -232,6 +234,7 @@ def evaluate_quality_gate(
     Returns:
         dict: Structured quality gate decision and authorization receipt.
     """
+    pub_prefix = xavier_prefix if xavier_prefix is not None else prefix
     now_utc = datetime.now(timezone.utc).isoformat()
 
     # If existing evidence is provided, verify its integrity first
@@ -402,7 +405,7 @@ def evaluate_quality_gate(
             "timestamp": now_utc,
         }
 
-    # All checks passed! Authorize publication to Xavier
+    # All checks passed! Authorize publication to memory store
     # When evidence was supplied, report the cited hash: the freshness check above has
     # already proven it equals a fresh audit of this tree.
     cited_hash = (evidence_data.get("evidence_chain_hash", chain_hash)
@@ -414,7 +417,8 @@ def evaluate_quality_gate(
         "verdict": verdict,
         "evidence_chain_hash": cited_hash,
         "fresh_evidence_chain_hash": chain_hash,
-        "publication_prefix": str(xavier_prefix),
+        "publication_prefix": str(pub_prefix),
+        "xavier_prefix": str(pub_prefix),
         "files_audited_count": evidence["audit"]["files_audited_count"],
         "findings_count": evidence["audit"]["findings_count"],
         "runs_verified": len(hashes),
@@ -422,7 +426,7 @@ def evaluate_quality_gate(
         "evidence": evidence,
         "message": (
             f"Quality gate PASSED: hash verified, reproducible, and verdict '{verdict}'. "
-            f"Authorized for Xavier publication at {xavier_prefix}"
+            f"Authorized for publication at {pub_prefix}"
         ),
     }
 
@@ -439,8 +443,9 @@ def main(argv=None):
                         help="Number of verification runs for reproducibility check")
     parser.add_argument("--strict", action=argparse.BooleanOptionalAction, default=True,
                         help="Enforce strict gate (reject WARN, FAIL, INCOMPLETE)")
-    parser.add_argument("--prefix", default=DEFAULT_XAVIER_PREFIX,
-                        help=f"Xavier publication path prefix (default: {DEFAULT_XAVIER_PREFIX})")
+    parser.add_argument("--prefix", default=DEFAULT_PREFIX,
+                        help=f"Publication path prefix (default: {DEFAULT_PREFIX})")
+    parser.add_argument("--xavier-prefix", dest="prefix", help=argparse.SUPPRESS)
     parser.add_argument("--output", help="Optional path to write authorization report JSON")
     parser.add_argument("--repo-root", help="Repository root used to resolve relative "
                         "targets recorded in --evidence (default: nearest ancestor of the "
@@ -465,7 +470,7 @@ def main(argv=None):
         clusters_path=args.clusters,
         reproducibility_runs=args.runs,
         strict=args.strict,
-        xavier_prefix=args.prefix,
+        prefix=args.prefix,
         evidence_path=args.evidence,
         repo_root=args.repo_root,
     )

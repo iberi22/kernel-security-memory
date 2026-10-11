@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2020-0118","coverage":"PARTIAL","cwe":"CWE-119","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"c7919199a0f6d1ce0e3c33499d1b37f862c990e4","parent_sha":"50bd80f874c851413a721bbe144eeba4dfb68b4e","project":"rustsec","repo":"KizzyCode/tiny_future-rust","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

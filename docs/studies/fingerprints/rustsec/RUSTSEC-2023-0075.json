@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2023-0075","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"7755559145c9cf5573639bfecc557893d4a46b0d","parent_sha":"389373f0d99dd8726eb52199e622056aa1d4ac8f","project":"rustsec","repo":"dtolnay/unsafe-libyaml","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

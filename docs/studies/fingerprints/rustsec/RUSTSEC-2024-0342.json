@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2024-0342","coverage":"PARTIAL","cwe":"CWE-1188","files":[],"fix_evidence":"advisory-commit-link","fix_sha":"297548cad4016ce448c4b5007c54db7ee39489d9","parent_sha":"2deb2062cb7c6620cba8835ff3e5cfee5d7c9a01","project":"rustsec","repo":"matrix-org/vodozemac","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}

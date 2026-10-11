@@ -1,0 +1,1 @@
+{"advisory_id":"RUSTSEC-2022-0024","coverage":"PARTIAL","cwe":null,"files":[],"fix_evidence":"advisory-commit-link","fix_sha":"9cf94d75316ef441033ce4c80def7c1a8c7643fe","parent_sha":"074dab4bb1ed37aac65060d97024e01a0ff01f78","project":"rustsec","repo":"niklasf/double-checked-cell","schema":"ksm-fixfp/1","tool":"code-graph@229aa969"}
