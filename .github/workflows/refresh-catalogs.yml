@@ -6,9 +6,7 @@ on:
     - cron: "17 5 * * 1"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 # One refresh at a time; a run that is still going is never cancelled, because
 # half-applied NVD windows are resumed from the cursor by the next run.
@@ -23,6 +21,21 @@ jobs:
   refresh:
     name: Refresh catalogs and propose a pull request
     runs-on: ubuntu-latest
+    # Least privilege: this is the only job and it pushes the automation
+    # branch plus opens/updates the pull request, so it holds exactly
+    # contents:write and pull-requests:write. The token is NOT available to
+    # the fetch steps: checkout uses persist-credentials:false and GH_TOKEN
+    # is exported only on the final propose step. Values reach scripts
+    # through env (AUTOMATION_BRANCH, GH_TOKEN), never ${{ }} in run:.
+    #
+    # Not split into read/build + write/PR jobs (cf. oss-scanner triage):
+    # this runs on schedule/dispatch (no fork-PR input), and the build must
+    # resume the automation branch cursor before fetching; an artifact
+    # handoff would duplicate that branch logic and risk cursor races for
+    # no real gain here.
+    permissions:
+      contents: write
+      pull-requests: write
     # The fetch phase is capped at 35 minutes by refresh_all.py
     # --deadline-seconds; the rest covers validation and the pull request.
     timeout-minutes: 50

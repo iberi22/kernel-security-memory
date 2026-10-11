@@ -30,3 +30,8 @@ docs/studies/cisa-cache/
 # the fix commits (third-party terms, docs/DATA-POLICY.md). Only derived,
 # code-free features are committed under docs/studies/fragments/.
 docs/studies/fragments-cache/
+
+# oss_scanner_projects.py cache: raw OSV v1/query responses (third-party
+# data, docs/DATA-POLICY.md). Only the derived osv_git_supported boolean is
+# committed in docs/studies/selection/oss-scanner-projects.json.
+docs/studies/selection/.osv-cache/
