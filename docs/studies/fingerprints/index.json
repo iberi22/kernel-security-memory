@@ -996,6 +996,1506 @@
    "project": "git"
   },
   {
+   "advisory_id": "CVE-2026-98084",
+   "fix_sha": "e3e4f66cc4b72333d0886ae2673c360248987889",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98085",
+   "fix_sha": "387b1baefbb776e3f48dc2261e77a49213f470f7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98086",
+   "fix_sha": "adeee7187694719890aaffdc14b7e89cfd736f1d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98087",
+   "fix_sha": "dae5c0292080dd7b9c7d784268dcf443f1f3d15e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98088",
+   "fix_sha": "e0d26fe176a8db6ccad4ab38c5bab29391c1946b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98089",
+   "fix_sha": "70f3995830d3f1e79faa14eb0605914f778feca9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98090",
+   "fix_sha": "e0b54613aabeb8e9da597f23b90c6a03d0981986",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98091",
+   "fix_sha": "c93b3c43df561cd9f592cee20ae058b563f9e5b6",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98092",
+   "fix_sha": "1b67e0d3b9691d7b6b74e18960ddd2be24f9dc9d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98093",
+   "fix_sha": "d3dbccfe6afa7b9a6a7ed65cfaa76a47fa050a56",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98094",
+   "fix_sha": "f576944a59f31bcffff121117ebf452c5dd162b7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98095",
+   "fix_sha": "73e594c19b4f815d8343461cec7074c4713bbde7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98096",
+   "fix_sha": "975b5b067f525a1b1338c4a3bee1c46545801518",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98097",
+   "fix_sha": "81c600c26302a27852ed8b19c5f2f647ea3555c9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98098",
+   "fix_sha": "b3b76e9f4f2476f1135b2ba7743a821db4a0df4b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98099",
+   "fix_sha": "0c8f56c583c3250408367880c98e4d6fbc929315",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98101",
+   "fix_sha": "c073d1b070f171d206b19c98d71739a97f15b3f1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98102",
+   "fix_sha": "93b49239840b91313adbd77b8b52993eff2d08c1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98103",
+   "fix_sha": "2987ee196c88dbde0463dc87d5fb209c684e34a2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98104",
+   "fix_sha": "d7e7e98d23f42a92d9ab7e36302bd96bd9b33b5f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98105",
+   "fix_sha": "172c974113bffe5723b80b1acac17593bb50513c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98106",
+   "fix_sha": "c4126f1db36e6b2e1c79b0e30a8a2de91c568f4c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98107",
+   "fix_sha": "56c2b5831d39dc84aad2573dc3e197af1a872a05",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98108",
+   "fix_sha": "4ef05db5b08b176a551b4a6287372045998806b0",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98109",
+   "fix_sha": "57938bbdb9bf7fd41cbd5cd509ec10c4b22bec18",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98110",
+   "fix_sha": "ac8aa9e0ec93a12a60230066f199f49c3b9aac3d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98111",
+   "fix_sha": "a086c0892969bf8a0151b0f12bd14a68827c88b2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98112",
+   "fix_sha": "a506290f59e1c6ce9ac0a13158640bb8fee93471",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98113",
+   "fix_sha": "feca5e70fc963b088377b20879e8cd8237c2fd7d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98114",
+   "fix_sha": "c61dc7b1b4a3234b4aa3965502908a292238805c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98115",
+   "fix_sha": "d12168084c8c1b6d883c8eca5853929ac5136a9e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98116",
+   "fix_sha": "9b110a9dcecc59516c77cb3c0caf1f492f75df2d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98117",
+   "fix_sha": "a67632c8c2688d6e0091529bcefe54bc5ee80e9b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98118",
+   "fix_sha": "fed0b33e6c584986ba70018ec9f9787a98216e64",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98119",
+   "fix_sha": "8fb45a934661419c04a44d4cfea1e0df7dcf2805",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98120",
+   "fix_sha": "3c30087e27598d9d359763e8be9bd3017fe08348",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98121",
+   "fix_sha": "e3eceb76515910746e6268c4e4ac1c07516ebd7b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98122",
+   "fix_sha": "4aa61c88b4e292e10abdfd791334b8272108d68a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98123",
+   "fix_sha": "2cb0b0b1ed69430bf73740377ea0a1c44c50db63",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98124",
+   "fix_sha": "448ba0ae65ca61064183564d2983c9aa59bd6ba7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98125",
+   "fix_sha": "01261a6fa48b62f5ead8e88aaca1e27cb9ab9032",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98126",
+   "fix_sha": "88972e35750792e717af287dc71f42a03b5cbce4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98127",
+   "fix_sha": "1519dc88c87f5346dae0464d7d6da1b6bf1f6e8e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98128",
+   "fix_sha": "419d129f970aaa6567dbac366b0c93784bf9ec97",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98129",
+   "fix_sha": "dba9e2181ca5e875f98b8b9b4535cdaab87dcb0d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98130",
+   "fix_sha": "2188569e7e1b0bc3f3b557dc97ab7a02befc11c8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98131",
+   "fix_sha": "a5d946466a95621fa2769720d59ea336003aa1a5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98132",
+   "fix_sha": "2f3536bff8823d3c5fdbbe15e17bfca696cc2b2e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98133",
+   "fix_sha": "ac727d86fb84bdc9626ba9c756c26767459f3083",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98134",
+   "fix_sha": "d3ef6c097ba078e1f8c7239d76a0ce8b61e75095",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98135",
+   "fix_sha": "323751a604e7533fa473874d999371592a614207",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98136",
+   "fix_sha": "c8504fc1245f5322af5fa5c325ab05f9cf792b87",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98137",
+   "fix_sha": "607a9478833db656e7ceac8e9e382fa4acfde545",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98138",
+   "fix_sha": "0e4c839905418d55bafe571a92533a1d1ac7b0a8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98139",
+   "fix_sha": "be9e89ccb8e52a3e4b67feeb03ebd8133091dc7e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98140",
+   "fix_sha": "cf06dcd572845723821b54a608fc2da995c3c8e2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98141",
+   "fix_sha": "9692b1b4fc00cf89628bc43f71729ab21f14f8d3",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98142",
+   "fix_sha": "92312d333bf700798f92f30406c721bce87506f3",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98143",
+   "fix_sha": "db9deec5a345abc538d081fb221dc0b00a9695bd",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98144",
+   "fix_sha": "7e33ba3a1d48c2d20ed270dec9d2d08332585c8e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98145",
+   "fix_sha": "ef6d27af71e1dc43181ec797a6aaa77c27c36786",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98146",
+   "fix_sha": "b3709d354545e70388177500761f92d906c4dfd6",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98147",
+   "fix_sha": "72dd0ec09e7cc98ed58ddeac26575e5d1ab8a93d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98148",
+   "fix_sha": "cb732d027aa18e1fcf9d2797f47d20b179ebc59c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98149",
+   "fix_sha": "75b0a6db4300e4c2c9e97a0848deaa7acfb42fb7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98150",
+   "fix_sha": "ed54bf564ac52699cf4def3d0c2125d493e756f9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98151",
+   "fix_sha": "150aeba624e8b7cac51c39440d7e8e1fd11de9a0",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98152",
+   "fix_sha": "fb1ed67788e21832b614c23767a088c08cfdd2f2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98153",
+   "fix_sha": "56e1c6bbe4bb084d7ecf61698afdf70be23dd35f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98154",
+   "fix_sha": "d61828199c6cb4b76d48403c77023cd4bb9d09fc",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98155",
+   "fix_sha": "ab243f74ab4084ca5c8dec608cb5b0deb27db067",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98156",
+   "fix_sha": "6a736d2f9d0c6e6217fe7532bc4c50ceca71db78",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98157",
+   "fix_sha": "66cc9dec919dd63d8e4b3d386f7aed3ae684e645",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98158",
+   "fix_sha": "8dc5d98a16fa23c00999aecf10018c9f69fa5bf4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98159",
+   "fix_sha": "9417c5818a0146980c2608fda94c908e604eb033",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98160",
+   "fix_sha": "264676418b726baca7be49171e306b6aa05cceb0",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98161",
+   "fix_sha": "c644a2f8fef5618fcf453c591177700fd07dd024",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98162",
+   "fix_sha": "39f2032096715daae5f6fd0f587ca7a474b019df",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98163",
+   "fix_sha": "057dac23d329d5c5ed62352f2659a39fd46c6d4a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98164",
+   "fix_sha": "0f38453cdb2e17566ccb7c0f3dabd5bd21caca26",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98165",
+   "fix_sha": "bd1f08246b8a2564d8ac61df715b6bcd5f994729",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98166",
+   "fix_sha": "3db7d7d583419f7b1f2e141e36418802dbb25cf8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98167",
+   "fix_sha": "f73726b83e4756fdaa099e1bc1143293bd57ad79",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98168",
+   "fix_sha": "5f0306e731e2f46e91419eae57eee3a241c055e0",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98169",
+   "fix_sha": "4775c3b7a597907e0b97556c7986fda238a377ae",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98170",
+   "fix_sha": "eeb5ef6083e1cefa2ef75041b5597ff228b8d7bb",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98171",
+   "fix_sha": "05762c5bc1cfdcac36747994fde2c04387a457f1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98172",
+   "fix_sha": "e75c96157d45e498970158c8f7373d90102e33b9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98173",
+   "fix_sha": "d034e836eefd7ce75e588f7031cffbeec594f5ac",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98174",
+   "fix_sha": "5f270f091256da1338c3631083e15d7f83cc05e1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98175",
+   "fix_sha": "c65eae6f61d1778ff7a82e4aae4080e26f486af1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98176",
+   "fix_sha": "c883d0a132d430ef7ebb23fd94323be94d0fbdb8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98177",
+   "fix_sha": "8ee521b8b189799e361d4233c5180ba56656d4d4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98178",
+   "fix_sha": "7f9caa70aef0950e06d395ca0035831214d88187",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98179",
+   "fix_sha": "5155002b03b24ba3ef91c5c313b8cf0171b24904",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98180",
+   "fix_sha": "01c8d1f385f788f1bbbbb7687c4386d614281218",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98181",
+   "fix_sha": "59ced288fcba9e91bd38e61a972ad782c4edb7d0",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98182",
+   "fix_sha": "2b04d6556964ae9f89819b86a0a7801e39c3aae5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98183",
+   "fix_sha": "e6031f02269c0f51cf67886d177f02bc300b47cd",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98184",
+   "fix_sha": "fa00193eb991f92b007aefe7afb6a7566976dacf",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98185",
+   "fix_sha": "3687d7d48070838cc2953431b3a27717cab0aaf6",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98186",
+   "fix_sha": "e667aee1c192d67d27c803007bfa9c6e0873e959",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98187",
+   "fix_sha": "d8efd84f49379ed28624098821f80e992657d935",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98188",
+   "fix_sha": "ce858fa6b8a214dee5adb82358885fa024cdd887",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98189",
+   "fix_sha": "c1ba7f7f18465e259cf1b4d9c73fc73853d7f790",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98190",
+   "fix_sha": "ba6cb7c0868a412c2eb68e8efd5aa38bfb258a14",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98191",
+   "fix_sha": "8a1f3cf89ddcc700e25afe42cfad333059adcc94",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98192",
+   "fix_sha": "d9be5e75530772fc31637070d51e5717d6aeaa2a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98193",
+   "fix_sha": "06f42accaf3c6aecab1dcc57f68dde6c06c8b380",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98194",
+   "fix_sha": "bbb9a0ab96d44a64529aafc7a16de460a1712f6a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98195",
+   "fix_sha": "b5526b780f8b297a76030410b96ba29153afb98f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98196",
+   "fix_sha": "1eeca1d5e0920fbdad6449768fd2d4364e714180",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98197",
+   "fix_sha": "0ff9c7775e51ac6d47b1bb5c46f06b1434fe58a8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98198",
+   "fix_sha": "26d5ff79768548efb1e604bb6e8697c101e06269",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98199",
+   "fix_sha": "06bd6794b5fd2163880ac3bfe973d4cc61f359f3",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98200",
+   "fix_sha": "e6cb0b4d4ecb8e71fd2200d907ab2e9663356f69",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98201",
+   "fix_sha": "f84819ef8d66931ee3998fee3c4f03230f4cb6cc",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98202",
+   "fix_sha": "fe10579b6dc3f0dac61e51e1797cacbba5039ac2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98203",
+   "fix_sha": "fb5022278b6ea7f1838e3ef78028d5d5e3375f65",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98204",
+   "fix_sha": "51cfe54f815ae175c7d1126b983d4d7c89715004",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98205",
+   "fix_sha": "8b852965b8eaf910c314dc346967ed82c8d4f235",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98206",
+   "fix_sha": "85f080fb87ed5cd3e46121be677f52c82f26a0ab",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98207",
+   "fix_sha": "8b0cc8707f65e0f51912e764e1b309b2559db1ec",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98208",
+   "fix_sha": "53823e25793a97d07e6e98e0904bbf74cac8bc76",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98209",
+   "fix_sha": "4396d70bb7fec531bcf934fed016b2f3300c670b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98210",
+   "fix_sha": "d3a421c82412344022982d5b91ba23194a0a6f29",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98211",
+   "fix_sha": "2b19cf3e50cddaff07b657dae1a8f30f06032852",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98212",
+   "fix_sha": "5d132990475f02cfa1debe03d50b479432864ebd",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98213",
+   "fix_sha": "6feadbecdae60a6324c967f3b1493741083793a3",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98214",
+   "fix_sha": "78fc54b934bfb2c18aad8154c7302067146946f9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98215",
+   "fix_sha": "8c0c602202b9a4909b00bc3354e3c0355bc69e65",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98216",
+   "fix_sha": "62f0f34fbd2b2d5653d33d3b9d42fdcabb1c0101",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98217",
+   "fix_sha": "1af874e9f4ce22ccf8b10ab5462f32c70d3be21a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98218",
+   "fix_sha": "ad34235808b63a70ca4989b7a2852923193d06ef",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98219",
+   "fix_sha": "c7a1c6e8004ab12a9c9bfdcb603f60f9bf4a3cee",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98220",
+   "fix_sha": "0a85182723b65ad8bee8131bc38fcf0347d6679b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98221",
+   "fix_sha": "114f00d738f15dd8c7318369edcdc53dd6d08763",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98222",
+   "fix_sha": "8697c431e297eb0d0ab13dda6bc172b48a34f05c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98223",
+   "fix_sha": "848d2ce2fce15fbdc083fbf9691bfa72911033c4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98224",
+   "fix_sha": "6cc27d82196385fe06853319f74312a7d8019726",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98225",
+   "fix_sha": "932cfb25e7ce98d1f93895671ec186a3087e4f80",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98226",
+   "fix_sha": "12e9ac7bc5b254048f886bf421e3a15491106c1f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98227",
+   "fix_sha": "90af7fde083e1b22c349c3a8b1626728e44e474c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98228",
+   "fix_sha": "bbc448c541ed90d52f9ec22f17394304e3bf170e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98229",
+   "fix_sha": "3cf5cdecd99c9c186a5ea518d93bbf3045b6e3aa",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98230",
+   "fix_sha": "2afb8dc1f4390f164db8352f8e685e126e9db566",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98231",
+   "fix_sha": "89fefad9f971bc637fb22373078144f2563c4be9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98232",
+   "fix_sha": "3d676e458fe0c566f5a62753dc696b6a862fc412",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98233",
+   "fix_sha": "33ff111d7ba3beb86e28938d6382bb5beabd865a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98234",
+   "fix_sha": "2cef2588c995722a901368def30befeef9ae55c6",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98235",
+   "fix_sha": "6e05e46fa821a5c1b281355f1f622ac76cb6080a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98236",
+   "fix_sha": "31550d585589fde1ae95bf7f7a8188b2d2fdf1c7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98237",
+   "fix_sha": "5d063822ac5184939c1ed377a339a01d8ae814e8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98238",
+   "fix_sha": "c7ead9704249d57d4693a04697e3bbd285138fa9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98239",
+   "fix_sha": "a9ce4053dc945c5372dedba5017ee675b30dc0c5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98240",
+   "fix_sha": "455ebeadf714f51e1dbbd6a022c74c9215b1cd76",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98241",
+   "fix_sha": "6973a21ee73c5567f883813c8ef414774b45892f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98242",
+   "fix_sha": "b344ca94e8cc85796f16ea25e2e5a8e0303fe813",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98243",
+   "fix_sha": "3ed11c671ff7ec58c8fd96410233c677df23f407",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98244",
+   "fix_sha": "3565893cc72cdf6b795cf6a33e7ff9605322334d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98245",
+   "fix_sha": "0594e3423f4ba3137c734371169491f9a98e9af4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98246",
+   "fix_sha": "9a10987a2f160a44a638c9a35994ca6e3089696e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98247",
+   "fix_sha": "d0795cfd6f655f4de84868a4f4bb41a03f037b3d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98248",
+   "fix_sha": "8cf2093f5372952a9ebc805c418d45df7112cd14",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98249",
+   "fix_sha": "955d86e5f3b95b731991fdb84966c50b16314629",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98250",
+   "fix_sha": "f76017a7663c4ce5e379f8a8d39f032bdb1fd865",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98251",
+   "fix_sha": "3f118c8217c109fd13ca61caa301d72c483897ef",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98252",
+   "fix_sha": "33fb59da49c4c3f5c2ec9f9d4447a56857a02c02",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98253",
+   "fix_sha": "662ade4de9ff5eceb0820a9f8e9fac70ba6a815b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98254",
+   "fix_sha": "b7d7914a9ae3097e63d113007e4fb44d33d515b1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98255",
+   "fix_sha": "f81e6c3fb06327bc49cdd6e559845293ba06a704",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98256",
+   "fix_sha": "d2710c8d938ae6a825a6463158e6e6f31eac792a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98257",
+   "fix_sha": "f97d8c7bab7843631206a114986c9059da03efeb",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98258",
+   "fix_sha": "c21eaa72f02fc6e85621cbe09d303d8fb8bd39cd",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98259",
+   "fix_sha": "8e2b8614039853e68d5338e37821e8bcee9fc05f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98260",
+   "fix_sha": "acb03d3881818581052924a9bbbe92b8741ed448",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98261",
+   "fix_sha": "717e0a25036b6c92cecace30913b2d874a4c22b8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98262",
+   "fix_sha": "82e47533221d4746947b74d2e79a478c36c6433a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98263",
+   "fix_sha": "03a5699a0a04309c597683967aaaf25d1e555ea2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98264",
+   "fix_sha": "6c05d00af307560e6a9f1631d6270d3df5aa2272",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98265",
+   "fix_sha": "76a986c980bb502c7688d605ac7a67fd257a9a1b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98266",
+   "fix_sha": "fd95e68df6fe66344161a1329cbe5e5805e7b704",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98267",
+   "fix_sha": "c60ae98c5aa64021751b38ab1313b19d620bf640",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98268",
+   "fix_sha": "88aed0422f39b22406f35f1e758cea25e7bbcfb5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98269",
+   "fix_sha": "97fcd34aa9fd73cefe3120ac9a82ca9d7763922f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98270",
+   "fix_sha": "723d4dc628d764b19cf9efca14b82cca5ff020c9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98271",
+   "fix_sha": "a5117e1eccac6ee3bd4aed7cacf8ebcb6b3eb309",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98272",
+   "fix_sha": "14cb1e7702e5cb3c58888f6aed498381a73927d2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98273",
+   "fix_sha": "a5f7a5bb3b7f28ba7e4fa246775b29a0e5537255",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98274",
+   "fix_sha": "a41f24c612c3f5139a3143307eb85bbcf1bd4d07",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98275",
+   "fix_sha": "1dd85662fee6e2ac580b1c4f9a0c0a7ae6e31f0e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98276",
+   "fix_sha": "9ed55f3dbef4f4adfe65eb03b0c35c53229a8490",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98277",
+   "fix_sha": "490599ab23134962a6d18a024e84541d77bdb999",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98278",
+   "fix_sha": "150dba2c69e93302af24a0c868eebe4871e2e107",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98279",
+   "fix_sha": "76bf149cd0298544631e756670b89c399c7acbca",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98280",
+   "fix_sha": "f0e9f963a3d209d7dc7ddd61116118ab5da2797d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98281",
+   "fix_sha": "b61b6f95d6722ddbbbd09e689fa41b55fd36f9a5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98282",
+   "fix_sha": "0b271f7d7f5ed45bc498a03ce0aa9cfd8402fc71",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98283",
+   "fix_sha": "51938dfa8a51a4f85328413fca9b6e21f9d2d088",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98284",
+   "fix_sha": "ceac0de741bfb47ca255eee075257b3bb31f0651",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98285",
+   "fix_sha": "2842ce397dd09882530b42f7fdb0c855767eb24e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98286",
+   "fix_sha": "c391a40f71886b28c082b47270f0e856fa3e1150",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98287",
+   "fix_sha": "ecc7253683a3c55caa868ce0ee530fcb0044bd3c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98288",
+   "fix_sha": "15989abd74f16f44bf953d056b95f1d2fda9b0cd",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98289",
+   "fix_sha": "4a4263dfeabad72f95e8ab6e15146861fa4144dd",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98290",
+   "fix_sha": "801fb950cae7048eb7d83b18857d1ca37b8cd5a4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98291",
+   "fix_sha": "2ea5a87a5a7ae58cb2662b8a7d06f209383e1765",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98292",
+   "fix_sha": "8879e3e0a84a86954c855caceead4867e74a9a27",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98293",
+   "fix_sha": "ca18ee413a7cb6f09885778039225e58bae0d607",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98294",
+   "fix_sha": "4e93c65f87825e1e012bce56615320aeb123815d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98295",
+   "fix_sha": "d236517c264e41dc09833c708ef23bccb7a91219",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98296",
+   "fix_sha": "4b837ebd0ea21ae5cc26f02dc042edc6fe7b46b9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98297",
+   "fix_sha": "6610c6fe4b8936c232048e6049bf77c70a6f759c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98298",
+   "fix_sha": "075bc7b1d3dde5ed43fbaabbc1a69f09b7fc3a47",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98299",
+   "fix_sha": "83a945a529d6e002dd7339c532288a931f463dba",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98300",
+   "fix_sha": "8e759cd1f6444a946bd1fd2b2b29eea582eea1d5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98301",
+   "fix_sha": "18a6fe05fb6e18de29fa90d388bb34044114b3d8",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98302",
+   "fix_sha": "7c8810c2e69c3d9ca6df870b40ae9218e50b4fb1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98303",
+   "fix_sha": "2998147b59c9df0a51477c7a6b3d1f0ba3127dd4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98304",
+   "fix_sha": "23ca4ddc4fce2c233a49e9fd34d4b5b02bd7324e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98305",
+   "fix_sha": "9e92ad4630f5dd1838ce6bbe6b1bd2c73d34de36",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98306",
+   "fix_sha": "7616242a2b37883f7322aaa1d2bd6cd0fed28315",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98307",
+   "fix_sha": "820b8cff81c796ba20573e04722ab62500713f97",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98308",
+   "fix_sha": "c9e6e5f38bf75276605f1952b22285f5f3abcaff",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98309",
+   "fix_sha": "073a30d75f309812ed61af134f24ffef4107b13a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98310",
+   "fix_sha": "985862be16c7e4da808c51f393d631fb60c0be5c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98311",
+   "fix_sha": "e5c8d7acd31b27057ea42cd405d0b3ece097bc89",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98312",
+   "fix_sha": "1589afe2d099d3e817873bc474676968d7080410",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98313",
+   "fix_sha": "e249a6e2a130c08bb4d8b0a55cbe29754307e5c9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98314",
+   "fix_sha": "1e713f9bb2ac583521f06b0eb4e22440b1e3d078",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98315",
+   "fix_sha": "91709ba5d6d709b2b663287b7e871e2c6b480502",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98316",
+   "fix_sha": "221253723dc58bb901c3f27a7659823e63fc598c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98317",
+   "fix_sha": "6d79b223ec44ada58ad37db42f539b60985a7722",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98318",
+   "fix_sha": "23c240d9509e15f72e4112fc95f0160ab32ec430",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98319",
+   "fix_sha": "9eb1a393c89a79c4210230d23e7d88d239c61d7b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98320",
+   "fix_sha": "e75a9fa1d44bcbd66ea02e8781bcca6ea4076e0d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98321",
+   "fix_sha": "cbdd39ce42530a193c56beb206a3356cb6d01016",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98322",
+   "fix_sha": "d313499df66159b4b7971d760d16729598ab7e5a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98323",
+   "fix_sha": "9ff797e516dbc1ecb73701ec4c24055712d44411",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98324",
+   "fix_sha": "f6504be006aa4bb4bd26285f410a885c17920d65",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98325",
+   "fix_sha": "50d3d79dc0743b616afb00d01a626c76758721f7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98326",
+   "fix_sha": "ae97fff6495a8764bc0ef281cfe5444f701e527f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98327",
+   "fix_sha": "860134b3af77970e006feab7e5decb8c84771c7f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98328",
+   "fix_sha": "cd54bf333f5631d3630bab0a832e9ae648f73515",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98329",
+   "fix_sha": "e14bf37bb2b3853012ff160131d1c6233f7a9cc9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98330",
+   "fix_sha": "4635b1a1c1d693178a537446a6e09963f0fdae52",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98331",
+   "fix_sha": "eee2efd82867b623982ac51925b5a1812a74c50d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98332",
+   "fix_sha": "6f0a100df8539ce90f37c14e1945f396ca2410bc",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98333",
+   "fix_sha": "78183e8331958fda11cd2b6850bb424a9747c4b2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98334",
+   "fix_sha": "3f28551d0241254a75626d868041c6340285088b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98335",
+   "fix_sha": "ac7472a24bd433b81c06582835dd1d5547c10da9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98336",
+   "fix_sha": "362bd5bce29ed0f6fd3d39a7065567777d70606e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98337",
+   "fix_sha": "733f0fde95392ed5f61a4e36aee661ea8d0e8581",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98338",
+   "fix_sha": "708f9d43d6a2eb9c6b83fe62af628de9dffd9314",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98339",
+   "fix_sha": "b377e1000d963e7182a987082b4b06580bd7ac84",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98340",
+   "fix_sha": "068843ed0902c552a13860c5ec6b2ca65b57a065",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98341",
+   "fix_sha": "dab68a74e90b8e07f08ed9deaa5884857a3cfe89",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98342",
+   "fix_sha": "dc750422170a563c7a81f6e49d36bb02c62ae37f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98343",
+   "fix_sha": "e873c74132f0c5f1452816cd9bb26208f0bba1e1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98344",
+   "fix_sha": "44dab659064eb5c10adb0306510eebe848ed592d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98345",
+   "fix_sha": "48b2c5c628b09cf36cbeca53e0432fc2a7518be7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98346",
+   "fix_sha": "a7783e585360ee05dfe21d3173dbbe985c94f29e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98347",
+   "fix_sha": "9a141d3dc869d18b2eab35e999f4790a9b84e40f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98348",
+   "fix_sha": "adb7118b7d2cfd7e8213c17d7d2829f353017754",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98349",
+   "fix_sha": "5ce5721e8cbe3e80db8f43851cc2a2a92485ef4b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98350",
+   "fix_sha": "e2de8d5eb2984416affdd9559e55f37c7f1bbf47",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98351",
+   "fix_sha": "f9edf7cf63b96d2b776fca8d258d3c5256e40c8e",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98352",
+   "fix_sha": "2ae16aaa78b5edc6e6d0904c84fd9cdfb762bcda",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98353",
+   "fix_sha": "00baeade709fb66da647e8327e8398bb532e30f7",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98354",
+   "fix_sha": "3476c28c9addfa253f505e6bd87f1f5598b961d0",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98355",
+   "fix_sha": "99c24a8968ebef0573825b5cb89d5985d51635b9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98356",
+   "fix_sha": "6c368f7baaea63c1c7c28c6df271511f2a1562c9",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98357",
+   "fix_sha": "a8fe3dfce8c0d8a76dc3d8486a5bff5feebe156f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98358",
+   "fix_sha": "d85f0f0a7c85756fc992c70d869706f19dac9259",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98359",
+   "fix_sha": "ef9fbe1b93f3b617b96e86d5cd76b3fa44514cb5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98360",
+   "fix_sha": "1caceeb2d74bbe88223aea55eb8626b4c5f076fd",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98361",
+   "fix_sha": "769001ce838d907ecaa95f1d0a4e8fc86f761f9f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98362",
+   "fix_sha": "70f4b78d560e592cbf3325b162424737d032fc1d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98363",
+   "fix_sha": "32471d84a487c7fd74532bc96be56f8028cf4a3f",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98364",
+   "fix_sha": "9fa903b24b1f46b4ff5443bcd4aca23e5c57f9c1",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98365",
+   "fix_sha": "d10e2a08799e858d3e71ea4169bcd018f216d444",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98366",
+   "fix_sha": "ae36a5b609ae79f4de966328b78d2584be9719a4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98367",
+   "fix_sha": "32cd87f54dd1070020e664ccb0312a9f0fea79b4",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98368",
+   "fix_sha": "f89416eb3db151170a6f3c6dfc5239d26cdce4d2",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98369",
+   "fix_sha": "d2f5082f9e84653fa1a9e8aebaaff23e688f5e19",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98370",
+   "fix_sha": "d1ebd9081879fd9ae9c8fb7e8928f19cc88ae320",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98371",
+   "fix_sha": "dc33262be1fe43d0eb0b84fb58c6ed42e2f64a8c",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98372",
+   "fix_sha": "d042487dc118e494db2e2c1382310255c90ff544",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98373",
+   "fix_sha": "9bdad082d44bdcf93716973dcba6be77e8a06e7b",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98374",
+   "fix_sha": "fe99bbeee5c5dbd3abc30721a8079ced59649d97",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98375",
+   "fix_sha": "089e58805c452e52179482b1025a8e309a57f801",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98376",
+   "fix_sha": "593980175389a05793f6060aa20e626330960395",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98377",
+   "fix_sha": "ab888242fce4f16f6c4d4c6ec53939ad36aa3b3a",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98378",
+   "fix_sha": "50e80e2bb5e2be8515205b9c496b9640ddefa434",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98379",
+   "fix_sha": "1b9b5323725e458906c7620a3bc10398b51ad954",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98380",
+   "fix_sha": "c82b797abe668d0b668601a93ba2c0b071a63574",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98381",
+   "fix_sha": "7104a370714346b667712913dc16abf14bbc97ed",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98382",
+   "fix_sha": "6db1ce73e9853f533eb7f413f14ba00f8ec6f80d",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98383",
+   "fix_sha": "e4a62833adff6ef0fe7c0b90393204fe3c26b5c5",
+   "project": "linux-cna"
+  },
+  {
+   "advisory_id": "CVE-2026-98384",
+   "fix_sha": "01b245ba016d44861690594e10f67e026ce8552f",
+   "project": "linux-cna"
+  },
+  {
    "advisory_id": "CVE-2002-1568",
    "fix_sha": "517a0e7fa0f5453c860a3aec17b678bd55d5aad7",
    "project": "openssl"
