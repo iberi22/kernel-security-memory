@@ -1,0 +1,11 @@
+project      state          entries         cursor                        new errors
+qemu         SKIPPED        10 -> 10        2008-05-13 -> 2008-05-13      0
+sqlite       SKIPPED        5 -> 5          2008-08-11 -> 2008-08-11      0
+systemd      SKIPPED        0 -> 0          2008-08-11 -> 2008-08-11      0
+unbound      SKIPPED        0 -> 0          2003-06-09 -> 2003-06-09      0
+projects that failed to fetch: 4/4 (qemu, sqlite, systemd, unbound)
+optional enricher failures (other work continued):
+  - enrich:fetch_kernel_cna_shas.py
+  - snapshot:linux-cna
+  - snapshot:openssl-upstream
+RESULT: FETCH OUTAGE (all 4 attempted project(s) failed)

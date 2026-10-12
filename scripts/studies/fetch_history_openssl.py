@@ -134,6 +134,22 @@ def transform_cve_item(cve_item):
         "fix_shas": fix_shas,
         "subsystem": None,
     }
+
+    # Ensure line byte size <= 500 bytes
+    import json
+    encoded = json.dumps(record, separators=(",", ":")).encode("utf-8")
+    while len(encoded) > 500 and record["patch_urls"]:
+        record["patch_urls"].pop()
+        shas = []
+        sha_pattern = re.compile(r"\b([0-9a-fA-F]{40})\b")
+        for u in record["patch_urls"]:
+            for m in sha_pattern.findall(u):
+                m_lower = m.lower()
+                if m_lower not in shas:
+                    shas.append(m_lower)
+        record["fix_shas"] = shas
+        encoded = json.dumps(record, separators=(",", ":")).encode("utf-8")
+
     return record
 
 

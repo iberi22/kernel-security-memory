@@ -1,0 +1,11 @@
+project      state          entries         cursor                        new errors
+openssl      OK             84 -> 107       2012-10-19 -> 2014-10-09      0
+fetch failures: none
+optional enricher failures (other work continued):
+  - enrich:fetch_kernel_cna_shas.py
+  - snapshot:linux-cna
+  - snapshot:openssl-upstream
+validation failures:
+  - offline:openssl
+  - unittest
+RESULT: FAILED (2 validation step(s) failed)

@@ -100,7 +100,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/studies/refresh_all.py \
-            --budget-seconds 240 --deadline-seconds 2100 | tee "$RUNNER_TEMP/refresh.log"
+            --budget-seconds 900 --deadline-seconds 3600 | tee "$RUNNER_TEMP/refresh.log"
 
       # Never pushes to the default branch: the result is proposed as a PR from
       # automation/refresh-catalogs. Only docs/studies/ is staged. The push is

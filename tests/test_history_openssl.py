@@ -147,5 +147,27 @@ class TestHistoryOpenSSL(unittest.TestCase):
         self.assertNotIn("1111111111111111111111111111111111111111", shas)
 
 
+
+    def test_transform_cve_item_truncates_long_lines(self):
+        long_url = "https://example.com/very/long/url/" + "a" * 400
+        item = {
+            "id": "CVE-2026-9999",
+            "published": "2026-01-01T00:00:00Z",
+            "references": [
+                {"url": long_url},
+                {"url": "https://github.com/openssl/openssl/commit/0000000000000000000000000000000000000000"}
+            ],
+            "descriptions": [{"value": "openssl: test", "lang": "en"}]
+        }
+
+        # In base_history_fetcher, we have a test for this, but fetch_history_openssl isn't class-based yet.
+        # Let's import transform_cve_item and test it directly.
+        from scripts.studies.fetch_history_openssl import transform_cve_item
+        import json
+        record = transform_cve_item(item)
+        self.assertIsNotNone(record)
+        encoded = json.dumps(record, separators=(",", ":")).encode("utf-8")
+        self.assertLessEqual(len(encoded), 500)
+
 if __name__ == "__main__":
     unittest.main()
