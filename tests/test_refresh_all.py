@@ -11,9 +11,10 @@ failure aggregation are covered without any network access. The stubs also:
   ``index.json`` (to simulate what a fetcher leaves behind).
 
 The behaviours that mattered in review are pinned here so the old false greens
-cannot come back: a total outage must exit EXIT_FETCH_OUTAGE (not 0), a fetch
-that records errors but advances its cursor is PARTIAL (exit 0), and a fetch
-that exceeds its wall clock ends TIMED_OUT or REVERTED. The budget flags the
+cannot come back: an outage of more than half the projects must exit
+EXIT_FETCH_OUTAGE (not 0), a fetch that records errors but advances its
+cursor is PARTIAL (exit 0), and a fetch that exceeds its wall clock or
+otherwise fails is FAILED with its committed files restored. The budget flags the
 planner derives are additionally checked against the real fetchers'
 ``--help`` output, offline.
 """
@@ -156,6 +157,7 @@ def write_stub_repo(root: Path, enrichers=(), snapshots=False) -> Path:
             (studies / name).write_text(STUB, encoding="utf-8")
     (root / "scripts").mkdir(parents=True, exist_ok=True)
     (root / "scripts" / "build_pack.py").write_text(STUB, encoding="utf-8")
+    (root / "scripts" / "build_guardrails.py").write_text(STUB, encoding="utf-8")
     tests = root / "tests"
     tests.mkdir(parents=True, exist_ok=True)
     (tests / "test_ok.py").write_text(
@@ -230,9 +232,9 @@ class PlanBuildingTest(unittest.TestCase):
 
         labels = [step.label for step in plan]
         self.assertEqual(labels[:12], [f"fetch:{p}" for p in refresh_all.PROJECTS])
-        self.assertEqual(labels[12:14], ["manifest", "cluster"])
-        self.assertEqual(labels[14:26], [f"offline:{p}" for p in refresh_all.PROJECTS])
-        self.assertEqual(labels[26:], ["unittest", "build-pack"])
+        self.assertEqual(labels[12:15], ["manifest", "cluster", "guardrails"])
+        self.assertEqual(labels[15:27], [f"offline:{p}" for p in refresh_all.PROJECTS])
+        self.assertEqual(labels[27:], ["unittest", "build-pack"])
 
         for step, project in zip(plan[:12], refresh_all.PROJECTS):
             self.assertEqual(step.kind, refresh_all.NETWORK)
@@ -251,6 +253,11 @@ class PlanBuildingTest(unittest.TestCase):
                 self.assertIn("600", step.argv)
         for step in plan[12:]:
             self.assertEqual(step.kind, refresh_all.STEP)
+        # The guardrails cite catalog rows and clusters, so they are rebuilt
+        # from the working tree (like the manifest), never fetched.
+        guardrails = plan[14]
+        self.assertTrue(str(guardrails.argv[1]).endswith("scripts/build_guardrails.py"))
+        self.assertNotIn("--check", guardrails.argv)
 
     def test_offline_only_plan_is_validation_only(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -258,7 +265,7 @@ class PlanBuildingTest(unittest.TestCase):
             plan = plan_of(Path(tmp), list(refresh_all.PROJECTS), 600, True)
 
         labels = [step.label for step in plan]
-        self.assertEqual(labels, ["manifest", "cluster"] +
+        self.assertEqual(labels, ["manifest", "cluster", "guardrails"] +
                          [f"offline:{p}" for p in refresh_all.PROJECTS] + ["unittest", "build-pack"])
         for step in plan:
             self.assertNotIn("--fetch", step.argv)
@@ -270,7 +277,7 @@ class PlanBuildingTest(unittest.TestCase):
             write_fetchers(Path(tmp) / "scripts" / "studies")
             plan = plan_of(Path(tmp), ["curl", "sqlite"], 90, False)
         self.assertEqual([s.label for s in plan],
-                         ["fetch:curl", "fetch:sqlite", "manifest", "cluster",
+                         ["fetch:curl", "fetch:sqlite", "manifest", "cluster", "guardrails",
                           "offline:curl", "offline:sqlite", "unittest", "build-pack"])
         self.assertIn("--max-time", plan[0].argv)
         self.assertIn("90", plan[0].argv)
@@ -418,8 +425,8 @@ class ExecutionTest(unittest.TestCase):
             invocations = repo.invocations()
         self.assertEqual(code, refresh_all.EXIT_FETCH_OUTAGE)
         self.assertEqual(refresh_all.EXIT_FETCH_OUTAGE, 3)
-        self.assertIn("NETWORK_FAILED", repo.stdout)
-        self.assertIn("RESULT: FETCH OUTAGE (all 2 attempted project(s) failed)", repo.stdout)
+        self.assertIn("FAILED", repo.stdout)
+        self.assertIn("RESULT: FETCH OUTAGE (2/2 attempted project(s) failed", repo.stdout)
         # The outage is per project: curl's own offline validation still ran.
         self.assertIn("fetch_history_curl.py --offline", [inv[0] for inv in invocations])
 
@@ -434,7 +441,7 @@ class ExecutionTest(unittest.TestCase):
                       indexes=indexes) as repo:
             code = refresh_all.main(["--projects", "curl,git", "--budget-seconds", "600"])
         self.assertEqual(code, refresh_all.EXIT_FETCH_OUTAGE)
-        self.assertIn("NETWORK_FAILED", repo.stdout)
+        self.assertIn("FAILED", repo.stdout)
 
     def test_cursor_advanced_with_error_is_partial_and_exits_zero(self):
         # curl advanced its cursor and then recorded an error: progress was
@@ -450,40 +457,45 @@ class ExecutionTest(unittest.TestCase):
         self.assertIn("partial (errors recorded, cursor advanced): curl", repo.stdout)
         self.assertIn("RESULT: OK (1 partial)", repo.stdout)
 
-    def test_timeout_keeps_state_when_offline_passes(self):
-        # curl sleeps past its wall clock (budget 1 s + grace 2 s) and is
-        # killed; its last written state validates, so it is TIMED_OUT and the
-        # only attempted project failed -> fetch-outage exit code.
+    def test_timeout_restores_committed_files_and_counts_as_failed(self):
+        # curl sleeps past its own wall clock (budget 1 s + grace 2 s) and is
+        # killed: no partial state is kept, the committed files are restored,
+        # and the only attempted project failed -> fetch-outage exit code.
         with StubRepo(sleeps={"fetch_history_curl.py --fetch": 30}) as repo:
             code = refresh_all.main(["--projects", "curl",
                                      "--budget-seconds", "1", "--grace-seconds", "2"])
             invocations = repo.invocations()
         self.assertEqual(code, refresh_all.EXIT_FETCH_OUTAGE)
-        self.assertIn("TIMED_OUT", repo.stdout)
-        self.assertIn("last written state kept", repo.stdout)
+        self.assertIn("FAILED", repo.stdout)
+        self.assertIn("previously committed catalog kept", repo.stdout)
         # The fetch process is gone: later steps still ran.
         self.assertIn("fetch_history_curl.py --offline", [inv[0] for inv in invocations])
 
-    def test_timeout_reverts_when_offline_fails(self):
-        # The killed fetcher's partial state fails offline validation, so the
-        # committed files are restored (REVERTED). The stub repo is not a git
-        # checkout, so the restore warns and the later offline step still
-        # fails -> validation exit code 1, not 0.
-        with StubRepo(sleeps={"fetch_history_curl.py --fetch": 30},
-                      exits={"fetch_history_curl.py --offline": 1}) as repo:
-            code = refresh_all.main(["--projects", "curl",
-                                     "--budget-seconds", "1", "--grace-seconds", "2"])
-        self.assertEqual(code, 1)
-        self.assertIn("REVERTED", repo.stdout)
-        self.assertIn("offline:curl", repo.stdout)
-        self.assertIn("RESULT: FAILED (1 validation step(s) failed)", repo.stdout)
+    def test_minority_of_failures_is_tolerated(self):
+        # One of two projects fails: its committed files are restored, the
+        # failure is recorded in the summary, but the run stays green so the
+        # successful project's progress can still be proposed.
+        indexes = {
+            "fetch_history_git.py --fetch": index_payload(errors=["Network timeout on NVD"]),
+        }
+        with StubRepo({"fetch_history_git.py --fetch": 1}, indexes=indexes) as repo:
+            code = refresh_all.main(["--projects", "curl,git", "--budget-seconds", "600"])
+        self.assertEqual(code, 0)
+        self.assertIn("projects that failed to fetch: 1/2 (git)", repo.stdout)
+        self.assertIn("RESULT: OK", repo.stdout)
 
-    def test_deadline_skips_fetches_that_cannot_finish(self):
-        # A 1 s deadline is less than MIN_FETCH_SECONDS, so no fetcher starts.
-        with StubRepo() as repo:
-            code = refresh_all.main(["--projects", "curl,git", "--deadline-seconds", "1"])
+    def test_more_than_half_failing_is_an_outage(self):
+        # Two of three projects fail: more than half, so the refresh is not
+        # proposed even though one project succeeded.
+        indexes = {
+            f"fetch_history_{p}.py --fetch": index_payload(errors=["Network timeout on NVD"])
+            for p in ("curl", "git")
+        }
+        exits = {f"fetch_history_{p}.py --fetch": 1 for p in ("curl", "git")}
+        with StubRepo(exits, indexes=indexes) as repo:
+            code = refresh_all.main(["--projects", "curl,git,sqlite", "--budget-seconds", "600"])
         self.assertEqual(code, refresh_all.EXIT_FETCH_OUTAGE)
-        self.assertIn("SKIPPED", repo.stdout)
+        self.assertIn("RESULT: FETCH OUTAGE (2/3 attempted project(s) failed", repo.stdout)
 
     def test_validation_failure_is_fatal_and_aggregated(self):
         with StubRepo({"fetch_history_git.py --offline": 1, "build_pack.py --check": 2}) as repo:
@@ -504,12 +516,12 @@ class ExecutionTest(unittest.TestCase):
             invocations = repo.invocations()
         self.assertEqual(code, 0)
         self.assertIn("RESULT: OK", repo.stdout)
-        self.assertEqual(len(invocations), 15)  # manifest, cluster, 12 offline, build-pack
+        self.assertEqual(len(invocations), 16)  # manifest, cluster, guardrails, 12 offline, build-pack
         self.assertIn("--offline", " ".join(key for key, *_ in invocations))
         self.assertIn("Ran 1 test", repo.stdout)  # unittest step really ran
 
-    def test_bad_deadline_and_grace_are_rejected(self):
-        for flag in ("--deadline-seconds", "--grace-seconds", "--budget-seconds"):
+    def test_bad_budgets_are_rejected(self):
+        for flag in ("--grace-seconds", "--budget-seconds"):
             with self.assertRaises(SystemExit):
                 refresh_all.main(["--projects", "curl", "--dry-run", flag, "0"])
 
