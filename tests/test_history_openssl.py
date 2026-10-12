@@ -146,6 +146,33 @@ class TestHistoryOpenSSL(unittest.TestCase):
         self.assertIn("0000000000000000000000000000000000000000", shas)
         self.assertNotIn("1111111111111111111111111111111111111111", shas)
 
+    def test_long_record_is_trimmed_to_the_500_byte_limit(self):
+        """A CVE with very long reference URLs must still fit the offline limit."""
+        import json as _json
+
+        long_path = "a" * 300
+        cve_item = {
+            "id": "CVE-2016-9999",
+            "published": "2016-09-26T12:00:00.000",
+            "configurations": [{"nodes": [{"cpeMatch": [{"criteria": "cpe:2.3:a:openssl:openssl:1.0.2:*:*:*:*:*:*:*"}]}]}],
+            "weaknesses": [{"description": [{"lang": "en", "value": "CWE-119"}]}],
+            "references": [
+                {"url": f"https://github.com/openssl/openssl/commit/{'b' * 40}?path={long_path}"},
+                {"url": f"https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h={'c' * 40}&x={long_path}"},
+                {"url": f"https://www.openssl.org/news/secadv/20160926.txt?ref={long_path}"},
+            ],
+        }
+
+        rec = fetch_history_openssl.transform_cve_item(cve_item)
+        self.assertIsNotNone(rec)
+        encoded = _json.dumps(rec, separators=(",", ":")).encode("utf-8")
+        self.assertLessEqual(len(encoded), 500, f"record still too long: {len(encoded)} bytes")
+        # The SHAs must be recomputed from the URLs actually kept.
+        sha_pattern = "0123456789abcdef"
+        for sha in rec["fix_shas"]:
+            self.assertTrue(all(ch in sha_pattern for ch in sha))
+            self.assertTrue(any(sha in u.lower() for u in rec["patch_urls"]))
+
 
 if __name__ == "__main__":
     unittest.main()
