@@ -43,18 +43,18 @@ class TestCatalogManifest(unittest.TestCase):
         manifest = generate_manifest()
         projects_by_name = {p["name"]: p for p in manifest["projects"]}
 
-        expected_paused = {
-            "linux": "2007-06-22",
-            "openssl": "2012-10-19",
-            "curl": "2006-08-22",
-            "glibc": "2000-12-21",
-            "openssh": "2001-06-19",
-        }
-
-        for name, expected_cursor in expected_paused.items():
+        # The expected cursor comes from each project's own index.json, never
+        # from a hardcoded date: every successful refresh advances the cursor,
+        # and pinning dates here would turn the next refresh red. What this
+        # test pins is honesty: the manifest must report exactly the cursor
+        # the fetcher persisted.
+        cve_history = Path(__file__).resolve().parents[1] / "docs" / "studies" / "cve-history"
+        for name in ("linux", "openssl", "curl", "glibc", "openssh"):
             self.assertIn(name, projects_by_name)
             proj = projects_by_name[name]
             self.assertEqual(proj["status"], "CURSOR_PAUSED", f"{name} must be CURSOR_PAUSED")
+            index_data = json.loads((cve_history / name / "index.json").read_text(encoding="utf-8"))
+            expected_cursor = index_data["resume"]["next_start_date"]
             self.assertEqual(proj["cursor_date"], expected_cursor, f"{name} cursor mismatch")
             self.assertFalse(proj["window_closed"], f"{name} window must NOT be closed")
             self.assertGreater(proj["entry_count"], 0)

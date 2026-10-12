@@ -4,31 +4,32 @@
 This module is the only command humans and CI need in order to refresh
 ``docs/studies/cve-history/``. It runs, in order:
 
-1. every ``fetch_history_<project>.py --fetch`` under a wall clock. Cursor
-   resumption is the fetcher's own job: it reloads ``index.json``/
-   ``catalog.jsonl`` and continues from ``resume.next_start_date``, so the
-   refresh is incremental and re-runnable. The fetchers exit 0 even when NVD
-   failed (they preserve the error in that catalog's ``index.json``
-   ``errors`` list), so this entrypoint snapshots each project's
-   ``index.json`` (cursor, entry_count, errors) before and after its fetch and
-   classifies the outcome itself:
+1. every ``fetch_history_<project>.py --fetch`` under its own wall clock
+   (``--budget-seconds`` plus ``--grace-seconds``). There is no global fetch
+   deadline: a slow NVD window for one project must never starve the projects
+   behind it. Cursor resumption is the fetcher's own job: it reloads
+   ``index.json``/``catalog.jsonl`` and continues from
+   ``resume.next_start_date``, so the refresh is incremental and re-runnable.
+   The fetchers exit 0 even when NVD failed (they preserve the error in that
+   catalog's ``index.json`` ``errors`` list), so this entrypoint snapshots
+   each project's ``index.json`` (cursor, entry_count, errors) before and
+   after its fetch and classifies the outcome itself:
 
-   * ``OK``             exit 0 and no new errors;
-   * ``PARTIAL``        new errors recorded, but the cursor advanced (progress
-                        was made before the failure); still exit 0 overall;
-   * ``NETWORK_FAILED`` new errors and the cursor did not advance;
-   * ``FAILED``         non-zero exit without any error recorded;
-   * ``TIMED_OUT``      killed at the wall clock; its last written state was
-                        kept because offline validation passed;
-   * ``REVERTED``       killed at the wall clock and its last written state
-                        failed offline validation, so ``git checkout --``
-                        restored the committed files;
-   * ``SKIPPED``        the global deadline ran out before this project.
+   * ``OK``      exit 0 and no new errors;
+   * ``PARTIAL`` new errors recorded, but the cursor advanced (progress was
+                 made before the failure); the new state is kept and the run
+                 stays green;
+   * ``FAILED``  the fetcher was killed at its wall clock, exited non-zero,
+                 or recorded new errors without advancing the cursor. The
+                 project's committed files are restored with ``git checkout
+                 --`` so no partial state is left, the failure is recorded in
+                 the summary, and the other projects still run.
 
-   If every attempted project failed (a total NVD outage) the process exits 3,
-   so the workflow fails and opens no pull request. Partial failures are still
-   exit 0 and are listed per project in the summary the workflow pastes into
-   the pull request body.
+   Fetch failures are tolerated: the process exits 3 (and the workflow fails
+   and opens no pull request) only when MORE than half of the attempted
+   projects failed, which signals a systemic problem such as a total NVD
+   outage. Anything less is still exit 0, with the per-project states listed
+   in the summary the workflow pastes into the pull request body.
 2. the optional enrichers, but only when their script is already in the tree
    (``scripts/studies/enrich_from_osv.py`` and
    ``scripts/studies/fetch_kernel_cna_shas.py`` are written in parallel).
@@ -44,7 +45,10 @@ This module is the only command humans and CI need in order to refresh
    ``--offline-only`` mode their ``--check`` runs and IS fatal, but only when
    the local cache exists (the raw snapshots are gitignored and the CNA clone
    is made by the workflow).
-4. ``build_catalog_manifest.py`` and ``cluster_patterns.py`` (regeneration).
+4. ``build_catalog_manifest.py``, ``cluster_patterns.py`` and
+   ``build_guardrails.py`` (regeneration). The guardrails cite catalog rows
+   and pattern clusters, so refreshing the catalogs without regenerating them
+   leaves the committed skill references stale and the unit tests red.
 5. validation: every fetcher with ``--offline``, the unit tests and
    ``build_pack.py --check``.
 
@@ -53,15 +57,18 @@ Rules encoded here:
 * A per-project network failure does not abort the other projects.
 * Any validation step that fails makes the process exit 1, after every step
   has run, so one run reports all problems.
-* ``--offline-only`` performs no network access: only the validation steps.
+* ``--offline-only`` performs no network access: only the regeneration
+  ``--check`` steps and the validation steps.
 * ``--dry-run`` prints the plan and exits without running anything.
-* No git operation happens here. Publishing is the workflow's job
-  (``.github/workflows/refresh-catalogs.yml`` resumes the automation branch,
-  merges main into it and opens a PR with a plain fast-forward push; main is
-  never pushed and no push is ever forced).
+* The only git operation here is restoring a failed fetch's committed files
+  (``git checkout -- docs/studies/cve-history/<project>``). Publishing is the
+  workflow's job (``.github/workflows/refresh-catalogs.yml`` resumes the
+  automation branch, merges main into it and opens a PR with a plain
+  fast-forward push; main is never pushed and no push is ever forced).
 
-Exit codes: 0 ok (possibly with partial projects), 1 validation failure,
-3 every attempted project failed to fetch.
+Exit codes: 0 ok (possibly with partial/failed projects below the outage
+threshold), 1 validation failure, 3 more than half of the attempted projects
+failed to fetch.
 
 Python 3 standard library only.
 """
@@ -73,7 +80,6 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
-import time
 from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -101,9 +107,6 @@ FETCH_RUSTSEC = "fetch_rustsec.py"
 OSV_ENRICHABLE_PROJECTS: Tuple[str, ...] = ("curl", "glibc", "linux", "nginx", "openssh", "openssl")
 
 DEFAULT_BUDGET_SECONDS = 600
-# Global wall clock for the fetch phase. The workflow allows 50 minutes; 35
-# minutes of fetching leaves room for validation and the pull request.
-DEFAULT_DEADLINE_SECONDS = 2100
 # Slack over a fetcher's own --max-time/--max-calls budget before it is
 # killed: one in-flight request (25 s socket timeout), or the 403/429 retry
 # path (15 s pacing + 40 s retry sleep + 25 s), can overrun the internal
@@ -113,10 +116,8 @@ DEFAULT_GRACE_SECONDS = 120
 # costs the fetcher's fixed 15 s pacing sleep plus the HTTP time, so the time
 # budget is converted at 25 s per call.
 NVD_CALL_SECONDS = 25
-# Never start another fetcher with less than this much of the deadline left.
-MIN_FETCH_SECONDS = 60
-# Exit code for "every attempted project failed to fetch" (distinct from 1,
-# which is reserved for validation failures).
+# Exit code for "more than half of the attempted projects failed to fetch"
+# (distinct from 1, which is reserved for validation failures).
 EXIT_FETCH_OUTAGE = 3
 
 VULNS_DIR_ENV = "KSM_VULNS_DIR"
@@ -124,7 +125,6 @@ DEFAULT_VULNS_DIR = Path(tempfile.gettempdir()) / "linux-security-vulns"
 CATALOGS_SUBDIR = Path("docs") / "studies" / "cve-history"
 CATALOG_NAME = "catalog.jsonl"
 HELP_TIMEOUT_SECONDS = 60
-OFFLINE_TIMEOUT_SECONDS = 120
 
 # Snapshot catalogs: no fetch_history_*.py fetcher builds them, so the refresh
 # rebuilds them explicitly before the manifest.
@@ -151,15 +151,12 @@ CNA_PUBLISHED_SUBDIR = Path("cve") / "published"
 NETWORK = "network"
 STEP = "step"
 
-# Per-project fetch states.
+# Per-project fetch states. FAILED projects are restored to their committed
+# files, so only OK and PARTIAL leave new state behind.
 OK = "OK"
 PARTIAL = "PARTIAL"                 # new errors, but the cursor advanced
-NETWORK_FAILED = "NETWORK_FAILED"   # new errors, cursor did not advance
-FAILED = "FAILED"                   # non-zero exit, no error recorded
-TIMED_OUT = "TIMED_OUT"             # killed; last state kept (offline passed)
-REVERTED = "REVERTED"               # killed; last state failed offline, restored from git
-SKIPPED = "SKIPPED"                 # deadline ran out before this project
-FAILED_STATES = frozenset({NETWORK_FAILED, FAILED, TIMED_OUT, REVERTED, SKIPPED})
+FAILED = "FAILED"                   # timeout, non-zero exit, or new errors
+                                      # without cursor progress; committed files restored
 
 _HELP_CACHE: Dict[str, str] = {}
 
@@ -368,6 +365,14 @@ def build_plan(
         [py, str(studies / "cluster_patterns.py"), *(["--check"] if offline_only else [])],
         STEP,
     ))
+    # The skill guardrails cite catalog rows and pattern clusters: without
+    # this rebuild a refresh that adds records leaves the committed
+    # references stale and the guardrail unit tests red.
+    steps.append(Step(
+        "guardrails",
+        [py, str(root / "scripts" / "build_guardrails.py"), *(["--check"] if offline_only else [])],
+        STEP,
+    ))
     for project in projects:
         steps.append(Step(f"offline:{project}", [py, str(fetcher_script(studies, project)), "--offline"], STEP))
     steps.append(Step("unittest", [py, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"], STEP))
@@ -422,11 +427,6 @@ def run_with_timeout(argv: Sequence[str], timeout: float) -> Tuple[Optional[int]
         return None, out or "", err or "", True
 
 
-def offline_ok(script: Path, timeout: float) -> bool:
-    rc, _out, _err, timed_out = run_with_timeout([sys.executable, str(script), "--offline"], timeout)
-    return rc == 0 and not timed_out
-
-
 def git_restore(project: str) -> bool:
     """Undo a killed fetcher's partial writes by restoring the committed files."""
     target = CATALOGS_SUBDIR / project
@@ -449,7 +449,7 @@ def cursor_advanced(before: Snapshot, after: Snapshot) -> bool:
 def classify(before: Snapshot, after: Snapshot, returncode: Optional[int]) -> str:
     new_errors = after.error_count > before.error_count
     if new_errors:
-        return PARTIAL if cursor_advanced(before, after) else NETWORK_FAILED
+        return PARTIAL if cursor_advanced(before, after) else FAILED
     if returncode not in (0, None):
         return FAILED
     return OK
@@ -460,48 +460,40 @@ def run_fetch(
     *,
     budget_seconds: int,
     grace_seconds: int,
-    deadline_seconds: float,
-    started: float,
 ) -> Tuple[str, Snapshot, Snapshot]:
-    """Fetch one project under its wall clock and classify the outcome."""
+    """Fetch one project under its own wall clock and classify the outcome.
+
+    A failure never leaves partial state behind: the project's committed
+    files are restored, the failure is recorded, and the other projects
+    still run. Only the summary (and the outage threshold in main) judges it.
+    """
     project = step.label.split(":", 1)[1]
     before = Snapshot.read(project)
     echo_output(f"{step.label} (network)", step.argv, ())
-    remaining = deadline_seconds - (time.monotonic() - started)
-    if remaining < MIN_FETCH_SECONDS:
-        print(f"--- {step.label}: {SKIPPED} "
-              f"(only {remaining:.0f}s of the {deadline_seconds:.0f}s deadline left)")
-        return SKIPPED, before, before
-
-    timeout = min(budget_seconds + grace_seconds, remaining)
+    timeout = budget_seconds + grace_seconds
     rc, out, err, timed_out = run_with_timeout(step.argv, timeout)
     for stream in (out, err):
         if stream:
             print(stream.rstrip())
     if timed_out:
-        print(f"--- {step.label}: killed after {timeout:.0f}s")
-        if offline_ok(Path(step.argv[1]), min(OFFLINE_TIMEOUT_SECONDS, max(30, remaining))):
-            print(f"--- {step.label}: {TIMED_OUT} (last written state kept: offline validation passed)")
-            return TIMED_OUT, before, Snapshot.read(project)
+        print(f"--- {step.label}: killed after {timeout:.0f}s; restoring committed files")
         git_restore(project)
-        print(f"--- {step.label}: {REVERTED} "
-              f"(partial state failed offline validation; committed files restored)")
-        return REVERTED, before, before
+        print(f"--- {step.label}: {FAILED} (timeout: previously committed catalog kept)")
+        return FAILED, before, before
 
     after = Snapshot.read(project)
     state = classify(before, after, rc)
+    if state == FAILED:
+        git_restore(project)
+        print(f"--- {step.label}: {FAILED} (exit {rc}; previously committed catalog kept)")
+        return FAILED, before, before
     print(f"--- {step.label}: {state} (exit {rc})")
     return state, before, after
 
 
-def run_enricher(step: Step, *, timeout_budget: float, deadline_seconds: float, started: float) -> bool:
+def run_enricher(step: Step, *, timeout: float) -> bool:
     """Optional enricher: recorded on failure, never fatal."""
-    remaining = deadline_seconds - (time.monotonic() - started)
     echo_output(f"{step.label} (network)", step.argv, ())
-    if remaining < MIN_FETCH_SECONDS:
-        print(f"--- {step.label}: FAILED (skipped: deadline)")
-        return False
-    timeout = min(timeout_budget, remaining)
     rc, out, err, timed_out = run_with_timeout(step.argv, timeout)
     for stream in (out, err):
         if stream:
@@ -547,7 +539,7 @@ def report(
             cursor = f"{_fmt(before.cursor)} -> {_fmt(after.cursor)}"
             print(f"{project:<12} {state:<14} {entries:<15} {cursor:<29} "
                   f"{after.error_count - before.error_count}")
-    failed = [p for p, state, _, _ in states if state in FAILED_STATES]
+    failed = [p for p, state, _, _ in states if state == FAILED]
     partial = [p for p, state, _, _ in states if state == PARTIAL]
     if not states:
         print("fetch phase: none (offline-only)")
@@ -567,8 +559,9 @@ def report(
         for label in failures:
             print(f"  - {label}")
         print(f"RESULT: FAILED ({len(failures)} validation step(s) failed)")
-    elif states and len(failed) == len(states):
-        print(f"RESULT: FETCH OUTAGE (all {len(states)} attempted project(s) failed)")
+    elif states and len(failed) > len(states) / 2:
+        print(f"RESULT: FETCH OUTAGE ({len(failed)}/{len(states)} attempted project(s) failed: "
+              f"more than half, so the refresh is not proposed)")
     else:
         suffix = f" ({len(partial)} partial)" if partial else ""
         print(f"RESULT: OK{suffix}")
@@ -583,9 +576,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--grace-seconds", type=int, default=DEFAULT_GRACE_SECONDS,
                         help=f"Slack over a fetch's budget before it is killed "
                              f"(default: {DEFAULT_GRACE_SECONDS})")
-    parser.add_argument("--deadline-seconds", type=int, default=DEFAULT_DEADLINE_SECONDS,
-                        help=f"Global wall clock for the whole fetch phase "
-                             f"(default: {DEFAULT_DEADLINE_SECONDS})")
     parser.add_argument("--offline-only", action="store_true",
                         help="No network: run only the validation steps")
     parser.add_argument("--dry-run", action="store_true", help="Print the plan and exit")
@@ -596,8 +586,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         raise SystemExit("error: --budget-seconds must be >= 1")
     if args.grace_seconds < 1:
         raise SystemExit("error: --grace-seconds must be >= 1")
-    if args.deadline_seconds < 1:
-        raise SystemExit("error: --deadline-seconds must be >= 1")
 
     studies = ROOT / "scripts" / "studies"
     missing = [p for p in projects if not fetcher_script(studies, p).is_file()]
@@ -607,7 +595,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     mode = "offline-only" if args.offline_only else "network+validation"
     print(f"refresh plan [{mode}] projects={len(projects)} "
           f"budget={args.budget_seconds}s+{args.grace_seconds}s/project "
-          f"deadline={args.deadline_seconds}s root={ROOT}")
+          f"root={ROOT}")
     plan = build_plan(projects, args.budget_seconds, args.offline_only, studies_dir=studies, root=ROOT)
     print(f"steps={len(plan)}")
 
@@ -620,24 +608,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     failures: List[str] = []
     network_failures: List[str] = []
     states: List[Tuple[str, str, Snapshot, Snapshot]] = []
-    started = time.monotonic()
+    step_timeout = args.budget_seconds + args.grace_seconds
     for step in plan:
         if step.kind == NETWORK and step.label.startswith("fetch:"):
             state, before, after = run_fetch(
                 step,
                 budget_seconds=args.budget_seconds,
                 grace_seconds=args.grace_seconds,
-                deadline_seconds=args.deadline_seconds,
-                started=started,
             )
             states.append((step.label.split(":", 1)[1], state, before, after))
         elif step.kind == NETWORK:
-            ok = run_enricher(
-                step,
-                timeout_budget=args.budget_seconds + args.grace_seconds,
-                deadline_seconds=args.deadline_seconds,
-                started=started,
-            )
+            ok = run_enricher(step, timeout=step_timeout)
             if not ok:
                 network_failures.append(step.label)
         elif not run_step(step, cwd=ROOT):
@@ -646,7 +627,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     report(states, failures, network_failures)
     if failures:
         return 1
-    if states and all(state in FAILED_STATES for _, state, _, _ in states):
+    if states and sum(1 for _, state, _, _ in states if state == FAILED) > len(states) / 2:
         return EXIT_FETCH_OUTAGE
     return 0
 
