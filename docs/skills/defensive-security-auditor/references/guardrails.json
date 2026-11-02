@@ -11,7 +11,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         },
         {
           "advisory_id": "CVE-2022-2068",
@@ -21,7 +22,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         }
       ],
       "cluster_count": 13,
@@ -43,6 +45,8 @@
       "preconditions": [],
       "rules": [
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Dynamic command string passed to system(), popen(), or shell exec() in C without sanitization.",
           "language": "C",
           "languages": [
@@ -51,11 +55,14 @@
           ],
           "lesson": "Use parameterized execv/execve with discrete arguments array instead of shell invocation.",
           "pattern": "\\b(?:system|popen)\\s*\\(\\s*(?!\"[^\\%\"\\'\\n]*\"\\s*[,)])([a-zA-Z0-9_]+|\"[^\"]*\\%[sS])|\\bexec[l|v]p?e?\\s*\\([^;]*\"/(?:bin/)?(?:sh|bash)\"[^;]*\\)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-78-COMMAND-INJECTION-C",
           "severity": "CRITICAL",
           "title": "OS Command Injection in C (system / popen / exec)"
         },
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Executing commands via shell=True, os.system, os.popen, or dynamic exec() with unsanitized input.",
           "language": "Python",
           "languages": [
@@ -63,11 +70,14 @@
           ],
           "lesson": "Pass arguments as a sequence without shell=True; use ast.literal_eval instead of eval/exec.",
           "pattern": "(?:subprocess\\.(?:call|run|Popen|check_output)\\s*\\(.*shell\\s*=\\s*True|os\\.(?:system|popen)\\s*\\([^)]+\\)|(?<!\\.)\\bexec\\s*\\(\\s*[a-zA-Z0-9_]+|\\beval\\s*\\(\\s*[a-zA-Z0-9_]+)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-78-COMMAND-INJECTION-PYTHON",
           "severity": "CRITICAL",
           "title": "OS Command Injection in Python (subprocess shell=True / os.system / exec)"
         },
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Unsanitized variables passed to eval, sh -c, or exec in shell script.",
           "language": "Shell",
           "languages": [
@@ -75,6 +85,7 @@
           ],
           "lesson": "Avoid eval; use direct binary execution and strictly quote/validate all external parameters.",
           "pattern": "(?:eval\\s+[\"\\']?\\$|\\b(?:sh|bash)\\s+-c\\s+[\"\\']?\\$|\\bexec\\s+[\"\\']?\\$)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-78-COMMAND-INJECTION-SHELL",
           "severity": "CRITICAL",
           "title": "Command Injection / Unquoted Evaluation in Shell"
@@ -91,7 +102,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         },
         {
           "advisory_id": "CVE-2021-47040",
@@ -101,7 +113,8 @@
           "project": "linux-cna",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
         },
         {
           "advisory_id": "CVE-2021-47107",
@@ -111,7 +124,8 @@
           "project": "linux-cna",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
         }
       ],
       "cluster_count": 72,
@@ -135,6 +149,8 @@
       ],
       "rules": [
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Unbounded string function (strcpy, strcat, gets, sprintf) prone to classic stack/heap buffer overflow.",
           "language": "C",
           "languages": [
@@ -143,9 +159,83 @@
           ],
           "lesson": "Replace with bounds-checked alternatives (strncpy, strlcat, fgets, snprintf) and validate buffer bounds.",
           "pattern": "\\b(strcpy|strcat|gets|sprintf)\\s*\\(",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-120-UNBOUNDED-COPY",
           "severity": "HIGH",
           "title": "Buffer Copy without Checking Size of Input (C/C++)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2016-6306",
+          "fix_commit_sha": "006a788c84e541c8920dd2ad85fb62b52185c519",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/006a788c84e541c8920dd2ad85fb62b52185c519",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
+        },
+        {
+          "advisory_id": "CVE-2017-3731",
+          "fix_commit_sha": "00d965474b22b54e4275232bc71ee0c699c5cd21",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/00d965474b22b54e4275232bc71ee0c699c5cd21",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
+        },
+        {
+          "advisory_id": "CVE-2017-3737",
+          "fix_commit_sha": "898fb884b706aaeb283de4812340bb0bde8476dc",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/898fb884b706aaeb283de4812340bb0bde8476dc",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
+        }
+      ],
+      "cluster_count": 658,
+      "cluster_sample_cves": [
+        "CVE-2004-0112",
+        "CVE-2014-0160",
+        "CVE-2016-2180",
+        "CVE-2016-6306",
+        "CVE-2017-10989",
+        "CVE-2017-3731",
+        "CVE-2017-3737",
+        "CVE-2017-8818",
+        "CVE-2018-11233",
+        "CVE-2018-16842"
+      ],
+      "cluster_title": "Out-of-bounds Read",
+      "cluster_with_fix_sha": 600,
+      "cwe_id": "CWE-125",
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "rules": [
+        {
+          "applicability_limits": "Review hypothesis only: external bounds checks may justify this access. No range, alias, macro or interprocedural analysis; raw-pointer reads are outside this trigger.",
+          "code_only": true,
+          "explanation": "Unchecked slice access requires a caller-proven in-bounds index or range.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Prefer get(); otherwise establish that every index or range is within the live slice before access.",
+          "pattern": "\\.\\s*get_unchecked\\s*\\(",
+          "requires_unsafe": true,
+          "rule_id": "SEC-CWE-125-UNCHECKED-READ-RUST",
+          "severity": "MEDIUM",
+          "title": "Unchecked Slice Read (Rust)"
         }
       ]
     },
@@ -159,7 +249,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         },
         {
           "advisory_id": "CVE-2021-23840",
@@ -169,7 +260,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         },
         {
           "advisory_id": "CVE-2021-46940",
@@ -179,7 +271,8 @@
           "project": "linux-cna",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
         }
       ],
       "cluster_count": 164,
@@ -201,6 +294,8 @@
       "preconditions": [],
       "rules": [
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Multiplication or addition inside allocation argument without bound or overflow check in C.",
           "language": "C",
           "languages": [
@@ -209,11 +304,14 @@
           ],
           "lesson": "Use overflow-checked helpers (e.g. check_mul_overflow, calloc) or explicit bounds validation before allocation.",
           "pattern": "\\b(?:malloc|kmalloc|kzalloc|vmalloc|xmalloc)\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)\\s*(?:,[^)]+)?\\)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-C",
           "severity": "MEDIUM",
           "title": "Integer Overflow or Wraparound in Allocation (C/C++)"
         },
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Unchecked arithmetic inside allocation size or capacity in Rust.",
           "language": "Rust",
           "languages": [
@@ -221,6 +319,7 @@
           ],
           "lesson": "Use checked_mul() or checked_add() before computing collection capacity or layout size.",
           "pattern": "\\b(?:Vec::with_capacity|alloc::alloc|Layout::array|Layout::from_size_align)\\s*(?:<[^>]+>)?\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*(\\*|\\+)\\s*([a-zA-Z0-9_]+)",
+          "requires_unsafe": true,
           "rule_id": "SEC-CWE-190-INTEGER-OVERFLOW-RUST",
           "severity": "MEDIUM",
           "title": "Integer Overflow in Allocation / Capacity (Rust)"
@@ -237,7 +336,8 @@
           "project": "linux-cna",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
         },
         {
           "advisory_id": "CVE-2021-46982",
@@ -247,7 +347,8 @@
           "project": "linux-cna",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
         }
       ],
       "cluster_count": 459,
@@ -271,6 +372,8 @@
       ],
       "rules": [
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "TOCTOU check-then-open pattern or rapid unlock-relock window in C creates concurrency race window.",
           "language": "C",
           "languages": [
@@ -279,11 +382,14 @@
           ],
           "lesson": "Use atomic open with O_CREAT|O_EXCL, or hold critical section invariants continuously.",
           "pattern": "(?:(?:access|stat|lstat)\\s*\\(\\s*([a-zA-Z0-9_\\\"'/]+)\\s*,[^)]+\\)(?:[^;]*;|[^\\n]*)\\s*[^;]*\\b(?:fopen|open)\\s*\\(\\s*\\1\\b|(?:spin_unlock|pthread_mutex_unlock|mutex_unlock)\\s*\\(&?([a-zA-Z0-9_]+)\\);\\s*(?:spin_lock|pthread_mutex_lock|mutex_lock)\\s*\\(&?\\2\\);)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-362-CONCURRENCY-RACE-C",
           "severity": "MEDIUM",
           "title": "Race Condition / TOCTOU Window (C/C++)"
         },
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Checking os.path.exists() before open() introduces a TOCTOU race condition in Python.",
           "language": "Python",
           "languages": [
@@ -291,11 +397,14 @@
           ],
           "lesson": "Use atomic file operations (e.g. open with 'x' mode) or try/except FileExistsError/FileNotFoundError.",
           "pattern": "(?:if\\s+os\\.path\\.exists\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*\\):[^:\\n]*\\n\\s*(?:with\\s+open|open)\\s*\\(\\s*\\1\\b)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON",
           "severity": "MEDIUM",
           "title": "Race Condition / TOCTOU File Access (Python)"
         },
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Testing file existence before operating on it in shell creates a TOCTOU race condition.",
           "language": "Shell",
           "languages": [
@@ -303,9 +412,97 @@
           ],
           "lesson": "Use atomic file operations or mktemp; handle command error codes directly.",
           "pattern": "(?:if\\s+\\[\\s*-[efrwxd]\\s+[\"\\']?\\$[a-zA-Z0-9_]+[\"\\']?\\s*\\];?\\s*then[^;]+(?:\\bcat\\b|\\bcp\\b|\\bmv\\b|\\brm\\b|>)\\s+[^;]*\\$)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL",
           "severity": "MEDIUM",
           "title": "Race Condition / TOCTOU File Operation (Shell)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2016-8618",
+          "fix_commit_sha": "8732ec40db652c53fa58cd13e2acb8eab6e40874",
+          "fix_commit_url": "https://github.com/curl/curl/commit/8732ec40db652c53fa58cd13e2acb8eab6e40874",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-415",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "736f56cab3bec7dcb3337427fa589e18803bad9fa94fde98638b900624505bd3"
+        },
+        {
+          "advisory_id": "CVE-2016-8619",
+          "fix_commit_sha": "3d6460edeee21d7d790ec570d0887bed1f4366dd",
+          "fix_commit_url": "https://github.com/curl/curl/commit/3d6460edeee21d7d790ec570d0887bed1f4366dd",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-415",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "736f56cab3bec7dcb3337427fa589e18803bad9fa94fde98638b900624505bd3"
+        },
+        {
+          "advisory_id": "CVE-2019-5481",
+          "fix_commit_sha": "9069838b30fb3b48af0123e39f664cea683254a5",
+          "fix_commit_url": "https://github.com/curl/curl/commit/9069838b30fb3b48af0123e39f664cea683254a5",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-415",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "736f56cab3bec7dcb3337427fa589e18803bad9fa94fde98638b900624505bd3"
+        }
+      ],
+      "cluster_count": 248,
+      "cluster_sample_cves": [
+        "CVE-2003-0545",
+        "CVE-2016-8618",
+        "CVE-2016-8619",
+        "CVE-2019-5481",
+        "CVE-2020-36785",
+        "CVE-2021-22945",
+        "CVE-2021-46938",
+        "CVE-2021-46979",
+        "CVE-2021-47082",
+        "CVE-2021-47123"
+      ],
+      "cluster_title": "CWE Family CWE-415",
+      "cluster_with_fix_sha": 216,
+      "cwe_id": "CWE-415",
+      "preconditions": [],
+      "rules": [
+        {
+          "applicability_limits": "Review hypothesis only: a pointer already equal to NULL is harmless. Only consecutive calls with the same identifier are covered; aliases and cross-function lifetime paths are not tracked.",
+          "code_only": true,
+          "explanation": "The same pointer is passed to free twice without an intervening assignment.",
+          "language": "C",
+          "languages": [
+            "c",
+            "cpp"
+          ],
+          "lesson": "Release each allocation once and invalidate every owning alias; free(NULL) is allowed.",
+          "pattern": "\\bfree\\s*\\(\\s*([A-Za-z_]\\w*)\\s*\\)\\s*;\\s*free\\s*\\(\\s*\\1\\s*\\)",
+          "requires_unsafe": false,
+          "rule_id": "SEC-CWE-415-DOUBLE-FREE-C",
+          "severity": "HIGH",
+          "title": "Consecutive Duplicate Free (C/C++)"
+        },
+        {
+          "applicability_limits": "Review hypothesis only: assumes standard Box and drop names. Only adjacent drop(Box::from_raw(p)) calls are covered; aliases, custom allocators and other ownership paths are not tracked.",
+          "code_only": true,
+          "explanation": "Repeated reconstruction and drop of a Box from the same raw pointer violates unique ownership.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Transfer a raw allocation into Box ownership once; invalidate the raw owner after that transfer.",
+          "pattern": "\\bdrop\\s*\\(\\s*Box::from_raw\\s*\\(\\s*([A-Za-z_]\\w*)\\s*\\)\\s*\\)\\s*;\\s*drop\\s*\\(\\s*Box::from_raw\\s*\\(\\s*\\1\\s*\\)",
+          "requires_unsafe": true,
+          "rule_id": "SEC-CWE-415-DUPLICATE-OWNERSHIP-RUST",
+          "severity": "HIGH",
+          "title": "Repeated Box Ownership from Raw Pointer (Rust)"
         }
       ]
     },
@@ -319,7 +516,8 @@
           "project": "openssh",
           "recorded_cwe": "CWE-416",
           "source": "docs/memory/records/openssh-CVE-2023-25136.json",
-          "source_kind": "pack_record"
+          "source_kind": "pack_record",
+          "source_sha256": "a821c68dbbd7bfe07c6b4c82f8af88d93adf59994f0cafcb88cad2c0074f741c"
         },
         {
           "advisory_id": "CVE-2016-6309",
@@ -329,7 +527,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         },
         {
           "advisory_id": "CVE-2016-8623",
@@ -339,7 +538,8 @@
           "project": "curl-upstream",
           "recorded_cwe": "CWE-416",
           "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "736f56cab3bec7dcb3337427fa589e18803bad9fa94fde98638b900624505bd3"
         }
       ],
       "cluster_count": 1430,
@@ -363,6 +563,8 @@
       ],
       "rules": [
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Pointer accessed or dereferenced after free() without nullification in C.",
           "language": "C",
           "languages": [
@@ -371,11 +573,14 @@
           ],
           "lesson": "Distinguish object lifetime from transaction visibility; set pointers to NULL immediately after free.",
           "pattern": "\\bfree\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*\\);\\s*(?!\\s*\\1\\s*=\\s*(?:NULL|0|nullptr)\\s*;)[^;]*\\b\\1\\b",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-416-USE-AFTER-FREE-C",
           "severity": "HIGH",
           "title": "Use After Free / Lifetime Invariant Violation (C/C++)"
         },
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Raw pointer or resource accessed after deallocation or drop in Rust.",
           "language": "Rust",
           "languages": [
@@ -383,9 +588,74 @@
           ],
           "lesson": "Enforce Rust ownership invariants or invalidate raw pointers immediately upon manual deallocation.",
           "pattern": "\\b(?:libc::free|dealloc|drop_in_place|ManuallyDrop::drop)\\s*\\(\\s*(?:&\\s*(?:mut\\s+)?)?([a-zA-Z0-9_]+)[^)]*\\);\\s*(?!\\s*\\1\\s*=\\s*(?:ptr::null|std::ptr::null|null_mut)\\s*;)[^;]*(?:\\*+\\s*\\1|\\b\\1\\s*\\.)",
+          "requires_unsafe": true,
           "rule_id": "SEC-CWE-416-USE-AFTER-FREE-RUST",
           "severity": "HIGH",
           "title": "Use After Free / Dereference After Drop or Deallocation (Rust)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2021-22898",
+          "fix_commit_sha": "39ce47f219b09c380b81f89fe54ac586c8db6bde",
+          "fix_commit_url": "https://github.com/curl/curl/commit/39ce47f219b09c380b81f89fe54ac586c8db6bde",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-457",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "736f56cab3bec7dcb3337427fa589e18803bad9fa94fde98638b900624505bd3"
+        },
+        {
+          "advisory_id": "CVE-2021-22925",
+          "fix_commit_sha": "894f6ec730597eb243618d33cc84d71add8d6a8a",
+          "fix_commit_url": "https://github.com/curl/curl/commit/894f6ec730597eb243618d33cc84d71add8d6a8a",
+          "linked_by": "recorded_cwe",
+          "project": "curl-upstream",
+          "recorded_cwe": "CWE-457",
+          "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "736f56cab3bec7dcb3337427fa589e18803bad9fa94fde98638b900624505bd3"
+        },
+        {
+          "advisory_id": "CVE-2024-26882",
+          "fix_commit_sha": "b0ec2abf98267f14d032102551581c833b0659d3",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/b0ec2abf98267f14d032102551581c833b0659d3",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
+        }
+      ],
+      "cluster_count": 3,
+      "cluster_sample_cves": [
+        "CVE-2021-22898",
+        "CVE-2021-22925",
+        "CVE-2024-26882"
+      ],
+      "cluster_title": "CWE Family CWE-457",
+      "cluster_with_fix_sha": 3,
+      "cwe_id": "CWE-457",
+      "preconditions": [],
+      "rules": [
+        {
+          "applicability_limits": "Review hypothesis only: validity depends on the type; some zero-sized or MaybeUninit types admit uninitialized storage. No type inference or tracking of separately initialized variables is performed.",
+          "code_only": true,
+          "explanation": "An uninitialized value is immediately treated as initialized without a write.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Write a valid value into MaybeUninit before assume_init, or construct an initialized value directly.",
+          "pattern": "\\b(?:MaybeUninit\\s*(?:::\\s*<[^;{}]+>)?::uninit\\s*\\(\\s*\\)\\s*\\.\\s*assume_init\\s*\\(|(?:std::|core::)?mem::uninitialized\\s*(?:::\\s*<[^;{}]+>)?\\s*\\()",
+          "requires_unsafe": true,
+          "rule_id": "SEC-CWE-457-UNINITIALIZED-RUST",
+          "severity": "HIGH",
+          "title": "Immediate Assumption of Uninitialized Value (Rust)"
         }
       ]
     },
@@ -399,7 +669,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         },
         {
           "advisory_id": "CVE-2016-7052",
@@ -409,7 +680,8 @@
           "project": "openssl-upstream",
           "recorded_cwe": null,
           "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
         },
         {
           "advisory_id": "CVE-2018-1000121",
@@ -419,7 +691,8 @@
           "project": "curl-upstream",
           "recorded_cwe": "CWE-476",
           "source": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
-          "source_kind": "catalog"
+          "source_kind": "catalog",
+          "source_sha256": "736f56cab3bec7dcb3337427fa589e18803bad9fa94fde98638b900624505bd3"
         }
       ],
       "cluster_count": 2097,
@@ -443,6 +716,8 @@
       ],
       "rules": [
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Pointer dereferenced immediately after allocation without NULL check in C.",
           "language": "C",
           "languages": [
@@ -451,11 +726,14 @@
           ],
           "lesson": "Always verify pointer return values against NULL before dereferencing.",
           "pattern": "([a-zA-Z0-9_]+)\\s*=\\s*(?:malloc|kmalloc|kzalloc|fopen|strdup)\\s*\\([^;]+\\);\\s*(?!\\s*if\\s*\\(\\s*(?:!\\s*\\1|\\1\\s*==\\s*NULL))\\s*(?:\\*\\s*\\1|\\1\\s*->)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-476-NULL-DEREFERENCE-C",
           "severity": "MEDIUM",
           "title": "Unchecked Return Value / NULL Pointer Dereference (C/C++)"
         },
         {
+          "applicability_limits": "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability.",
+          "code_only": false,
           "explanation": "Raw pointer dereferenced in unsafe block without is_null() guard in Rust.",
           "language": "Rust",
           "languages": [
@@ -463,9 +741,83 @@
           ],
           "lesson": "Validate raw pointers with .is_null() before dereferencing in unsafe blocks, or use NonNull.",
           "pattern": "(?:let\\s+([a-zA-Z0-9_]+)\\s*=\\s*[^;]*as\\s+\\*(?:mut|const)\\s+[a-zA-Z0-9_]+;(?![^;]*\\1\\.is_null\\(\\))[^;]*unsafe\\s*\\{\\s*\\*+\\s*\\1\\b)",
+          "requires_unsafe": false,
           "rule_id": "SEC-CWE-476-NULL-DEREFERENCE-RUST",
           "severity": "MEDIUM",
           "title": "Unchecked Raw Pointer Dereference (Rust)"
+        }
+      ]
+    },
+    {
+      "citations": [
+        {
+          "advisory_id": "CVE-2016-6303",
+          "fix_commit_sha": "1027ad4f34c30b8585592764b9a670ba36888269",
+          "fix_commit_url": "https://github.com/openssl/openssl/commit/1027ad4f34c30b8585592764b9a670ba36888269",
+          "linked_by": "cluster_sample_cves",
+          "project": "openssl-upstream",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "18a8c744e48360bd01e23557b89034f681d8053f06442f3170cb25df0454cf76"
+        },
+        {
+          "advisory_id": "CVE-2021-46931",
+          "fix_commit_sha": "918fc3855a6507a200e9cf22c20be852c0982687",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/918fc3855a6507a200e9cf22c20be852c0982687",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
+        },
+        {
+          "advisory_id": "CVE-2021-47132",
+          "fix_commit_sha": "b5941f066b4ca331db225a976dae1d6ca8cf0ae3",
+          "fix_commit_url": "https://github.com/torvalds/linux/commit/b5941f066b4ca331db225a976dae1d6ca8cf0ae3",
+          "linked_by": "cluster_sample_cves",
+          "project": "linux-cna",
+          "recorded_cwe": null,
+          "source": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+          "source_kind": "catalog",
+          "source_sha256": "7e401399d49271789362e38b787c3ed0bc3e5d06d742821ace1520e26c856940"
+        }
+      ],
+      "cluster_count": 514,
+      "cluster_sample_cves": [
+        "CVE-2007-1320",
+        "CVE-2007-5730",
+        "CVE-2016-2182",
+        "CVE-2016-6303",
+        "CVE-2017-9445",
+        "CVE-2019-6454",
+        "CVE-2020-15358",
+        "CVE-2021-46931",
+        "CVE-2021-47132",
+        "CVE-2021-47138"
+      ],
+      "cluster_title": "Out-of-bounds Write",
+      "cluster_with_fix_sha": 479,
+      "cwe_id": "CWE-787",
+      "preconditions": [
+        "Untrusted buffer length or unbounded string processing"
+      ],
+      "rules": [
+        {
+          "applicability_limits": "Review hypothesis only: creating the reference does not prove a write or exploit. Caller checks may establish bounds; raw writes and macro expansions are outside this trigger.",
+          "code_only": true,
+          "explanation": "Unchecked mutable slice access can create an out-of-bounds reference and permit invalid writes.",
+          "language": "Rust",
+          "languages": [
+            "rust"
+          ],
+          "lesson": "Prefer get_mut(); otherwise prove bounds and exclusive access before creating the mutable reference.",
+          "pattern": "\\.\\s*get_unchecked_mut\\s*\\(",
+          "requires_unsafe": true,
+          "rule_id": "SEC-CWE-787-UNCHECKED-WRITE-RUST",
+          "severity": "MEDIUM",
+          "title": "Unchecked Mutable Slice Access (Rust)"
         }
       ]
     }
@@ -482,10 +834,10 @@
     "rules": "scripts/defensive_auditor.py:SECURITY_RULES"
   },
   "summary": {
-    "citations_total": 16,
-    "families_covered": 6,
-    "rule_families_total": 6,
+    "citations_total": 28,
+    "families_covered": 10,
+    "rule_families_total": 10,
     "rule_families_without_evidence": 0,
-    "rules_covered": 13
+    "rules_covered": 18
   }
 }
