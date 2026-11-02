@@ -79,10 +79,13 @@ def validate_manifest_path(path_str):
 
 
 class PackReader:
-    def __init__(self, source: str, cache_dir: Path, manifest_sha256: Optional[str] = None):
+    def __init__(self, source: str, cache_dir: Path, manifest_sha256: Optional[str] = None,
+                 vectors_path: Optional[Path] = None):
         self.source = source
         self.cache_dir = Path(cache_dir).resolve()
         self.manifest_sha256 = manifest_sha256
+        self.vectors_path = Path(vectors_path) if vectors_path is not None else None
+        self.vectors = None
         self.temp_dir = None
         self.db_path = None
         self.opener = create_opener()
@@ -107,6 +110,7 @@ class PackReader:
             shutil.rmtree(self.temp_dir)
         self.temp_dir = None
         self.db_path = None
+        self.vectors = None
 
     def _mount(self):
         is_url = self.source.startswith("https://")
@@ -174,6 +178,33 @@ class PackReader:
         if not records:
              raise ValueError("No valid records found in manifest")
 
+        if self.vectors_path is not None:
+            from embed_vectors import load_vectors
+
+            info = manifest.get('vectors')
+            if not isinstance(info, dict) or info.get('status') != 'BUILT':
+                raise ValueError('Manifest does not declare BUILT vectors')
+            expected_size = info.get('bytes')
+            if (type(expected_size) is not int or not 0 < expected_size <= MAX_DOWNLOAD_SIZE
+                    or not isinstance(info.get('sha256'), str)):
+                raise ValueError('Invalid vectors size/hash metadata')
+            with self.vectors_path.open('rb') as stream:
+                body = stream.read(expected_size + 1)
+            if len(body) != expected_size:
+                raise ValueError('Size mismatch for vectors')
+            if hashlib.sha256(body).hexdigest() != info['sha256']:
+                raise ValueError('Hash mismatch for vectors')
+            snapshot = Path(self.temp_dir) / 'vectors.json'
+            snapshot.write_bytes(body)
+            contract, vectors = load_vectors(snapshot)
+            for field, key in (('model', 'model'), ('revision', 'model_revision'),
+                               ('dims', 'dims'), ('provider', 'provider')):
+                if field not in info or key not in contract or info[field] != contract[key]:
+                    raise ValueError(f'Vectors contract mismatch: {field}')
+            if not set(vectors) <= {r['id'] for r in records}:
+                raise ValueError('Vectors contain unknown record ids')
+            self.vectors = vectors
+
         # Generate SQL locally via trusted build_sql
         sql_script = build_sql(records)
 
@@ -192,19 +223,30 @@ class PackReader:
              raise RuntimeError("PackReader not mounted")
         return query_database(self.db_path, query_str, limit)
 
+    def rank_by_cosine(self, query_vec, limit: int = 5):
+        """Return vector candidate IDs, or no candidates in lexical-only mode."""
+        if not self.db_path:
+            raise RuntimeError('PackReader not mounted')
+        if self.vectors is None:
+            return []
+        from embed_vectors import rank_by_cosine
+
+        return rank_by_cosine(query_vec, self.vectors, limit)
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', required=True, help='Local directory or HTTPS URL base to manifest')
     parser.add_argument('--cache', required=True, type=Path, help='Temp directory')
     parser.add_argument('--manifest-sha256', help='Explicit expected SHA256 for network use')
+    parser.add_argument('--vectors', type=Path, help='Optional local vectors JSON verified against manifest')
     parser.add_argument('--query', help='Optional query to run')
     parser.add_argument('--limit', type=int, default=5, help='Query limit')
 
     args = parser.parse_args()
 
     try:
-        with PackReader(args.source, args.cache, args.manifest_sha256) as reader:
+        with PackReader(args.source, args.cache, args.manifest_sha256, args.vectors) as reader:
             if args.query:
                 results = reader.query(args.query, args.limit)
                 print(json.dumps({'results': results, 'status': 'EVIDENCE_FOUND' if results else 'ABSTAIN_NO_MATCH', 'detector': False}, indent=2))

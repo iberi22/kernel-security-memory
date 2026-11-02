@@ -189,12 +189,29 @@ def source_scope(records):
             'not the full history of any upstream project')
 
 
-def artifacts(records):
+def artifacts(records, vectors=None):
     files = {'kernel-security-memory.sql': build_sql(records).encode()}
     for r in records:
         files[f'records/{r["id"]}.json'] = (json.dumps(r, indent=2, ensure_ascii=False) + '\n').encode()
     projects = sorted({r['project'] for r in records})
     manifest = {'schema_version': '0.1.0', 'pack_id': 'kernel-security-memory-bootstrap-v0', 'project': pack_projects(records), 'projects': projects, 'record_count': len(records), 'source_scope': source_scope(records), 'vectors': 'NOT_BUILT', 'files': [{'path': p, 'sha256': hashlib.sha256(b).hexdigest(), 'bytes': len(b)} for p, b in sorted(files.items())]}
+    if vectors is not None:
+        from embed_vectors import load_vectors
+
+        body = Path(vectors).read_bytes()
+        with tempfile.TemporaryDirectory() as td:
+            snapshot = Path(td) / 'vectors.json'
+            snapshot.write_bytes(body)
+            contract, index = load_vectors(snapshot)
+        if not set(index) <= {r['id'] for r in records}:
+            raise ValueError('Vectors contain unknown record ids')
+        files['vectors.json'] = body
+        info = {'path': 'vectors.json', 'sha256': hashlib.sha256(body).hexdigest(),
+                'bytes': len(body)}
+        manifest['files'].append(info)
+        manifest['vectors'] = dict(info, status='BUILT', model=contract['model'],
+                                   revision=contract['model_revision'], dims=contract['dims'],
+                                   provider=contract['provider'])
     files['manifest.json'] = (json.dumps(manifest, indent=2) + '\n').encode()
     return files
 
@@ -202,9 +219,10 @@ def artifacts(records):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true')
+    parser.add_argument('--vectors', type=Path, help='Optional derived vectors JSON to include')
     args = parser.parse_args()
     records = load_records()
-    outputs = artifacts(records)
+    outputs = artifacts(records, vectors=args.vectors)
     memory = ROOT / 'docs/memory'
     for name, body in outputs.items():
         path = memory / name

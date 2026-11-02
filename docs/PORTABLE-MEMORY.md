@@ -36,6 +36,21 @@ Open the resulting database with `mode=ro` and close it after use. Independent p
 
 Vector artifacts are optional: model ID/revision, dimension, dtype, normalization, source-content hash and build version are mandatory. No compatibility with Xavier's embedding space is assumed from equal dimensions. Consumers may rebuild embeddings locally or operate lexically.
 
+`python3 scripts/build_pack.py --vectors /path/to/vectors.json` validates an
+existing derived index and includes it as `vectors.json`. The manifest's
+`vectors` object records `status=BUILT`, `model`, `revision`, `dims`, `provider`,
+`path`, `bytes` and `sha256`; without this option it remains `NOT_BUILT`.
+Fixture indexes retain `provider=fixture` and a null revision, and are plumbing
+fixtures rather than neural measurements.
+
+`PackReader(source, cache_dir, vectors_path=Path(...))` verifies the supplied
+local file's size, hash and contract against that manifest before loading it.
+`rank_by_cosine(query_vec, limit)` returns candidate record IDs in cosine order;
+the caller supplies a query vector from the matching embedding space. Omitting
+the vectors path leaves `reader.vectors=None`, returns no cosine candidates and
+keeps `query(...)` available for lexical retrieval, even for a vector-enabled
+manifest. Neither path executes SQL supplied by the pack.
+
 ## Hosting limits and freshness
 
 GitHub Pages is static and subject to [usage limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits). Large shard sets/derived indexes belong in release assets or a separately chosen store. No guarantee of unlimited free bandwidth, permanent availability or complete security coverage. Consumers cache pinned revisions and inspect pack freshness explicitly.

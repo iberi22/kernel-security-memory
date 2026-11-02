@@ -38,6 +38,12 @@ Evidence schema and deterministic JSON/SQL pack; read-only lexical+graph pack re
 
 No LLM is used anywhere in extraction or enrichment.
 
+Optional derived vector wiring: `build_pack.py --vectors` packages a validated
+index with model/revision/provider and integrity metadata; `PackReader` can
+explicitly load a local index and rank query vectors. Lexical-only operation
+remains available. This wiring uses offline fixtures in tests; no neural model
+has been downloaded or measured.
+
 ## Known limits
 
 - NVD keyword search is a weak source: slow (one request per 15 s without a key) and polluted. Per-project upstream feeds are the primary source from now on.
