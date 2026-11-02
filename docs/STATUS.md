@@ -54,4 +54,5 @@ has been downloaded or measured.
 - Kernel test fixtures under `tests/fixtures/` are GPL-2.0-only excerpts carrying SPDX and provenance headers.
 - "Related CVEs" vectors are deterministic TF-IDF over metadata and fingerprint features, not neural embeddings. Until more CVEs carry fingerprints, most neighbours share only CWE and project.
 - Fingerprint matching finds missing patches within a project; across projects it raised no strong finding in 27,948 functions, so it neither produces noise nor, yet, finds the same bug in unrelated code. systemd and SQLite releases produced no strong finding (few fingerprinted fixes: 10 and 17).
-- Not implemented: neural embeddings, follow-up/revert tracking, native Xavier mount/unmount.
+- Reversible Xavier HTTP mount/unmount: `scripts/xavier_mount.py` verifies packs, records import receipts, lists namespace IDs and verifies receipt-scoped deletion. Tested against an in-process HTTP mock; deployed Xavier compatibility and live deletion remain unverified. See `XAVIER-BRIDGE.md`.
+- Not implemented: neural embeddings, follow-up/revert tracking.
