@@ -32,7 +32,7 @@ Open the resulting database with `mode=ro` and close it after use. Independent p
 
 1. Agent fetches JSON evidence over HTTP and includes cited facts in its audit context. Works without modifying Xavier.
 2. Planned optional adapter queries a read-only pack alongside Xavier and merges rankings. Native attach/detach is NOT implemented by the bootstrap.
-3. Optional import must use a pack-specific namespace and import receipt with exact record IDs/revision/hash; removing only those IDs makes the import reversible. Do not claim import deletion exists until tested against Xavier's live API.
+3. Optional import must use a pack-specific namespace and import receipt with exact record IDs/revision/hash; removing only those IDs makes the import reversible. The reversible HTTP importer `scripts/xavier_mount.py` implements receipt-scoped deletion and verification against an in-process mock (see `XAVIER-BRIDGE.md`); live Xavier import deletion remains unverified.
 
 Vector artifacts are optional: model ID/revision, dimension, dtype, normalization, source-content hash and build version are mandatory. No compatibility with Xavier's embedding space is assumed from equal dimensions. Consumers may rebuild embeddings locally or operate lexically.
 
