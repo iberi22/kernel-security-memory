@@ -1,23 +1,9 @@
 #!/usr/bin/env python3
-"""Measure qrels-v1 baseline against lexical/graph retrieval (stdlib only).
+"""Measure exploratory qrels against ordered lexical/graph retrieval (stdlib only).
 
-Builds the SQLite pack from the deterministic SQL text export inside a
-temporary directory, runs every qrels-v1 item read-only
-(`query_pack.query_database` for ``lexical`` mode,
-`query_graph.query_graph` for ``graph`` mode), and reports one verdict per
-item plus two bounded summary rates:
-
-- ``positive_recall`` = HIT / measurable FOUND items (lexical q1-q4 and
-  graph q5-q6 are scored together; see experiments/QRELS.md).
-- ``negative_abstention`` = ABSTAIN_CORRECT / measurable ABSTAIN items.
-
-Verdicts: HIT (expected record + all expected evidence observed), MISS
-(expected FOUND not retrieved, or expected ABSTAIN but results returned),
-ABSTAIN_CORRECT (expected ABSTAIN and nothing returned), NOT_MEASURED
-(item not scoreable: unknown mode, missing fields, or retrieval error).
-
-Deliberately NO MRR / composite recall: qrels-v1 carries unranked
-FOUND/ABSTAIN judgments only, so ranking metrics would be invented.
+Report existing evidence-aware verdicts plus MRR, Recall@5 and citation
+completeness over measurable FOUND items. Unmeasurable items are excluded;
+empty denominators are null. v1 and v2 judgment schemas are supported.
 """
 import argparse
 import json
@@ -74,12 +60,12 @@ def run_item(db_path, item, limit=5):
     mode = item.get("mode")
     query = item.get("query")
     if mode == "lexical":
-        results = query_pack.query_database(db_path, query, limit)
+        results = query_pack.query_database(db_path, query, max(5, limit))
         status = "EVIDENCE_FOUND" if results else "ABSTAIN_NO_MATCH"
         return results, status, None
     if mode == "graph":
         outcome = query_graph.query_graph(db_path, query)
-        return outcome.get("results", []), outcome.get("status"), None
+        return (outcome.get("results") or [])[:max(5, limit)], outcome.get("status"), None
     return None, None, "unsupported mode %r" % (mode,)
 
 
@@ -104,6 +90,17 @@ def score_item(db_path, item, limit=5):
         base.update(verdict="NOT_MEASURED", reason="unsupported expect %r" % (item.get("expect"),),
                     observed_record_ids=[], observed_evidence_ids=[])
         return base
+    expected_records = ([item["record_id"]] if item.get("record_id")
+                        else item.get("expected_record_ids", []))
+    expected_evidence = item.get("evidence", item.get("expected_evidence_ids", []))
+    if item["expect"] == "FOUND" and (
+            not isinstance(expected_records, list) or not expected_records
+            or not all(isinstance(r, str) and r for r in expected_records)
+            or not isinstance(expected_evidence, list)
+            or not all(isinstance(e, str) and e for e in expected_evidence)):
+        base.update(verdict="NOT_MEASURED", reason="invalid FOUND record/evidence judgment",
+                    observed_record_ids=[], observed_evidence_ids=[])
+        return base
     try:
         results, status, error = run_item(db_path, item, limit)
     except Exception as exc:  # retrieval failure => not measurable, not a MISS
@@ -117,7 +114,7 @@ def score_item(db_path, item, limit=5):
 
     observed = observed_by_record(results)
     base["status"] = status
-    base["observed_record_ids"] = sorted(observed)
+    base["observed_record_ids"] = list(observed)
     base["observed_evidence_ids"] = sorted({e for ev in observed.values() for e in ev})
 
     if item["expect"] == "ABSTAIN":
@@ -129,11 +126,14 @@ def score_item(db_path, item, limit=5):
         return base
 
     # expect == FOUND
-    expected_records = item.get("expected_record_ids") or []
-    expected_evidence = set(item.get("expected_evidence_ids") or [])
-    if not expected_records:
-        base.update(verdict="NOT_MEASURED", reason="FOUND item without expected_record_ids")
-        return base
+    expected_evidence = set(expected_evidence)
+    ranked_ids = [r.get("id") for r in results or []]
+    first_rank = next((rank for rank, rid in enumerate(ranked_ids, 1)
+                       if rid in expected_records), None)
+    base["reciprocal_rank"] = 1 / first_rank if first_rank else 0.0
+    base["recall_at_5"] = float(any(rid in ranked_ids[:5] for rid in expected_records))
+    base["citation_completeness"] = float(any(
+        rid in observed and expected_evidence <= observed[rid] for rid in expected_records))
     hits = [rid for rid in expected_records
             if rid in observed and expected_evidence <= observed[rid]]
     if hits:
@@ -145,7 +145,7 @@ def score_item(db_path, item, limit=5):
 
 
 def summarize(scored):
-    """Bounded summary rates over measurable items only (no composites)."""
+    """Summary rates over measured judgments; absent metric observations stay null."""
     pos = [s for s in scored if s.get("expect") == "FOUND" and s.get("verdict") in ("HIT", "MISS")]
     neg = [s for s in scored if s.get("expect") == "ABSTAIN" and s.get("verdict") in ("ABSTAIN_CORRECT", "MISS")]
     not_measured = [s["id"] for s in scored if s.get("verdict") == "NOT_MEASURED"]
@@ -155,7 +155,14 @@ def summarize(scored):
     def rate(ok, total):
         return ok / total if total else None
 
+    metrics = {}
+    for name, field in (("mrr", "reciprocal_rank"), ("recall_at_5", "recall_at_5"),
+                        ("citation_completeness", "citation_completeness")):
+        values = [s[field] for s in pos if field in s]
+        metrics[name] = {"denominator": len(values),
+                         "value": rate(sum(values), len(values))}
     return {
+        **metrics,
         "n_items": len(scored),
         "n_measured": len(pos) + len(neg),
         "n_not_measured": len(not_measured),
@@ -182,8 +189,8 @@ def main():
     a = p.parse_args()
     report = measure(a.qrels, a.sql, a.limit)
     s = report["summary"]
-    lines = ["baseline qrels-v1: %d items (%d measured, %d NOT_MEASURED)"
-             % (s["n_items"], s["n_measured"], s["n_not_measured"])]
+    lines = ["baseline %s: %d items (%d measured, %d NOT_MEASURED)"
+             % (a.qrels.name, s["n_items"], s["n_measured"], s["n_not_measured"])]
     for item in report["items"]:
         lines.append("  %-28s %-8s %-15s %s" % (item["id"], item.get("mode"), item["verdict"], item.get("reason")))
     pr = s["positive_recall"]
@@ -192,6 +199,11 @@ def main():
                  " = %.3f" % pr["value"] if pr["value"] is not None else " (NOT_MEASURED: empty denominator)"))
     lines.append("negative_abstention: %s/%s%s" % (na["correct"], na["denominator"],
                  " = %.3f" % na["value"] if na["value"] is not None else " (NOT_MEASURED: empty denominator)"))
+    for name in ("mrr", "recall_at_5", "citation_completeness"):
+        metric = s[name]
+        lines.append("%s: %s (n=%d)" % (name,
+                     "%.6f" % metric["value"] if metric["value"] is not None
+                     else "NOT_MEASURED", metric["denominator"]))
     print("\n".join(lines))
     if a.json_out:
         a.json_out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

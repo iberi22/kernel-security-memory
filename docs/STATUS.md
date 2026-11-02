@@ -2,6 +2,17 @@
 
 Date: 2026-11-02 UTC (re-scored: progress records reconciled with delivered code).
 
+## Evaluation update (2026-11-02)
+
+Exploratory qrels v2 expands the nine-item pilot to 30 items (22 FOUND,
+8 ABSTAIN; seven records across six projects), with author/source review
+metadata; independent review remains pending. On the 35-record SQL pack,
+`python3 scripts/measure_baseline.py --qrels experiments/qrels-v2.json`
+measures MRR 1.000, Recall@5 1.000, citation completeness 1.000 and negative
+abstention 5/8, with zero NOT_MEASURED items. Explicit identifiers and
+correlated seed paraphrases limit interpretation; this is not the full
+Phase-B benchmark. See `experiments/QRELS.md` and `experiments/BASELINE.md`.
+
 ## Measured state
 
 | Area | Value | Source of truth |
