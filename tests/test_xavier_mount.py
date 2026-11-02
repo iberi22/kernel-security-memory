@@ -15,6 +15,7 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from build_pack import artifacts
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tests'))
 from test_pack_to_xavier import make_record
 from xavier_mount import main
 
