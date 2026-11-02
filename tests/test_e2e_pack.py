@@ -77,7 +77,7 @@ class PackEndToEndTests(unittest.TestCase):
         pos = summary["positive_recall"]
         neg = summary["negative_abstention"]
         self.assertEqual((pos["hits"], pos["denominator"]), (6, 6))
-        self.assertEqual((neg["correct"], neg["denominator"]), (2, 3))
+        self.assertEqual((neg["correct"], neg["denominator"]), (3, 3))
 
 
 if __name__ == "__main__":
