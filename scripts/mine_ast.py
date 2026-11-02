@@ -13,11 +13,15 @@ Backends:
 """
 import argparse
 import difflib
+from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import subprocess
 import sys
+from urllib.parse import quote
 
 # Exact pins verified against PyPI on 2026-10-07. Keep in sync with docs/AST.md.
 TREE_SITTER_PIN = "tree-sitter==0.26.0"
@@ -450,22 +454,198 @@ def mine_file(source_path, repo, commit, blob=None, backend="stdlib"):
     }
 
 
+def _local_git(git_dir, *args):
+    """Read objects only: no checkout, hooks, replacement objects or lazy fetch."""
+    env = dict(os.environ, GIT_NO_LAZY_FETCH="1", GIT_NO_REPLACE_OBJECTS="1",
+               GIT_TERMINAL_PROMPT="0", GIT_ALLOW_PROTOCOL="")
+    result = subprocess.run(
+        ["git", "--no-replace-objects", "-C", str(git_dir), *args],
+        env=env, capture_output=True, check=False,
+    )
+    if result.returncode:
+        raise ASTError(f"Local Git {args[0]} failed: "
+                       + result.stderr.decode("utf-8", errors="replace").strip())
+    return result.stdout
+
+
+def mine_revision_pair(git_dir, repo, revision_pair, paths=None, backend="stdlib",
+                       observed_at=None):
+    """Index C/H blobs in two local commit trees as a pack-compatible record.
+
+    A..B selects endpoints, not the intervening history. Actual B parents are
+    recorded independently; matching (path, symbol) is only a lineage hypothesis.
+    """
+    parts = revision_pair.split("..")
+    if len(parts) != 2 or not all(parts) or any(p.startswith(".") for p in parts):
+        raise ASTError("Revision pair must be A..B with two explicit local revisions")
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repo):
+        raise ASTError("Revision mode --repo must be the asserted GitHub owner/name")
+    revisions = []
+    for ref in parts:
+        sha = _local_git(git_dir, "rev-parse", "--verify", "--end-of-options",
+                         ref + "^{commit}").decode().strip()
+        if not SHA_RE.fullmatch(sha):
+            raise ASTError("Revision must resolve to a full 40-hex commit SHA")
+        revisions.append(sha)
+    before, after = revisions
+    if before == after:
+        raise ASTError("Revision pair endpoints must be distinct")
+    now = observed_at or datetime.now(timezone.utc).isoformat()
+    base_url = "https://github.com/" + repo
+    nodes, edges, evidence, files, errors = [], [], [], [], []
+    node_ids = set()
+
+    def add_node(node_id, kind, label, attrs):
+        if node_id not in node_ids:
+            nodes.append(dict(id=node_id, type=kind, label=label, attributes=attrs))
+            node_ids.add(node_id)
+
+    def add_evidence(eid, raw, url, scope):
+        evidence.append(dict(
+            id=eid, url=url, fetch_url=url, observed_at=now,
+            sha256=hashlib.sha256(raw).hexdigest(), hash_scope=scope,
+            source_license="upstream terms; not relicensed", extractor="mine-ast-revision-v1",
+            canonicalization="raw local Git object content bytes; URL is a caller-asserted pointer",
+        ))
+
+    def add_edge(source, target, relation, eids, status="observed"):
+        identity = json.dumps([repo, source, target, relation], ensure_ascii=True)
+        edges.append(dict(id="edge:" + hashlib.sha256(identity.encode()).hexdigest(),
+                          source=source, target=target, relation=relation,
+                          status=status, evidence_ids=eids, known_at=now))
+
+    trees = {}
+    commit_evidence = {}
+    for revision in revisions:
+        raw = _local_git(git_dir, "cat-file", "commit", revision)
+        eid = "e-commit:" + revision
+        add_evidence(eid, raw, base_url + "/commit/" + revision, "Git commit object content")
+        commit_evidence[revision] = eid
+        add_node("commit:" + revision, "commit", revision, dict(sha=revision, repo=repo))
+        if revision == after:
+            # Header only: a commit message may contain fake parent lines.
+            parents = [line[7:].decode("ascii") for line in raw.split(b"\n\n", 1)[0].splitlines()
+                       if line.startswith(b"parent ")]
+            for parent in parents:
+                add_node("commit:" + parent, "commit", parent, dict(sha=parent, repo=repo))
+                add_edge("commit:" + parent, "commit:" + after, "parent_of", [eid])
+        tree = {}
+        for entry in _local_git(git_dir, "ls-tree", "-r", "-z", revision).split(b"\0"):
+            if not entry:
+                continue
+            header, path_bytes = entry.split(b"\t", 1)
+            mode, kind, blob = header.decode("ascii").split()
+            path = path_bytes.decode("utf-8", errors="surrogateescape")
+            if path.endswith((".c", ".h")):
+                tree[path] = (mode, kind, blob)
+        trees[revision] = tree
+
+    selected = sorted(set(paths) if paths is not None else
+                      set(trees[before]) | set(trees[after]))
+    matches = {"before": {}, "after": {}}
+    for path in selected:
+        if not any(path in trees[rev] for rev in revisions):
+            errors.append(f"Missing C/H input in both revision trees: {path}")
+        for role, revision in zip(("before", "after"), revisions):
+            if path not in trees[revision]:
+                files.append(dict(file=path, commit=revision, role=role, status="ABSENT",
+                                  units=[], unit_count=0, skipped=[], parser_skipped_count=0))
+                continue
+            mode, kind, blob = trees[revision][path]
+            record = dict(file=path, commit=revision, role=role, blob=blob, units=[],
+                          unit_count=0, skipped=[], parser_skipped_count=0, status="INCOMPLETE")
+            files.append(record)
+            try:
+                if kind != "blob" or mode not in ("100644", "100755"):
+                    raise ASTError(f"Unsupported Git entry mode {mode}")
+                raw = _local_git(git_dir, "cat-file", "blob", blob)
+                source = raw.decode("utf-8")
+                if backend == "stdlib":
+                    units, skipped = extract_units_stdlib(source, path, return_skipped=True)
+                elif backend == "tree-sitter":
+                    units, skipped = extract_units_treesitter(source, path), []
+                else:
+                    raise ASTError(f"Unknown backend: {backend}")
+                eid = "e-blob:" + revision + ":" + quote(path, safe="/")
+                add_evidence(eid, raw, base_url + "/blob/" + revision + "/" + quote(path),
+                             "source file bytes")
+                record.update(units=units, unit_count=len(units), skipped=skipped,
+                              parser_skipped_count=len(skipped),
+                              status="PARSER_SKIPPED" if skipped else "COMPLETE")
+                for unit in units:
+                    identity = [repo, revision, path, unit["symbol"], unit["start_line"],
+                                unit["end_line"], unit["body_sha256"]]
+                    uid = "code:" + hashlib.sha256(json.dumps(identity).encode()).hexdigest()
+                    attrs = dict(unit, repo=repo, revision=revision, role=role, path=path,
+                                 git_blob=blob, content_sha256=hashlib.sha256(raw).hexdigest(),
+                                 ast_indexed=True, evidence_ids=[eid], validation_state="observed")
+                    add_node(uid, "code_version", f"{role} {path} {unit['symbol']}", attrs)
+                    add_edge("commit:" + after, uid, role, [eid, commit_evidence[revision]])
+                    matches[role].setdefault((path, unit["symbol"]), []).append((uid, eid))
+            except (ASTError, UnicodeError) as exc:
+                record["error"] = str(exc)
+                errors.append(f"{revision}:{path}: {exc}")
+
+    for key in sorted(matches["before"].keys() & matches["after"].keys()):
+        b, a = matches["before"][key], matches["after"][key]
+        if len(b) == len(a) == 1:
+            add_edge(b[0][0], a[0][0], "before", [b[0][1], a[0][1]], "hypothesis")
+    skipped_count = sum(f["parser_skipped_count"] for f in files)
+    if skipped_count:
+        errors.append(f"Parser skipped {skipped_count} function definition(s)")
+    return dict(
+        schema_version="0.1.0", id=f"ast-{before}-{after}", project=repo,
+        title=f"AST revision index {before}..{after}", status="observed",
+        nodes=nodes, edges=edges, evidence=evidence, claims=[],
+        evolution=dict(outcome="UNKNOWN", horizon_end=None, coverage="NOT_SCANNED", followups=[]),
+        validation=dict(method="Local Git objects and heuristic C parser; lineage by path/symbol",
+                        security_effectiveness="UNKNOWN"),
+        license=dict(original_annotations="MIT", code_redistributed=False),
+        revision_pair=dict(before=before, after=after),
+        scope=dict(paths=selected, extensions=[".c", ".h"], history_scanned=False),
+        coverage="INCOMPLETE" if errors else "COMPLETE_REQUESTED_INPUTS",
+        extraction_status="PARSER_SKIPPED" if skipped_count else "INCOMPLETE" if errors else "COMPLETE",
+        count=sum(f["unit_count"] for f in files), parser_skipped_count=skipped_count,
+        errors=errors, files=files,
+    )
+
+
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description="Extract C function units (offline).")
-    p.add_argument("--input", action="append", required=True, help="Local C file")
+    p.add_argument("--input", action="append", help="Local C file, or exact C/H tree path in revision mode")
     p.add_argument("--repo", required=True, help="Source repo, e.g. torvalds/linux")
-    p.add_argument("--commit", required=True, help="Full 40-hex SHA the blob belongs to")
+    mode = p.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--commit", help="Full 40-hex SHA the blob belongs to")
+    mode.add_argument("--revision-pair", help="Two local Git revisions A..B (endpoint trees)")
+    p.add_argument("--git-dir", default=".", help="Local working tree or bare repository")
     p.add_argument("--blob", default=None, help="Optional blob SHA for the file")
     p.add_argument("--backend", default="stdlib", choices=["stdlib", "tree-sitter"])
     p.add_argument("--output", required=True, help="Output JSON file")
     args = p.parse_args(argv)
-    if not SHA_RE.match(args.commit):
+    if args.commit and not SHA_RE.match(args.commit):
         p.error("Commit must be a full 40-hex SHA")
+    if args.commit and not args.input:
+        p.error("--commit requires --input")
+    if args.revision_pair and args.blob:
+        p.error("--blob is not used with --revision-pair; blobs come from Git")
     return args
 
 
 def main(argv=None):
     args = parse_args(argv)
+    if args.revision_pair:
+        try:
+            payload = mine_revision_pair(args.git_dir, args.repo, args.revision_pair,
+                                         args.input, args.backend)
+        except (ASTError, OSError) as exc:
+            payload = dict(coverage="INCOMPLETE", extraction_status="INCOMPLETE",
+                           count=0, errors=[str(exc)], nodes=[], edges=[], files=[])
+        with open(args.output, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+        print(f"AST revision mining: {payload['count']} units; {payload['coverage']}")
+        if payload["errors"]:
+            sys.exit(1)
+        return
     records = []
     errors = []
     for path in args.input:
