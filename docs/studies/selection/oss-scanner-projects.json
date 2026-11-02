@@ -10,7 +10,8 @@
       "ksm_catalogs": [],
       "name": "anti-xss",
       "osv_git_supported": false,
-      "repo": "https://github.com/voku/anti-xss"
+      "repo": "https://github.com/voku/anti-xss",
+      "notes": "NO_OSV_GIT_FEED: no repo-scoped OSV GIT data in the recorded selection snapshot; skipped without creating a catalog. This does not establish absence of vulnerabilities."
     },
     {
       "branch": "master",
@@ -46,7 +47,8 @@
       "ksm_catalogs": [],
       "name": "homebrew",
       "osv_git_supported": false,
-      "repo": "https://github.com/Homebrew/brew"
+      "repo": "https://github.com/Homebrew/brew",
+      "notes": "NO_OSV_GIT_FEED: no repo-scoped OSV GIT data in the recorded selection snapshot; skipped without creating a catalog. This does not establish absence of vulnerabilities."
     },
     {
       "branch": "master",
@@ -91,7 +93,8 @@
       "ksm_catalogs": [],
       "name": "napi-rs",
       "osv_git_supported": false,
-      "repo": "https://github.com/napi-rs/napi-rs"
+      "repo": "https://github.com/napi-rs/napi-rs",
+      "notes": "NO_OSV_GIT_FEED: no repo-scoped OSV GIT data in the recorded selection snapshot; skipped without creating a catalog. This does not establish absence of vulnerabilities."
     },
     {
       "branch": "main",
@@ -118,7 +121,8 @@
       "ksm_catalogs": [],
       "name": "nss",
       "osv_git_supported": false,
-      "repo": "https://github.com/mozilla/nss"
+      "repo": "https://github.com/mozilla/nss",
+      "notes": "NO_OSV_GIT_FEED: no repo-scoped OSV GIT data in the recorded selection snapshot; skipped without creating a catalog. This does not establish absence of vulnerabilities."
     },
     {
       "branch": null,
@@ -184,7 +188,8 @@
       "ksm_catalogs": [],
       "name": "sccache",
       "osv_git_supported": false,
-      "repo": "https://github.com/mozilla/sccache"
+      "repo": "https://github.com/mozilla/sccache",
+      "notes": "NO_OSV_GIT_FEED: no repo-scoped OSV GIT data in the recorded selection snapshot; skipped without creating a catalog. This does not establish absence of vulnerabilities."
     },
     {
       "branch": "main",
@@ -211,7 +216,8 @@
       "ksm_catalogs": [],
       "name": "zmap",
       "osv_git_supported": false,
-      "repo": "https://github.com/zmap/zmap"
+      "repo": "https://github.com/zmap/zmap",
+      "notes": "NO_OSV_GIT_FEED: no repo-scoped OSV GIT data in the recorded selection snapshot; skipped without creating a catalog. This does not establish absence of vulnerabilities."
     }
   ],
   "source_commit": "2cef161ea2a5612eb42c29454735ea9c1e5ff744",

@@ -52,6 +52,7 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 from pathlib import Path
 
 SNAPSHOT_LIMIT_BYTES = 5 * 1024 * 1024
@@ -85,6 +86,7 @@ POSTGRES_REPO = "https://github.com/postgres/postgres"
 # count, refreshed only by --fetch-commit-parents. Located beside the catalogs.
 CVE_HISTORY_ROOT = Path(__file__).resolve().parents[2] / "docs" / "studies" / "cve-history"
 COMMIT_PARENTS_PATH = CVE_HISTORY_ROOT / "commit-parents.jsonl"
+SELECTION_PATH = CVE_HISTORY_ROOT.parent / "selection" / "oss-scanner-projects.json"
 COMMIT_PARENTS_ENV = "KSM_COMMIT_PARENTS"  # test override: a sidecar path to read/write
 
 
@@ -121,6 +123,38 @@ PROJECT_META = {
                  "package": POSTGRES_PACKAGE, "ecosystem": OSV_GIT_ECOSYSTEM},
 }
 
+
+def _is_osv(project):
+    return PROJECT_META[project].get("ecosystem") == OSV_GIT_ECOSYSTEM
+
+
+def selection_projects(path):
+    """Validate names/URLs before using manifest values as output paths or queries."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    projects = data.get("projects")
+    if not isinstance(projects, list):
+        raise FetchError(f"{path}: expected projects list")
+    seen = set()
+    for entry in projects:
+        if not isinstance(entry, dict):
+            raise FetchError(f"{path}: expected project object")
+        name, repo = entry.get("name"), entry.get("repo")
+        if not isinstance(name, str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name) or name in seen:
+            raise FetchError(f"{path}: invalid or duplicate project name {name!r}")
+        seen.add(name)
+        if not isinstance(repo, str) or urlsplit(repo).scheme != "https" or not urlsplit(repo).netloc:
+            raise FetchError(f"{name}: expected HTTPS repository URL")
+        if not isinstance(entry.get("osv_git_supported"), bool):
+            raise FetchError(f"{name}: expected boolean osv_git_supported")
+    return projects
+
+
+def _selection_meta(entry):
+    repo = entry["repo"].rstrip("/")
+    return {"name": entry["name"] + "-upstream", "repo": repo, "feed": OSV_API_URL,
+            "package": repo.removeprefix("https://").removesuffix(".git"),
+            "ecosystem": OSV_GIT_ECOSYSTEM}
+
 OPENSSL_ENTRY_RE = re.compile(r'href="(cve-\d{4}-\d+\.json)"')
 OPENSSL_CVE_RE = re.compile(r"^\d{4}-\d+$")
 # Fix commits published by OpenSSL for the main repository, in either URL form.
@@ -139,7 +173,11 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description="Build a complete advisory catalog (curl, openssl, or an OSV.dev GIT repo) from the source's own feed."
     )
-    parser.add_argument("--project", choices=("curl", "openssl", *OSV_PROJECTS))
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--project", help="Built-in project or a name in the selection manifest.")
+    selection.add_argument("--projects-file", type=Path, help="Selection manifest; fetch only OSV GIT supported repos.")
+    parser.add_argument("--skip-unsupported", action=argparse.BooleanOptionalAction, default=True,
+                        help="Skip NO_OSV_GIT_FEED projects (default: true; disable to fail explicitly).")
     parser.add_argument("--out-dir", help="Catalog directory (holds source.json).")
     parser.add_argument(
         "--offline",
@@ -515,11 +553,25 @@ def fetch_openssl_snapshot():
 def fetch_osv_snapshot(project):
     """Query OSV.dev for every GIT-ecosystem advisory scoped to the repo URL."""
     meta = PROJECT_META[project]
-    payload = _dump({"package": {"name": meta["package"], "ecosystem": meta["ecosystem"]}})
-    body = _http_post_json(OSV_API_URL, payload)
-    data = json.loads(body.decode("utf-8"))
-    records = data.get("vulns")
-    if not isinstance(records, list) or not records:
+    query = {"package": {"name": meta["package"], "ecosystem": meta["ecosystem"]}}
+    records = []
+    seen_tokens = set()
+    while True:
+        data = json.loads(_http_post_json(OSV_API_URL, _dump(query)).decode("utf-8"))
+        page = data.get("vulns", [])
+        if not isinstance(page, list):
+            raise FetchError(f"{project}: invalid OSV vulns list")
+        records.extend(page)
+        if len(_dump(records).encode("utf-8")) > SNAPSHOT_LIMIT_BYTES:
+            raise FetchError(f"{project}: paginated snapshot exceeds {SNAPSHOT_LIMIT_BYTES} bytes")
+        token = data.get("next_page_token")
+        if not token:
+            break
+        if not isinstance(token, str) or token in seen_tokens:
+            raise FetchError(f"{project}: invalid or repeated OSV page token")
+        seen_tokens.add(token)
+        query["page_token"] = token
+    if not records:
         raise FetchError(f"{OSV_API_URL}: no advisories for package {meta['package']}")
     # OSV returns records in an unspecified order; sort by id so the snapshot
     # (and therefore the committed catalog) is deterministic.
@@ -550,6 +602,12 @@ def load_snapshot_records(project, snapshot_bytes):
         if not isinstance(data, list) or not data:
             raise FetchError("curl snapshot: expected a non-empty JSON array of advisories")
         return data
+    if _is_osv(project):
+        meta = PROJECT_META[project]
+        if (not isinstance(data, dict) or data.get("schema") != SNAPSHOT_SCHEMA
+                or data.get("project") != project or data.get("package") != meta["package"]
+                or data.get("ecosystem") != meta["ecosystem"]):
+            raise FetchError(f"{project}: snapshot does not match the OSV GIT repository query")
     records = (data or {}).get("records")
     if not isinstance(records, list) or not records:
         raise FetchError(f"{project} snapshot: expected a non-empty records list")
@@ -639,6 +697,33 @@ def _gh_commit_parents(slug, sha):
         raise FetchError(f"gh api repos/{slug}/commits/{sha}: non-integer parents {result.stdout!r}") from exc
 
 
+def _parent_rows():
+    path = _commit_parents_path()
+    load_commit_parents(path)  # validate before preserving provenance rows
+    return {(_normalize_repo_url(r["repo"]), r["sha"]): r
+            for r in (json.loads(line) for line in path.read_text().splitlines() if line.strip())} if path.exists() else {}
+
+
+def refresh_project_parents(project, snapshot_bytes):
+    """Fetch missing parent observations; never guess or overwrite known facts."""
+    meta = PROJECT_META[project]
+    rows, _ = _osv_rows(load_snapshot_records(project, snapshot_bytes), meta)
+    collected = _parent_rows()
+    slug = _github_slug(meta["repo"])
+    for sha in sorted({sha for row in rows for sha in row["fix_shas"]}):
+        key = (_normalize_repo_url(meta["repo"]), sha)
+        if key in collected:
+            continue
+        if slug is None:
+            raise FetchError(f"{meta['repo']}: parent count requires an independently populated sidecar")
+        collected[key] = {"repo": meta["repo"], "sha": sha,
+                          "parents": _gh_commit_parents(slug, sha),
+                          "fetched_via": f"gh api repos/{slug}/commits/{sha}"}
+    target = _commit_parents_path()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    _write_if_changed(target, "".join(json.dumps(collected[k], sort_keys=True) + "\n" for k in sorted(collected)))
+
+
 def fetch_commit_parents():
     """Refresh commit-parents.jsonl from GitHub for every OSV fix-sha candidate.
 
@@ -647,7 +732,7 @@ def fetch_commit_parents():
     GitHub for each parent count. Existing rows for other repos are preserved.
     Returns the sorted list of rows written.
     """
-    collected = load_commit_parents()
+    collected = _parent_rows()
     for project in OSV_PROJECTS:
         meta = PROJECT_META[project]
         snapshot_path = CVE_HISTORY_ROOT / meta["name"] / "source.json"
@@ -678,10 +763,10 @@ def fetch_commit_parents():
 
 def build_catalog(project, snapshot_bytes, parents_index=None):
     records = load_snapshot_records(project, snapshot_bytes)
-    built = ROW_BUILDERS[project](records)
+    built = _osv_rows(records, PROJECT_META[project]) if _is_osv(project) else ROW_BUILDERS[project](records)
     rows, stats = built
     rows.sort(key=lambda row: row["advisory_id"])
-    if parents_index is not None and project in OSV_PROJECTS:
+    if parents_index is not None and _is_osv(project):
         # Fix shas are verified against the sidecar: only single-parent commits
         # stay in fix_shas, merges move to fixed_in_shas and are counted.
         rows, demoted = apply_commit_parent_policy(rows, PROJECT_META[project]["repo"], parents_index)
@@ -695,7 +780,7 @@ def build_catalog(project, snapshot_bytes, parents_index=None):
 
 
 def _build_index(project, snapshot_bytes, rows, stats):
-    if project in OSV_PROJECTS:
+    if _is_osv(project):
         return _build_osv_index(project, snapshot_bytes, rows, stats)
     meta = PROJECT_META[project]
     fetcher_note = (
@@ -749,7 +834,7 @@ def _build_index(project, snapshot_bytes, rows, stats):
 
 def _newest_timestamp(project, snapshot_bytes):
     records = load_snapshot_records(project, snapshot_bytes)
-    if project == "curl" or project in OSV_PROJECTS:
+    if project == "curl" or _is_osv(project):
         return max((r.get("modified") or "" for r in records), default="")
     return max(
         (((r.get("containers") or {}).get("cna") or {}).get("datePublic") or "" for r in records),
@@ -814,8 +899,56 @@ def _build_osv_index(project, snapshot_bytes, rows, stats):
 
 def main(argv=None):
     args = parse_args(argv)
+    if args.check and not args.offline:
+        print("Error: --check requires --offline", file=sys.stderr)
+        return 2
+    if args.projects_file or (args.project and args.project not in PROJECT_META):
+        try:
+            entries = selection_projects(args.projects_file or SELECTION_PATH)
+            if args.project:
+                entries = [p for p in entries if p["name"] == args.project]
+                if not entries:
+                    raise FetchError(f"unknown project: {args.project}")
+            if args.source and args.projects_file:
+                raise FetchError("--source is only supported with --project")
+            unsupported = [p for p in entries if not p["osv_git_supported"]]
+            for entry in unsupported:
+                print(f"SKIP {entry['name']}: NO_OSV_GIT_FEED")
+            if unsupported and not args.skip_unsupported:
+                raise FetchError("NO_OSV_GIT_FEED: unsupported projects selected (--no-skip-unsupported)")
+            failures = 0
+            completed = 0
+            for entry in entries:
+                if not entry["osv_git_supported"]:
+                    continue
+                name = entry["name"]
+                previous = PROJECT_META.get(name)
+                PROJECT_META[name] = _selection_meta(entry)
+                project_args = argparse.Namespace(**vars(args))
+                project_args.project = name
+                project_args.projects_file = None
+                project_args.out_dir = (str(Path(args.out_dir or CVE_HISTORY_ROOT) / (name + "-upstream"))
+                                        if args.projects_file else args.out_dir)
+                try:
+                    result = _run_project(project_args)
+                    failures += bool(result)
+                    completed += not result
+                finally:
+                    if previous is None:
+                        del PROJECT_META[name]
+                    else:
+                        PROJECT_META[name] = previous
+            print(f"Batch: {completed} completed, {len(unsupported)} NO_OSV_GIT_FEED, {failures} failed")
+            return 1 if failures else 0
+        except (FetchError, ValueError, OSError, TypeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+    return _run_project(args)
 
-    if args.fetch_commit_parents:
+
+def _run_project(args):
+
+    if args.fetch_commit_parents and not args.project:
         # Explicit network refresh of the sidecar; needs neither --project nor
         # --out-dir (it reads each project's snapshot under CVE_HISTORY_ROOT).
         try:
@@ -847,7 +980,7 @@ def main(argv=None):
         snapshot_bytes = snapshot_path.read_bytes()
     else:
         try:
-            snapshot_bytes = FETCHERS[args.project]()
+            snapshot_bytes = fetch_osv_snapshot(args.project) if _is_osv(args.project) else FETCHERS[args.project]()
         except (FetchError, ValueError) as exc:
             print(f"Error: {exc}", file=sys.stderr)
             return 1
@@ -856,11 +989,12 @@ def main(argv=None):
 
     # OSV projects verify every fix sha against the committed sidecar; the two
     # project-hosted feeds (curl, openssl) keep their own verified fix column.
-    parents_index = load_commit_parents() if args.project in OSV_PROJECTS else None
-
     try:
+        if args.fetch_commit_parents and _is_osv(args.project):
+            refresh_project_parents(args.project, snapshot_bytes)
+        parents_index = load_commit_parents() if _is_osv(args.project) else None
         catalog_text, index_text, rows = build_catalog(args.project, snapshot_bytes, parents_index)
-    except (ValueError, FetchError) as exc:
+    except (ValueError, FetchError, OSError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
@@ -868,7 +1002,7 @@ def main(argv=None):
     index_path = out_dir / "index.json"
 
     demoted_clause = ""
-    if args.project in OSV_PROJECTS:
+    if _is_osv(args.project):
         demoted = json.loads(index_text).get("merge_fix_refs_demoted", 0)
         demoted_clause = f", {demoted} merge fix ref(s) demoted"
 
