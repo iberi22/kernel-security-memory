@@ -2,17 +2,6 @@
 
 Date: 2026-11-02 UTC (re-scored: progress records reconciled with delivered code).
 
-## Evaluation update (2026-11-02)
-
-Exploratory qrels v2 expands the nine-item pilot to 30 items (22 FOUND,
-8 ABSTAIN; seven records across six projects), with author/source review
-metadata; independent review remains pending. On the 35-record SQL pack,
-`python3 scripts/measure_baseline.py --qrels experiments/qrels-v2.json`
-measures MRR 1.000, Recall@5 1.000, citation completeness 1.000 and negative
-abstention 5/8, with zero NOT_MEASURED items. Explicit identifiers and
-correlated seed paraphrases limit interpretation; this is not the full
-Phase-B benchmark. See `experiments/QRELS.md` and `experiments/BASELINE.md`.
-
 ## Measured state
 
 | Area | Value | Source of truth |
@@ -38,12 +27,6 @@ Evidence schema and deterministic JSON/SQL pack; read-only lexical+graph pack re
 
 No LLM is used anywhere in extraction or enrichment.
 
-Optional derived vector wiring: `build_pack.py --vectors` packages a validated
-index with model/revision/provider and integrity metadata; `PackReader` can
-explicitly load a local index and rank query vectors. Lexical-only operation
-remains available. This wiring uses offline fixtures in tests; no neural model
-has been downloaded or measured.
-
 ## Known limits
 
 - NVD keyword search is a weak source: slow (one request per 15 s without a key) and polluted. Per-project upstream feeds are the primary source from now on.
@@ -54,5 +37,5 @@ has been downloaded or measured.
 - Kernel test fixtures under `tests/fixtures/` are GPL-2.0-only excerpts carrying SPDX and provenance headers.
 - "Related CVEs" vectors are deterministic TF-IDF over metadata and fingerprint features, not neural embeddings. Until more CVEs carry fingerprints, most neighbours share only CWE and project.
 - Fingerprint matching finds missing patches within a project; across projects it raised no strong finding in 27,948 functions, so it neither produces noise nor, yet, finds the same bug in unrelated code. systemd and SQLite releases produced no strong finding (few fingerprinted fixes: 10 and 17).
-- Reversible Xavier HTTP mount/unmount: `scripts/xavier_mount.py` verifies packs, records import receipts, lists namespace IDs and verifies receipt-scoped deletion. Tested against an in-process HTTP mock; deployed Xavier compatibility and live deletion remain unverified. See `XAVIER-BRIDGE.md`.
-- Not implemented: neural embeddings, follow-up/revert tracking.
+- Local patch evolution miner: `scripts/mine_evolution.py` emits sourced follow-up candidates and explicit revert/backport edges from bounded local Git history. Coverage remains partial; it does not establish patch stability or scan external reviews/tests.
+- Not implemented: neural embeddings, whole-kernel evolution scans, native Xavier mount/unmount.
