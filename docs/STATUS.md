@@ -54,3 +54,8 @@ Single-fix, non-independent labels do not establish general retrieval quality.
 - Fingerprint matching finds missing patches within a project; across projects it raised no strong finding in 27,948 functions, so it neither produces noise nor, yet, finds the same bug in unrelated code. systemd and SQLite releases produced no strong finding (few fingerprinted fixes: 10 and 17).
 - Local patch evolution miner: `scripts/mine_evolution.py` emits sourced follow-up candidates and explicit revert/backport edges from bounded local Git history. Coverage remains partial; it does not establish patch stability or scan external reviews/tests.
 - Not implemented: neural embeddings, whole-kernel evolution scans, native Xavier mount/unmount.
+
+## Top-20 Projects Dataset
+- **Curated Dataset:** Developed `docs/studies/top20/` containing the top 20 open-source projects dataset, tracking declared CVEs, patched commits, and follow-up evolution.
+- **Components:** includes methodology (`README.md`), project metadata (`projects.json`), consolidated lessons (`lessons.md`), and agent skill files (`skills/`).
+- **Test suite validation:** added `tests/test_top20.py` to ensure schema constraints, project count, and citation standards are met.
