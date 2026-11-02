@@ -41,3 +41,8 @@ excluded from lexical recall scoring).
 - Labels declared by one author, no independent review => report any
   metric using these qrels as exploratory.
 - Graph probes q5/q6 use explicit SHAs; score lexical recall on q1–q4 only.
+
+Independent labeling, review metadata, agreement measurement and release
+adjudication follow [the review process](../docs/REVIEW-PROCESS.md). The v1
+artifact remains unchanged; `scripts/check_qrels_review.py` reports its missing
+review metadata and unavailable kappa rather than inventing review history.
