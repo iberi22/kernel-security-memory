@@ -253,7 +253,9 @@
             "REFINED",
             "REVERTED",
             "TEST_SUPPORTED",
-            "DISPUTED"
+            "DISPUTED",
+            "BACKPORTED",
+            "FIXED_STABLE"
           ]
         },
         "horizon_end": {
@@ -281,7 +283,9 @@
                   "test_result",
                   "revert",
                   "fix_followup",
-                  "dispute"
+                  "dispute",
+                  "backport",
+                  "path_followup"
                 ]
               },
               "node_id": {

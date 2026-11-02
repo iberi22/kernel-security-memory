@@ -37,4 +37,5 @@ No LLM is used anywhere in extraction or enrichment.
 - Kernel test fixtures under `tests/fixtures/` are GPL-2.0-only excerpts carrying SPDX and provenance headers.
 - "Related CVEs" vectors are deterministic TF-IDF over metadata and fingerprint features, not neural embeddings. Until more CVEs carry fingerprints, most neighbours share only CWE and project.
 - Fingerprint matching finds missing patches within a project; across projects it raised no strong finding in 27,948 functions, so it neither produces noise nor, yet, finds the same bug in unrelated code. systemd and SQLite releases produced no strong finding (few fingerprinted fixes: 10 and 17).
-- Not implemented: neural embeddings, follow-up/revert tracking, native Xavier mount/unmount.
+- Local patch evolution miner: `scripts/mine_evolution.py` emits sourced follow-up candidates and explicit revert/backport edges from bounded local Git history. Coverage remains partial; it does not establish patch stability or scan external reviews/tests.
+- Not implemented: neural embeddings, whole-kernel evolution scans, native Xavier mount/unmount.

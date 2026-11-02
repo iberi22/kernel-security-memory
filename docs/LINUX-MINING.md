@@ -31,7 +31,7 @@ Use the fix's selected parent and fix tree, not a range from an arbitrary releas
 
 Persist paths, blob IDs/content SHA-256, revision and byte/line spans. A line diff is evidence of change, not a complete causal pattern. No kernel code verbatim is redistributed by the seed pack.
 
-## Did the fix mature or fail?
+## REQ-005: Did the fix mature or fail?
 
 Track later commits until a declared horizon: explicit reverts, commits whose `Fixes:` targets this patch, related upstream/backports, changes to the same function, review discussions and available regression/test reports. Search commit linkage AND symbol/path evolution; store coverage so missed history remains visible.
 
@@ -40,6 +40,51 @@ Track later commits until a declared horizon: explicit reverts, commits whose `F
 - Test observation: record actual command, revision, config/environment and outcome; a passing regression test supports that case, not general security.
 - Same-file edit or later release inclusion: context/evolution, not evidence of effectiveness.
 - No follow-up located: UNKNOWN, potentially right-censored; never “mature” merely because enough days passed.
+
+The stdlib-only local miner is `scripts/mine_evolution.py`. It emits a JSON array
+of complete records accepted by `build_pack.validate`, with commit-object SHA-256
+hashes, commit SHAs and changed-file pointers. It stores no upstream source or
+commit prose and never fetches objects, invokes a shell or executes source data.
+Use an existing repository; do not clone Linux for this command:
+
+```sh
+python3 scripts/mine_evolution.py /path/to/local/repo FULL_FIX_SHA \
+  --repository-url https://example.org/project/repo --project linux \
+  --ref refs/heads/main --ref refs/heads/stable --until 2026-10-31 \
+  --observed-at 2026-11-02T00:00:00Z > evolution.json
+```
+
+The HTTPS URL is a provenance/discovery pointer and is never contacted. Hashes
+cover the raw local Git commit payload, not bytes downloaded from that URL.
+The scan pins the requested local ref tips (default `HEAD`) and runs
+`git log --follow` for each fix path. Its inclusive window starts at the fix's
+committer time and ends at `--until` (default latest tip date). Ancestors of the
+fix are excluded; explicitly scoped sibling branches can supply backports.
+`horizon_end` records the last observed relevant commit date, including the fix,
+and may precede the requested cutoff. Capture time remains separate from commit
+time, so consumers must enforce both for temporal evaluation.
+
+Same-file edits become `path_followup` observations and hypothesis `changes`
+edges. Messages containing Revert or Backport/cherry-pick signals are retained
+as candidates. A `reverts` or `backport_of` observed edge requires an explicit
+`This reverts commit <SHA>`, `Backport [of] [commit] <SHA>`, or
+`(cherry picked from commit <SHA>)` reference resolving unambiguously to the fix,
+as well as a shared changed file. Source statements establish `REVERTED` or
+`BACKPORTED`, not empirical security effectiveness. A revert takes precedence
+when both occur in scope; inspect the individual observations by branch rather
+than interpreting that summary as global patch state. Other outcomes stay
+`UNKNOWN`. `FIXED_STABLE` is reserved for separately supplied positive validation
+and is never inferred by this miner; schema validation requires at least sourced
+passing-test support for that outcome.
+
+Coverage is `PARTIAL` for the path heuristic, or `UNKNOWN` for a fix without
+changed paths. Shallow/partial-clone state, pinned tips, observation window,
+path-log commands and scan errors are recorded in `validation`. Missing local
+objects fail locally; failed path logs remain explicit errors. `COMPLETE_AT_HORIZON`
+is deliberately not emitted: `--follow` may miss forward renames, merge history,
+symbol changes and external reviews/tests. A quiet window never proves stability.
+Offline synthetic Git fixtures cover these distinctions without a kernel checkout
+or network access (`tests/test_mine_evolution.py`).
 
 The causal lesson can span several commits. Version patterns and preserve superseded explanations. For time-split evaluation exclude every fact captured after the query cutoff.
 

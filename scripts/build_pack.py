@@ -95,26 +95,29 @@ def validate(record):
     if not text(evolution['coverage']) or (evolution['horizon_end'] is not None and not text(evolution['horizon_end'])) or not isinstance(evolution['followups'], list):
         raise ValueError('Invalid evolution coverage/horizon/observations')
     outcome = evolution['outcome']
-    if outcome not in {'UNKNOWN', 'REFINED', 'REVERTED', 'TEST_SUPPORTED', 'DISPUTED'}:
+    if outcome not in {'UNKNOWN', 'REFINED', 'REVERTED', 'BACKPORTED', 'FIXED_STABLE', 'TEST_SUPPORTED', 'DISPUTED'}:
         raise ValueError('Invalid evolution outcome')
     kinds = set()
     for obs in evolution['followups']:
         fields(obs, ['kind', 'node_id', 'evidence_ids'], 'follow-up observation')
-        if obs['kind'] not in {'test_result', 'revert', 'fix_followup', 'dispute'} or not text(obs['node_id']) or obs['node_id'] not in nodes or not references(obs['evidence_ids'], evidence_ids):
+        if obs['kind'] not in {'test_result', 'revert', 'backport', 'path_followup', 'fix_followup', 'dispute'} or not text(obs['node_id']) or obs['node_id'] not in nodes or not references(obs['evidence_ids'], evidence_ids):
             raise ValueError('Unsubstantiated follow-up observation')
         node = nodes[obs['node_id']]
         if obs['kind'] == 'test_result':
             attrs = node['attributes']
             if node['type'] != 'test_observation' or attrs.get('outcome') != 'PASS' or not all(text(attrs.get(k)) for k in ['command', 'revision', 'environment']):
                 raise ValueError('Test support needs a sourced passing test observation')
-        elif obs['kind'] in {'revert', 'fix_followup'}:
-            relations = {'reverts'} if obs['kind'] == 'revert' else {'fixes', 'supersedes'}
+        elif obs['kind'] == 'path_followup':
+            if node['type'] != 'commit' or not any(e['source'] == obs['node_id'] and e['relation'] == 'changes' and set(e['evidence_ids']) & set(obs['evidence_ids']) for e in record['edges']):
+                raise ValueError('Path follow-up needs a source-supported change edge')
+        elif obs['kind'] in {'revert', 'backport', 'fix_followup'}:
+            relations = {'revert': {'reverts'}, 'backport': {'backport_of'}, 'fix_followup': {'fixes', 'supersedes'}}[obs['kind']]
             if node['type'] != 'commit' or not any(e['source'] == obs['node_id'] and e['relation'] in relations and e['status'] in {'observed', 'validated'} and set(e['evidence_ids']) & set(obs['evidence_ids']) for e in record['edges']):
                 raise ValueError('Patch evolution needs a source-supported typed edge')
         elif node['type'] != 'review_observation':
             raise ValueError('Dispute needs a review observation')
         kinds.add(obs['kind'])
-    needs = {'TEST_SUPPORTED': 'test_result', 'REVERTED': 'revert', 'REFINED': 'fix_followup', 'DISPUTED': 'dispute'}
+    needs = {'FIXED_STABLE': 'test_result', 'BACKPORTED': 'backport', 'TEST_SUPPORTED': 'test_result', 'REVERTED': 'revert', 'REFINED': 'fix_followup', 'DISPUTED': 'dispute'}
     if outcome in needs and needs[outcome] not in kinds:
         raise ValueError('Evolution conclusion requires the corresponding observation')
     if not isinstance(record['validation'], dict) or not isinstance(record['license'], dict):
