@@ -3,11 +3,11 @@
 | Stage | Deliverable | Current state (2026-10-11) |
 |---|---|---|
 | 0 | Public docs, evidence contract, JSON/SQL packaging | Done |
-| 1 | Remote seven-method sensitivity + retrieval smoke | Dispatched to Jules; no measured ranking yet |
+| 1 | Remote seven-method sensitivity + retrieval smoke | Simulation run (swal-sim SECURITY-RAG-decision.md, winner flips by scenario); measured retrieval NOT_RUN; qrels-v1 pilot (recall 6/6, abstention 2/3) |
 | 2 | Official CNA ingestion and scoped history miners | Done for the Linux kernel CNA, curl and OpenSSL feeds and OSV repo-scoped git, systemd, sqlite, postgres; deterministic CWE overlay (NVD + CISA); NVD keyword catalogs paused (weak source) |
-| 3 | C AST before/after units and temporal patch graph | Partial: before/after function features for the 35 pack records (hashes and ranges, no code); typed SQLite graph |
+| 3 | C AST before/after units and temporal patch graph | Partial: offline C AST miner delivered (mine_ast.py); before/after features for 35 pack records (hashes/ranges, no code); typed SQLite graph |
 | 4 | Curated causal lessons + independent label review | Partial: 35 pack records, lessons kept as hypotheses; no independent label review yet |
-| 5 | Hybrid retrieval and revocable Xavier adapter | Partial: dry-run publisher, quality gate that rejects stale evidence, injectable guardrails for 6 CWE families; deterministic related-CVE vectors (`vectors.jsonl`); vulnerability atlas UI and `ksm` CLI; structural matcher over fix fingerprints |
+| 5 | Hybrid retrieval and revocable Xavier adapter | Partial: HTTP publish/disconnect (pack_to_xavier.py) delivered; dry-run publisher, quality gate, guardrails (6 CWE), related-CVE TF-IDF, atlas UI, ksm CLI, fingerprint matcher delivered; native Xavier mount/unmount pending |
 | 6 | Larger time/family-separated evaluation, refresh pipeline | Partial: weekly refresh workflow proposes PRs; no evaluation yet |
 | Later | Additional open-source projects with selection manifest | 19 catalogs; selection manifest of the 23 OSS Scanner projects (`docs/studies/selection/`) |
 

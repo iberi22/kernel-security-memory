@@ -63,7 +63,7 @@ GitHub serves immutable JSON by repository revision. Start with `docs/memory/man
 A generated `docs/memory/kernel-security-memory.sql` reconstructs an independent SQLite evidence graph with FTS5. A consumer can open the generated SQLite file read-only and close it after the audit. Runtime database files are not committed. Xavier can consume JSON over HTTP; a reversible native Xavier mount is a planned adapter, not an existing integration promised by this repository.
 
 ```sh
-python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -v   # 864 tests, 3 skipped
 python3 scripts/build_pack.py --check
 python3 scripts/query_pack.py --query 'interval garbage collection' --limit 5
 ```

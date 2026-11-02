@@ -27,4 +27,4 @@ The immutable corpus is the authority for what was recorded, not a guarantee eve
 
 ## Bootstrap implementation
 
-The first scripts package and validate a source-linked record, build SQLite FTS/graph SQL and query it read-only. There is no whole-kernel miner, AST index, vector model, native Xavier mount or autonomous detector yet. These are explicit roadmap items.
+The first scripts package and validate a source-linked record, build SQLite FTS/graph SQL and query it read-only. Delivered since bootstrap: scoped CNA/upstream miners (20 catalogs), offline C AST miner, defensive auditor, fingerprint matcher, HTTP pack->Xavier adapter, related-CVE TF-IDF. Still pending: whole-kernel miner, full AST index by revision, vector model, native Xavier mount/unmount, autonomous detector. These are explicit roadmap items.

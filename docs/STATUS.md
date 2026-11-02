@@ -1,13 +1,13 @@
 # Status
 
-Date: 2026-10-11 UTC (atlas, agent use, first fingerprint batch).
+Date: 2026-11-02 UTC (re-scored: progress records reconciled with delivered code).
 
 ## Measured state
 
 | Area | Value | Source of truth |
 |---|---|---|
 | Evidence pack records | 35 (1 Linux seed + 34 vetted Fable records: git 8, nginx 2, openssh 8, sqlite 8, systemd 8) | `python3 scripts/build_pack.py --check` |
-| CVE catalogs | 19 catalogs, 18,489 rows, 17,734 with a 40-hex fix SHA | `docs/studies/cve-history/manifest.json` |
+| CVE catalogs | 20 catalogs, 20,513 rows, 17,734 with a 40-hex fix SHA | `docs/studies/cve-history/manifest.json` |
 | Upstream snapshot catalogs | `linux-cna` 17,337 rows (all with fix SHA, kernel CNA `vulns.git`); `curl-upstream` 215 (189 SHA); `openssl-upstream` 297 (169 SHA); OSV repo-scoped `git-upstream` 25 (10), `systemd-upstream` 60 (10), `sqlite-upstream` 62 (17), `postgres-upstream` 2 (2). For OSV rows `fix_shas` come only from FIX references; GIT `fixed` boundaries (often release stamps or merges) are kept separately as `fixed_in_shas`; FIX references that are merge commits (4 in systemd, checked against the committed `commit-parents.jsonl`) are demoted to `fixed_in_shas` | `fetch_kernel_cna_shas.py`, `fetch_upstream_advisories.py` |
 | NVD keyword catalogs | 12, all `CURSOR_PAUSED` between 2000 and 2012; most rows of the 7 newer ones are unrelated products | `fetch_history_*.py` |
 | CWE coverage | 9,617 of 18,424 clustered CVEs (52.2%) are `UNKNOWN` (was 97.6%): 468 CWEs stated by catalogs, 8,339 from the deterministic overlay (NVD 2.0 primary 7,920, CISA vulnrichment ADP 376, NVD secondary 43). The remainder are NVD/CISA `noinfo` or pre-2002 ids. 65 ids present in two catalogs are counted once | `docs/studies/cwe-overlay.jsonl`, `docs/studies/pattern_clusters.json` |
@@ -19,7 +19,7 @@ Date: 2026-10-11 UTC (atlas, agent use, first fingerprint batch).
 | Agent use | CLI (`ksm update/setup/doctor/deps/audit/scan/search/show/related`, all with `--json`), MCP server (`ksm mcp`, 7 tools), public skill `skills/ksm/SKILL.md`; no Xavier needed at run time. Acceptance on edge-hive by an agent given only the skill: completed install, readiness and all three checks unaided | `docs/design/AGENT-USE.md` |
 | RustSec | 2,024 advisories (OSV crates.io export, GHSA twins folded), 727 link a commit; 726 fingerprinted (`fix_evidence: advisory-commit-link`, not verified fixes) | `docs/studies/cve-history/rustsec/` |
 | Public use | Pages deployed by `pages.yml` (site, data, `bundle.tar.gz`, legacy `/memory` and `/schemas`); release `code-graph-229aa969` (Linux x86_64 binary + sha256). Fresh public install (`uv tool install git+...`, `ksm update`, `ksm setup`, `ksm doctor`) ready with no local files. Scans 2026-10-11: edge-hive 149 dependency advisories in 66 packages, 3 audit findings, 0 strong scan findings; xavier 24 advisories in 23 packages, 14 audit findings, 0 strong | release `code-graph-229aa969` |
-| Tests | 863 run, 4 skipped (live-network smoke test; upstream-validator tests need `OSS_SCANNER_CLONE`) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| Tests | 864 run, 3 skipped (live-network smoke tests) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 

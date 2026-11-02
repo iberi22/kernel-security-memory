@@ -1,0 +1,7 @@
+{
+  "schema": "gitcore-implementation-score-v1",
+  "project": "kernel-security-memory",
+  "real_pct": null,
+  "status": "partial",
+  "notes": "Re-scored 2026-11-02. Tracked-feature declared avg 30% (3 stable: pack, reader, research; 7 planned). Delivered beyond bootstrap: miners (20 catalogs, 20,513 rows, 17,734 fix SHA), CWE overlay (52.2%), 35 pack records/90 files/97 functions, typed SQLite graph, defensive auditor (6 CWE families), OSS Scanner (23 projects), Vulnerability Atlas + ksm CLI, fingerprints (1,423 commits), MCP (7 tools), portable reader, AST miner, candidate miner, pack->Xavier adapter, related-CVE TF-IDF, qrels-v1 baseline (recall 6/6, abstention 2/3). Still open: ADR-001 PROPOSED (7-method sim + measured retrieval NOT_RUN), neural embeddings, follow-up/revert tracking, native Xavier mount/unmount, independent label review, OSV catalogs for 17 OSS projects, no empirical cross-project matcher proof. Tests 864 pass / 3 skip. A single percentage is intentionally not asserted."
+}
