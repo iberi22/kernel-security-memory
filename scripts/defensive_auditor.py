@@ -171,6 +171,67 @@ SECURITY_RULES = [
     },
 ]
 
+# These are review hypotheses, not proofs of a reachable memory violation.
+# Keep the limits in the generated guardrails alongside the executable triggers.
+SECURITY_RULES.extend([
+    {
+        "id": "SEC-CWE-125-UNCHECKED-READ-RUST",
+        "cwe_id": "CWE-125",
+        "title": "Unchecked Slice Read (Rust)",
+        "severity": "MEDIUM", "language": "Rust", "languages": ["rust"],
+        "pattern": r"\.\s*get_unchecked\s*\(",
+        "requires_unsafe": True, "code_only": True,
+        "explanation": "Unchecked slice access requires a caller-proven in-bounds index or range.",
+        "lesson": "Prefer get(); otherwise establish that every index or range is within the live slice before access.",
+        "applicability_limits": "Review hypothesis only: external bounds checks may justify this access. No range, alias, macro or interprocedural analysis; raw-pointer reads are outside this trigger.",
+    },
+    {
+        "id": "SEC-CWE-787-UNCHECKED-WRITE-RUST",
+        "cwe_id": "CWE-787",
+        "title": "Unchecked Mutable Slice Access (Rust)",
+        "severity": "MEDIUM", "language": "Rust", "languages": ["rust"],
+        "pattern": r"\.\s*get_unchecked_mut\s*\(",
+        "requires_unsafe": True, "code_only": True,
+        "explanation": "Unchecked mutable slice access can create an out-of-bounds reference and permit invalid writes.",
+        "lesson": "Prefer get_mut(); otherwise prove bounds and exclusive access before creating the mutable reference.",
+        "applicability_limits": "Review hypothesis only: creating the reference does not prove a write or exploit. Caller checks may establish bounds; raw writes and macro expansions are outside this trigger.",
+    },
+    {
+        "id": "SEC-CWE-415-DOUBLE-FREE-C",
+        "cwe_id": "CWE-415",
+        "title": "Consecutive Duplicate Free (C/C++)",
+        "severity": "HIGH", "language": "C", "languages": ["c", "cpp"],
+        "pattern": r"\bfree\s*\(\s*([A-Za-z_]\w*)\s*\)\s*;\s*free\s*\(\s*\1\s*\)",
+        "code_only": True,
+        "explanation": "The same pointer is passed to free twice without an intervening assignment.",
+        "lesson": "Release each allocation once and invalidate every owning alias; free(NULL) is allowed.",
+        "applicability_limits": "Review hypothesis only: a pointer already equal to NULL is harmless. Only consecutive calls with the same identifier are covered; aliases and cross-function lifetime paths are not tracked.",
+    },
+    {
+        "id": "SEC-CWE-415-DUPLICATE-OWNERSHIP-RUST",
+        "cwe_id": "CWE-415",
+        "title": "Repeated Box Ownership from Raw Pointer (Rust)",
+        "severity": "HIGH", "language": "Rust", "languages": ["rust"],
+        "pattern": r"\bdrop\s*\(\s*Box::from_raw\s*\(\s*([A-Za-z_]\w*)\s*\)\s*\)\s*;\s*drop\s*\(\s*Box::from_raw\s*\(\s*\1\s*\)",
+        "requires_unsafe": True, "code_only": True,
+        "explanation": "Repeated reconstruction and drop of a Box from the same raw pointer violates unique ownership.",
+        "lesson": "Transfer a raw allocation into Box ownership once; invalidate the raw owner after that transfer.",
+        "applicability_limits": "Review hypothesis only: assumes standard Box and drop names. Only adjacent drop(Box::from_raw(p)) calls are covered; aliases, custom allocators and other ownership paths are not tracked.",
+    },
+    {
+        "id": "SEC-CWE-457-UNINITIALIZED-RUST",
+        "cwe_id": "CWE-457",
+        "title": "Immediate Assumption of Uninitialized Value (Rust)",
+        "severity": "HIGH", "language": "Rust", "languages": ["rust"],
+        "pattern": r"\b(?:MaybeUninit\s*(?:::\s*<[^;{}]+>)?::uninit\s*\(\s*\)\s*\.\s*assume_init\s*\(|(?:std::|core::)?mem::uninitialized\s*(?:::\s*<[^;{}]+>)?\s*\()",
+        "requires_unsafe": True, "code_only": True,
+        "explanation": "An uninitialized value is immediately treated as initialized without a write.",
+        "lesson": "Write a valid value into MaybeUninit before assume_init, or construct an initialized value directly.",
+        "applicability_limits": "Review hypothesis only: validity depends on the type; some zero-sized or MaybeUninit types admit uninitialized storage. No type inference or tracking of separately initialized variables is performed.",
+    },
+])
+
+
 
 def _detect_language(filename):
     """Infer source language from filename extension."""
@@ -235,7 +296,7 @@ def _char_len(content, i):
     return len(m.group(0)) if m else None
 
 
-_UNSAFE_OPEN = re.compile(r"\bunsafe\b(?:\s+(?:extern\s+\"[^\"]*\"\s+)?fn\b[^{;]*)?\s*\{")
+_UNSAFE_OPEN = re.compile(r"\bunsafe\b(?:\s+(?:extern\s+(?:\"[^\"]*\"\s+)?)?fn\b[^{;]*)?\s*\{")
 
 
 def _unsafe_spans(content):
@@ -289,20 +350,72 @@ def _in_spans(pos, spans):
     return any(start <= pos <= end for start, end in spans)
 
 
+def _code_mask(content):
+    """Blank comments and literals, preserving offsets/newlines for code-only rules.
+
+    Handles nested Rust block comments, raw strings and character literals; Rust
+    lifetimes remain intact. This is lexical filtering, not a language parser.
+    """
+    masked = list(content)
+    i, n = 0, len(content)
+    while i < n:
+        start = i
+        if content.startswith("//", i):
+            end = content.find("\n", i)
+            i = n if end == -1 else end
+        elif content.startswith("/*", i):
+            depth = 1
+            i += 2
+            while i < n and depth:
+                if content.startswith("/*", i):
+                    depth += 1
+                    i += 2
+                elif content.startswith("*/", i):
+                    depth -= 1
+                    i += 2
+                else:
+                    i += 1
+        elif content[i] == "r" and _raw_open(content, i) is not None:
+            hashes = _raw_open(content, i)
+            closer = '"' + '#' * hashes
+            end = content.find(closer, i + hashes + 2)
+            i = n if end == -1 else end + len(closer)
+        elif content[i] == '"':
+            i += 1
+            while i < n and content[i] != '"':
+                i += 2 if content[i] == "\\" else 1
+            i = min(i + 1, n)
+        elif content[i] == "'" and _char_len(content, i) is not None:
+            i += _char_len(content, i)
+        else:
+            i += 1
+            continue
+        for j in range(start, min(i, n)):
+            if content[j] != "\n":
+                masked[j] = " "
+    return "".join(masked)
+
+
 def scan_content(content, filename="<buffer>", cluster_map=None):
     """Scan text content for defensive security violations."""
     findings = []
     lines = content.splitlines()
     file_lang = _detect_language(filename)
 
+    code_mask = None
     for rule in SECURITY_RULES:
         rule_langs = rule.get("languages", [])
         if file_lang and rule_langs and file_lang not in rule_langs:
             continue
 
         regex = re.compile(rule["pattern"], re.MULTILINE)
-        unsafe_spans = _unsafe_spans(content) if rule.get("requires_unsafe") else None
-        for match in regex.finditer(content):
+        scan_text = content
+        if rule.get("code_only"):
+            if code_mask is None:
+                code_mask = _code_mask(content)
+            scan_text = code_mask
+        unsafe_spans = _unsafe_spans(scan_text) if rule.get("requires_unsafe") else None
+        for match in regex.finditer(scan_text):
             if unsafe_spans is not None and not _in_spans(match.start(), unsafe_spans):
                 continue
             literal_groups = rule.get("skip_literal_operands")

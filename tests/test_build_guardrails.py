@@ -7,6 +7,7 @@ generator against the real repository data.
 """
 
 import json
+import hashlib
 import subprocess
 import sys
 import tempfile
@@ -42,6 +43,38 @@ class TestBuildGuardrails(TestCase):
             self.assertTrue(family["rules"], family["cwe_id"])
             for citation in family["citations"]:
                 self.assertRegex(citation["fix_commit_sha"], HEX40)
+
+    def test_ten_families_include_four_new_memory_families(self):
+        covered = {f["cwe_id"] for f in GUARDRAILS["families"]}
+        self.assertEqual(len(covered), 10)
+        self.assertTrue({"CWE-125", "CWE-787", "CWE-415", "CWE-457"} <= covered)
+        self.assertEqual(GUARDRAILS["families_without_evidence"], [])
+
+    def test_citations_bind_exact_source_bytes(self):
+        for family in GUARDRAILS["families"]:
+            for citation in family["citations"]:
+                source = REPO_ROOT / citation["source"]
+                self.assertEqual(citation["source_sha256"], hashlib.sha256(source.read_bytes()).hexdigest())
+
+    def test_verify_citations_rejects_changed_hash_or_advisory(self):
+        for key, value in (("source_sha256", "0" * 64),
+                           ("advisory_id", "CVE-1900-0000"),
+                           ("fix_commit_url", "https://example.invalid/commit"),
+                           ("linked_by", "invented")):
+            with self.subTest(key=key):
+                tampered = json.loads(json.dumps(GUARDRAILS))
+                tampered["families"][0]["citations"][0][key] = value
+                self.assertTrue(verify_citations(tampered))
+
+    def test_limits_and_executable_scope_are_emitted(self):
+        by_id = {r["id"]: r for r in SECURITY_RULES}
+        for family in GUARDRAILS["families"]:
+            for rule in family["rules"]:
+                original = by_id[rule["rule_id"]]
+                self.assertEqual(rule["requires_unsafe"], bool(original.get("requires_unsafe")))
+                self.assertEqual(rule["code_only"], bool(original.get("code_only")))
+                self.assertTrue(rule["applicability_limits"])
+                self.assertIn(rule["applicability_limits"], MARKDOWN)
 
     def test_families_without_evidence_are_the_complement(self):
         covered = {f["cwe_id"] for f in GUARDRAILS["families"]}

@@ -178,6 +178,10 @@ The auditor validates code against canonical CWE vulnerability archetypes:
 | **CWE-190** | Integer Overflow in Alloc | C, Rust | Overflow-checked arithmetic before allocation (`calloc`, `check_mul_overflow`) |
 | **CWE-476** | NULL Pointer Dereference | C, Rust (unsafe) | Mandatory non-NULL check on allocation return prior to dereference |
 | **CWE-362** | Concurrency TOCTOU Window | C, Python, Shell | Atomicity across check-and-act; no premature lock dropping |
+| **CWE-125** | Unchecked Slice Read | Rust (unsafe) | Prove slice bounds or use `get()` |
+| **CWE-787** | Unchecked Mutable Slice Access | Rust (unsafe) | Prove bounds and exclusive access or use `get_mut()` |
+| **CWE-415** | Double Free | C, Rust (unsafe) | Release allocations and reconstruct raw ownership once |
+| **CWE-457** | Uninitialized Value | Rust (unsafe) | Initialize valid storage before `assume_init()` |
 
 Only these language families have rules: **C/C++** (`.c`, `.h`, `.cpp`, `.cc`, `.cxx`,
 `.hpp`), **Rust** (`.rs`), **Python** (`.py`), **shell** (`.sh`, `.bash`). Other extensions
@@ -194,6 +198,10 @@ Rule IDs are language-suffixed; the full list is `SECURITY_RULES` in
 | CWE-190 | `SEC-CWE-190-INTEGER-OVERFLOW-C`, `SEC-CWE-190-INTEGER-OVERFLOW-RUST` |
 | CWE-476 | `SEC-CWE-476-NULL-DEREFERENCE-C`, `SEC-CWE-476-NULL-DEREFERENCE-RUST` |
 | CWE-362 | `SEC-CWE-362-CONCURRENCY-RACE-C`, `SEC-CWE-362-CONCURRENCY-TOCTOU-PYTHON`, `SEC-CWE-362-CONCURRENCY-TOCTOU-SHELL` |
+| CWE-125 | `SEC-CWE-125-UNCHECKED-READ-RUST` |
+| CWE-787 | `SEC-CWE-787-UNCHECKED-WRITE-RUST` |
+| CWE-415 | `SEC-CWE-415-DOUBLE-FREE-C`, `SEC-CWE-415-DUPLICATE-OWNERSHIP-RUST` |
+| CWE-457 | `SEC-CWE-457-UNINITIALIZED-RUST` |
 
 ---
 

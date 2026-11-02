@@ -33,6 +33,7 @@ Stdlib only.
 """
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -112,7 +113,9 @@ def load_catalog_candidates():
         project = catalog_path.parent.name
         source = _repo_relative(catalog_path)
         repo = repos.get(project)
-        for line in catalog_path.read_text(encoding="utf-8").splitlines():
+        source_bytes = catalog_path.read_bytes()
+        source_sha256 = hashlib.sha256(source_bytes).hexdigest()
+        for line in source_bytes.decode("utf-8").splitlines():
             if not line.strip():
                 continue
             row = json.loads(line)
@@ -129,6 +132,7 @@ def load_catalog_candidates():
                     "fix_commit_url": f"{repo}/commit/{sha}" if repo else None,
                     "recorded_cwe": row.get("cwe"),
                     "source": source,
+                    "source_sha256": source_sha256,
                     "source_kind": "catalog",
                 })
     return candidates
@@ -138,7 +142,8 @@ def load_record_candidates():
     """Return {advisory_id: [candidate, ...]} from docs/memory/records/*.json."""
     candidates = {}
     for record_path in sorted(RECORDS_DIR.glob("*.json")):
-        record = json.loads(record_path.read_text(encoding="utf-8"))
+        source_bytes = record_path.read_bytes()
+        record = json.loads(source_bytes)
         advisory_id = recorded_cwe = sha = url = None
         for node in record.get("nodes") or []:
             if not isinstance(node, dict):
@@ -159,6 +164,7 @@ def load_record_candidates():
             "fix_commit_url": url if isinstance(url, str) and url else None,
             "recorded_cwe": recorded_cwe,
             "source": _repo_relative(record_path),
+            "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
             "source_kind": "pack_record",
         })
     return candidates
@@ -238,6 +244,9 @@ def build_families():
                 "pattern": rule.get("pattern"),
                 "explanation": rule.get("explanation"),
                 "lesson": rule.get("lesson"),
+                "requires_unsafe": bool(rule.get("requires_unsafe")),
+                "code_only": bool(rule.get("code_only")),
+                "applicability_limits": rule.get("applicability_limits", "Lexical review hypothesis; no control-flow, data-flow or reachability proof. A match alone does not establish a vulnerability."),
             } for rule in rules],
         }
         if citations:
@@ -322,6 +331,11 @@ def render_markdown(guardrails):
         "",
         "Every number, pattern and citation below is read from repository data:",
         "",
+        "Matches are analyst hypotheses requiring review, not validated vulnerabilities. "
+        "Citations establish recorded family examples, not applicability to the audited code. "
+        "Source SHA-256 hashes bind citations to exact local evidence bytes; they do not "
+        "prove upstream correctness or patch success. UNKNOWN catalog records remain UNKNOWN.",
+        "",
         "- rule ids, matched patterns, severities and remediation: `SECURITY_RULES` in "
         "`scripts/defensive_auditor.py`",
         "- family counts and `with_fix_sha`: `docs/studies/pattern_clusters.json`",
@@ -387,10 +401,20 @@ def render_markdown(guardrails):
             lines.append("")
             lines.append(f"- **Required invariant** — {_md_escape(rule['lesson'])}")
             lines.append("")
+            gates = []
+            if rule["requires_unsafe"]:
+                gates.append("Rust matches require an unsafe block or unsafe function")
+            if rule["code_only"]:
+                gates.append("comments and string/character literals are ignored")
+            if gates:
+                lines.append("- **Scope** — " + "; ".join(gates) + ".")
+                lines.append("")
+            lines.append(f"- **Applicability limits** — {_md_escape(rule['applicability_limits'])}")
+            lines.append("")
         lines.append("#### Evidence")
         lines.append("")
-        lines.append("| Advisory | Project | Fix commit | Linked by | Source |")
-        lines.append("|---|---|---|---|---|")
+        lines.append("| Advisory | Project | Fix commit | Linked by | Source | Source SHA-256 |")
+        lines.append("|---|---|---|---|---|---|")
         for citation in family["citations"]:
             sha = citation["fix_commit_sha"]
             url = citation["fix_commit_url"]
@@ -398,7 +422,7 @@ def render_markdown(guardrails):
             lines.append(
                 f"| {citation['advisory_id']} | {_md_escape(citation['project'])} | "
                 f"{commit_cell} | {citation['linked_by']} | "
-                f"`{citation['source']}` |"
+                f"`{citation['source']}` | `{citation['source_sha256']}` |"
             )
         lines.append("")
 
@@ -415,7 +439,7 @@ def render_markdown(guardrails):
                      "be generated without inventing data:")
         lines.append("")
         lines.append("| Rule family | Rules | Cluster count / with_fix_sha | Why no section |")
-        lines.append("|---|---|---|---|---|")
+        lines.append("|---|---|---|---|---|---|")
         for family in without_evidence:
             count = family["cluster_count"]
             with_fix = family["cluster_with_fix_sha"]
@@ -448,18 +472,23 @@ def verify_citations(guardrails):
     Returns a list of human-readable problems; empty means every cited fix commit is
     backed by a file in this repository.
     """
-    cache = {}
+    # Reconstruct qualified source candidates rather than accepting a SHA merely
+    # appearing somewhere in a file (possibly for a different advisory or CWE).
+    clusters = load_clusters()
+    catalogs = load_catalog_candidates()
+    records = load_record_candidates()
     problems = []
-    for cwe_id, advisory_id, sha, source in iter_cited_shas(guardrails):
-        if source not in cache:
-            path = REPO_ROOT / source
-            cache[source] = path.read_text(encoding="utf-8") if path.is_file() else None
-        content = cache[source]
-        if content is None:
-            problems.append(f"{cwe_id} {advisory_id}: source file missing: {source}")
-            continue
-        if sha not in content:
-            problems.append(f"{cwe_id} {advisory_id}: sha {sha} not found in {source}")
+    for family in guardrails["families"]:
+        cwe_id = family["cwe_id"]
+        expected = select_citations(cwe_id, clusters.get(cwe_id), catalogs, records)
+        for citation in family.get("citations", []):
+            identity = (citation["advisory_id"], citation["fix_commit_sha"], citation["source"])
+            found = next((c for c in expected if
+                          (c["advisory_id"], c["fix_commit_sha"], c["source"]) == identity), None)
+            if found is None:
+                problems.append(f"{cwe_id} {identity[0]}: qualified citation not found in {identity[2]}")
+            elif citation != found:
+                problems.append(f"{cwe_id} {identity[0]}: citation metadata or source hash mismatch")
     return problems
 
 

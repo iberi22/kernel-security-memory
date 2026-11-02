@@ -29,6 +29,85 @@ from quality_gate import (
 )
 
 
+
+class TestExpandedMemoryGuardrails(TestCase):
+    CASES = {
+        "CWE-125": "let value = *slice.get_unchecked(index);",
+        "CWE-787": "*slice.get_unchecked_mut(index) = value;",
+        "CWE-415": "drop(Box::from_raw(ptr)); drop(Box::from_raw(ptr));",
+        "CWE-457": "let value = MaybeUninit::<u32>::uninit().assume_init();",
+    }
+
+    def _families(self, code, filename="lib.rs"):
+        return {f["cwe_id"] for f in scan_content(code, filename)} & self.CASES.keys()
+
+    def test_new_rust_families_require_unsafe_context(self):
+        for cwe, body in self.CASES.items():
+            with self.subTest(cwe=cwe):
+                self.assertEqual(self._families("fn f() { " + body + " }"), set())
+                for header in ('unsafe {', 'unsafe fn f() {', 'unsafe extern "C" fn f() {'):
+                    self.assertIn(cwe, self._families(header + body + " }"))
+
+    def test_safe_code_after_unsafe_block_is_not_reported(self):
+        for body in self.CASES.values():
+            self.assertEqual(self._families("unsafe {} fn safe() { " + body + " }"), set())
+
+    def test_safe_methods_in_unsafe_impl_are_not_reported(self):
+        for body in self.CASES.values():
+            self.assertEqual(self._families("unsafe impl Trait for T { fn f() { " + body + " } }"), set())
+
+    def test_safe_unit_tests_and_embedded_unsafe_fixtures_are_not_findings(self):
+        for body in self.CASES.values():
+            code = ('#[cfg(test)] mod tests { #[test] fn fixture() { '
+                    'let input = r###"unsafe { ' + body + ' }"###; '
+                    'assert!(!input.is_empty()); } }')
+            self.assertEqual(self._families(code), set())
+            # Neither quoted unsafe headers nor commented ones create a span.
+            for prefix in ('// unsafe {\n', '/* unsafe { */ ', 'let s = "unsafe {"; '):
+                self.assertEqual(self._families(prefix + body), set())
+
+    def test_literals_and_nested_comments_inside_unsafe_are_not_findings(self):
+        for body in self.CASES.values():
+            for fixture in ('// ' + body + '\n', '/* outer /* inner */ ' + body + ' */',
+                            'r##"' + body + '"##', '"' + body + '"'):
+                self.assertEqual(self._families('unsafe { ' + fixture + ' }'), set())
+
+    def test_safe_alternatives_do_not_match(self):
+        code = """#[test] fn safe() {
+            let read = slice.get(index);
+            let write = slice.get_mut(index);
+            let value = MaybeUninit::new(42);
+            drop(Box::new(value));
+        }"""
+        self.assertEqual(self._families(code), set())
+
+    def test_test_attribute_does_not_hide_actual_unsafe_operations(self):
+        # Test source can contain real violations; only literal fixtures are ignored.
+        for cwe, body in self.CASES.items():
+            self.assertIn(cwe, self._families('#[test] fn f() { unsafe { ' + body + ' } }'))
+
+    def test_double_free_c_same_pointer_only(self):
+        self.assertIn('CWE-415', self._families('free(ptr); free(ptr);', 'lib.c'))
+        for code in ('free(a); free(b);', 'free(p); p = NULL; free(p);',
+                     '// free(p); free(p);', 'const char *s = "free(p); free(p);";'):
+            self.assertNotIn('CWE-415', self._families(code, 'lib.c'))
+
+    def test_legacy_uninitialized_rust_api_is_unsafe_gated(self):
+        body = 'let value = std::mem::uninitialized::<u32>();'
+        self.assertIn('CWE-457', self._families('unsafe {' + body + '}'))
+        self.assertNotIn('CWE-457', self._families(body))
+
+    def test_new_findings_keep_original_lines_and_evidence_hash(self):
+        code = '// fixture\nunsafe {\n slice.get_unchecked(i);\n}'
+        findings = scan_content(code, 'lib.rs')
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]['line'], 3)
+        self.assertEqual(findings[0]['snippet'], 'slice.get_unchecked(i);')
+        before = build_evidence_chain('lib.rs', ['lib.rs'], findings)
+        after = build_evidence_chain('lib.rs', ['lib.rs'], findings)
+        self.assertEqual(before['evidence_chain_hash'], after['evidence_chain_hash'])
+
+
 class TestDefensiveAuditor(TestCase):
     def setUp(self):
         self.tmp_dir = tempfile.TemporaryDirectory()
