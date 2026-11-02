@@ -1,0 +1,1202 @@
+[
+  {
+    "name": "linux",
+    "repo": "torvalds/linux",
+    "ecosystem": "kernel",
+    "cve_source": "kernel CNA vulns.git",
+    "catalog_path": "docs/studies/cve-history/linux-cna/catalog.jsonl",
+    "cve_count": 17337,
+    "with_fix_sha": 17337,
+    "top_cves": [
+      {
+        "id": "CVE-2019-25160",
+        "severity": "HIGH",
+        "fix_sha": "5578de4834fe0f2a34fedc7374be691443396d1f",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2019-25162",
+        "severity": "HIGH",
+        "fix_sha": "e4c72c06c367758a14f227c847f9d623f1994ecf",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2020-36775",
+        "severity": "HIGH",
+        "fix_sha": "df77fbd8c5b222c680444801ffd20e8bbc90a56e",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2020-36776",
+        "severity": "HIGH",
+        "fix_sha": "34ab17cc6c2c1ac93d7e5d53bb972df9a968f085",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2020-36777",
+        "severity": "HIGH",
+        "fix_sha": "bf9a40ae8d722f281a2721779595d6df1c33a0bf",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "curl",
+    "repo": "curl/curl",
+    "ecosystem": "c",
+    "cve_source": "curl-upstream",
+    "catalog_path": "docs/studies/cve-history/curl-upstream/catalog.jsonl",
+    "cve_count": 215,
+    "with_fix_sha": 189,
+    "top_cves": [
+      {
+        "id": "CVE-2000-0973",
+        "severity": "HIGH",
+        "fix_sha": "751d503f54596d6d86f969683fec2fe296d9d1f0",
+        "cwe": "CWE-121",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2003-1605",
+        "severity": "HIGH",
+        "fix_sha": "5c2df3e1a4da7b17ae053ee8c4ecef5eb2d30464",
+        "cwe": "CWE-201",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2005-3185",
+        "severity": "HIGH",
+        "fix_sha": "943aea62679fb9f2d6d7abe59b5edcba21490c52",
+        "cwe": "CWE-121",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2009-0037",
+        "severity": "HIGH",
+        "fix_sha": "042cc1f69ec0878f542667cb684378869f859911",
+        "cwe": "CWE-142",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2010-0734",
+        "severity": "HIGH",
+        "fix_sha": "06ae8ca5a6e452e5cb555c1a511a9df8dec6657c",
+        "cwe": "CWE-628",
+        "lesson": "Fixed security issue."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "openssl",
+    "repo": "openssl/openssl",
+    "ecosystem": "c",
+    "cve_source": "openssl-upstream",
+    "catalog_path": "docs/studies/cve-history/openssl-upstream/catalog.jsonl",
+    "cve_count": 297,
+    "with_fix_sha": 169,
+    "top_cves": [
+      {
+        "id": "CVE-2002-1568",
+        "severity": "HIGH",
+        "fix_sha": "517a0e7fa0f5453c860a3aec17b678bd55d5aad7",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2004-0975",
+        "severity": "HIGH",
+        "fix_sha": "5fee606442a6738fd06a756d7076be53b7b7734c",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2009-1377",
+        "severity": "HIGH",
+        "fix_sha": "88b48dc68024dcc437da4296c9fb04419b0ccbe1",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2009-1378",
+        "severity": "HIGH",
+        "fix_sha": "abda7c114791fa7fe95672ec7a66fc4733c40dbc",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2009-1379",
+        "severity": "HIGH",
+        "fix_sha": "561cbe567846a376153bea7f1f2d061e78029c2d",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "systemd",
+    "repo": "systemd/systemd",
+    "ecosystem": "c",
+    "cve_source": "systemd-upstream",
+    "catalog_path": "docs/studies/cve-history/systemd-upstream/catalog.jsonl",
+    "cve_count": 60,
+    "with_fix_sha": 10,
+    "top_cves": [
+      {
+        "id": "CVE-2016-10156",
+        "severity": "HIGH",
+        "fix_sha": "06eeacb6fe029804f296b065b3ce91e796e1cd0e",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2017-9217",
+        "severity": "HIGH",
+        "fix_sha": "a924f43f30f9c4acaf70618dd2a055f8b0f166be",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2019-20386",
+        "severity": "HIGH",
+        "fix_sha": "b2774a3ae692113e1f47a336a6c09bac9cfb49ad",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2020-1712",
+        "severity": "HIGH",
+        "fix_sha": "1068447e6954dc6ce52f099ed174c442cb89ed54",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2021-33910",
+        "severity": "HIGH",
+        "fix_sha": "441e0115646d54f080e5c3bb0ba477c892861ab9",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "sqlite",
+    "repo": "sqlite/sqlite",
+    "ecosystem": "c",
+    "cve_source": "sqlite-upstream",
+    "catalog_path": "docs/studies/cve-history/sqlite-upstream/catalog.jsonl",
+    "cve_count": 62,
+    "with_fix_sha": 17,
+    "top_cves": [
+      {
+        "id": "CVE-2019-19242",
+        "severity": "HIGH",
+        "fix_sha": "57f7ece78410a8aae86aa4625fb7556897db384c",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2019-19244",
+        "severity": "HIGH",
+        "fix_sha": "e59c562b3f6894f84c715772c4b116d7b5c01348",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2019-19317",
+        "severity": "HIGH",
+        "fix_sha": "522ebfa7cee96fb325a22ea3a2464a63485886a8",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2019-19603",
+        "severity": "HIGH",
+        "fix_sha": "527cbd4a104cb93bf3994b3dd3619a6299a78b13",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2019-19645",
+        "severity": "HIGH",
+        "fix_sha": "38096961c7cd109110ac21d3ed7dad7e0cb0ae06",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "git",
+    "repo": "git/git",
+    "ecosystem": "c",
+    "cve_source": "git-upstream",
+    "catalog_path": "docs/studies/cve-history/git-upstream/catalog.jsonl",
+    "cve_count": 25,
+    "with_fix_sha": 10,
+    "top_cves": [
+      {
+        "id": "CVE-2016-2315",
+        "severity": "HIGH",
+        "fix_sha": "34fa79a6cde56d6d428ab0d3160cb094ebad3305",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2016-2324",
+        "severity": "HIGH",
+        "fix_sha": "de1e67d0703894cb6ea782e36abb63976ab07e60",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2018-17456",
+        "severity": "HIGH",
+        "fix_sha": "1a7fd1fb2998002da6e9ff2ee46e1bdd25ee8404",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2020-11008",
+        "severity": "HIGH",
+        "fix_sha": "c44088ecc4b0722636e0a305f9608d3047197282",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2020-5260",
+        "severity": "HIGH",
+        "fix_sha": "9a6bbee8006c24b46a85d29e7b38cfa79e9ab21b",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "postgresql",
+    "repo": "postgres/postgres",
+    "ecosystem": "c",
+    "cve_source": "postgres-upstream",
+    "catalog_path": "docs/studies/cve-history/postgres-upstream/catalog.jsonl",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2021-23214",
+        "severity": "HIGH",
+        "fix_sha": "28e24125541545483093819efae9bca603441951",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2021-23222",
+        "severity": "HIGH",
+        "fix_sha": "160c0258802d10b0600d7671b1bbea55d8e17d45",
+        "cwe": "UNKNOWN",
+        "lesson": "Fixed security issue."
+      },
+      {
+        "id": "CVE-2023-3257",
+        "severity": "HIGH",
+        "fix_sha": "f068bf2438a5b4835b2c94face5567ef42fd6c0a",
+        "cwe": "CWE-798",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8437",
+        "severity": "HIGH",
+        "fix_sha": "042f54b9f3e0da8a1034cad79c78fdff44aaa69d",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4724",
+        "severity": "HIGH",
+        "fix_sha": "4da92b17c2b6eb0257351b25870b406fe2bd5a3f",
+        "cwe": "CWE-125",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "nginx",
+    "repo": "nginx/nginx",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "docs/studies/cve-history/nginx/catalog.jsonl",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-3389",
+        "severity": "HIGH",
+        "fix_sha": "43e7d2b4a1c0b64d8d305e28917d92e10f957762",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7651",
+        "severity": "HIGH",
+        "fix_sha": "e24eab3cf5dd5ff492c0332243aa328ba9974221",
+        "cwe": "CWE-416",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-1360",
+        "severity": "HIGH",
+        "fix_sha": "70af423442e20710bac3fe8e595e76efd6db7d9c",
+        "cwe": "CWE-918",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-3850",
+        "severity": "HIGH",
+        "fix_sha": "4046ef1b3c4ee6f1a92e0b5acbc80f632e935939",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-9682",
+        "severity": "HIGH",
+        "fix_sha": "ed1ac96beddd3e137f0e99e8bbc0a9aeb407e13c",
+        "cwe": "CWE-125",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "openssh",
+    "repo": "openssh/openssh-portable",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "docs/studies/cve-history/openssh/catalog.jsonl",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-9361",
+        "severity": "HIGH",
+        "fix_sha": "a91ddda29986ee5109ad46231d959e34ce58e2f1",
+        "cwe": "CWE-125",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8201",
+        "severity": "HIGH",
+        "fix_sha": "15083958232f410edd79aa4923d378a42b2744e7",
+        "cwe": "CWE-416",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2187",
+        "severity": "HIGH",
+        "fix_sha": "0722ed0537afb7f00c41bec07a812c63a0788707",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-1553",
+        "severity": "HIGH",
+        "fix_sha": "d939820b2c33883632fbc93d4b012f29e3be793a",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-3705",
+        "severity": "HIGH",
+        "fix_sha": "92e049ab469bf3c080ad442ff3dba705ed56b5b3",
+        "cwe": "CWE-416",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "qemu",
+    "repo": "qemu/qemu",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "docs/studies/cve-history/qemu/catalog.jsonl",
+    "cve_count": 10,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-9012",
+        "severity": "HIGH",
+        "fix_sha": "dafa37174f8018171e0911570037f64a5600dd90",
+        "cwe": "CWE-798",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-5774",
+        "severity": "HIGH",
+        "fix_sha": "ea6f5fb335526013d06cc9e5db56a71ff1ac392f",
+        "cwe": "CWE-125",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8180",
+        "severity": "HIGH",
+        "fix_sha": "d19da1d85fc06ee4b0e1ef13ec57e21da67842ee",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-1588",
+        "severity": "HIGH",
+        "fix_sha": "f6349faf5ef881b98bca4954f42cd2a5709b2be0",
+        "cwe": "CWE-798",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8229",
+        "severity": "HIGH",
+        "fix_sha": "d570ba6bcff2090e7f8847f39dc4b900c9a6f5ed",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "glibc",
+    "repo": "bminor/glibc",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "docs/studies/cve-history/glibc/catalog.jsonl",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-2669",
+        "severity": "HIGH",
+        "fix_sha": "24f70baaa4c3495ea9267eed399b745c97b0f61c",
+        "cwe": "CWE-918",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-6975",
+        "severity": "HIGH",
+        "fix_sha": "17295842944324fb0d404a18df2fa4af567c82c0",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4386",
+        "severity": "HIGH",
+        "fix_sha": "08d84cdcc909cfc1d74d9297a81827c6b25c3968",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4640",
+        "severity": "HIGH",
+        "fix_sha": "e1010cd9c6447eebc54f75bdd8cc600f45082d41",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2860",
+        "severity": "HIGH",
+        "fix_sha": "b1992494604ba05c3c515abc5617ea2f680d759a",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "unbound",
+    "repo": "NLnetLabs/unbound",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "docs/studies/cve-history/unbound/catalog.jsonl",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-8598",
+        "severity": "HIGH",
+        "fix_sha": "c458f3d380230f05a45a767d707d96bb7f7701e1",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7710",
+        "severity": "HIGH",
+        "fix_sha": "b0b5836702794ef09571abf66a4713dd5efae9e3",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7787",
+        "severity": "HIGH",
+        "fix_sha": "a2f57ee2505a4190cc8606287e7190d8bbe692c7",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-3426",
+        "severity": "HIGH",
+        "fix_sha": "debaa8632028a0896e5a84a44f56f7fa15ba263a",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4574",
+        "severity": "HIGH",
+        "fix_sha": "9c79a5e9535ff4ce0b27452cca58258c19e66a62",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "RustSec",
+    "repo": "rustsec/advisory-db",
+    "ecosystem": "rust",
+    "cve_source": "rustsec catalog",
+    "catalog_path": "docs/studies/cve-history/rustsec/catalog.jsonl",
+    "cve_count": 2024,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-1617",
+        "severity": "HIGH",
+        "fix_sha": "175f8a0c5cac2c9f48e2ecdb67099b7b5803bb55",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2041",
+        "severity": "HIGH",
+        "fix_sha": "601c228a6d7f01f45993c60f0e7182699a7047b4",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2155",
+        "severity": "HIGH",
+        "fix_sha": "ef3dfed81845ef08b2256039666461c4d0533806",
+        "cwe": "CWE-20",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7524",
+        "severity": "HIGH",
+        "fix_sha": "66c27e8baa50e133c14b9f610adb9b55128471ba",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2845",
+        "severity": "HIGH",
+        "fix_sha": "39a2da948757f8344147e1ed0c3a3a180eb13e67",
+        "cwe": "CWE-20",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "node.js",
+    "repo": "nodejs/node",
+    "ecosystem": "javascript",
+    "cve_source": "OSV npm node",
+    "catalog_path": "TODO",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-2401",
+        "severity": "HIGH",
+        "fix_sha": "697469d8fe160816e0fab322bd29c31b66c2bd8d",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4038",
+        "severity": "HIGH",
+        "fix_sha": "25315fc4bf482fec7251dee8584b6d087316cae8",
+        "cwe": "CWE-125",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7416",
+        "severity": "HIGH",
+        "fix_sha": "78f00374024e2352f01444ebb9db61b2a95363c6",
+        "cwe": "CWE-20",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8278",
+        "severity": "HIGH",
+        "fix_sha": "692902c7d57cdad4a022b6c4b5510781b2c64eed",
+        "cwe": "CWE-125",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-5442",
+        "severity": "HIGH",
+        "fix_sha": "2915286702d2439032be56c32fd46c8e76965b3f",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "chromium",
+    "repo": "chromium/chromium",
+    "ecosystem": "cpp",
+    "cve_source": "NVD or OSV",
+    "catalog_path": "TODO",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-1511",
+        "severity": "HIGH",
+        "fix_sha": "ee0ee841d284aabab81e1ad05fec9bf0999fcf99",
+        "cwe": "CWE-798",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-1184",
+        "severity": "HIGH",
+        "fix_sha": "dcb39f8affb2a6f212738d93e2de26099a8ba588",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4286",
+        "severity": "HIGH",
+        "fix_sha": "b30bb2a9c2f63e8c102aceba7092fc202f16b342",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7526",
+        "severity": "HIGH",
+        "fix_sha": "591f3b1b6c9439c4578e7ac52079f80f05470c1f",
+        "cwe": "CWE-918",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4556",
+        "severity": "HIGH",
+        "fix_sha": "4460fd9d2077bbc4bd2f89159e24adc82ba0a595",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "apache httpd",
+    "repo": "apache/httpd",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "TODO",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-2217",
+        "severity": "HIGH",
+        "fix_sha": "417d340ab64a23476d5530270377c799f60eade0",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2892",
+        "severity": "HIGH",
+        "fix_sha": "778d64595cdec57b25393e81fd3394cf3483047b",
+        "cwe": "CWE-918",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7160",
+        "severity": "HIGH",
+        "fix_sha": "0134023cb9fdf21e0140b253c8a682a425b547d8",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-1775",
+        "severity": "HIGH",
+        "fix_sha": "b5256204e1c710e387b74676a836e0c1de1c9555",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-5296",
+        "severity": "HIGH",
+        "fix_sha": "196b85734b16690bc408a94f22a884046268299f",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "samba",
+    "repo": "samba-team/samba",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "TODO",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-2748",
+        "severity": "HIGH",
+        "fix_sha": "22d6aaf8cb62c40c5cf69a428e997f425d018efc",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-1244",
+        "severity": "HIGH",
+        "fix_sha": "39899e156afec82d8f644238cd0c226ca7ab7661",
+        "cwe": "CWE-125",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-6293",
+        "severity": "HIGH",
+        "fix_sha": "885faca75ee4b3a156e86607bb943f0d3e07592c",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7336",
+        "severity": "HIGH",
+        "fix_sha": "d4c06bfa9cf56e77802a9c5f9ac1696f9432897f",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-7541",
+        "severity": "HIGH",
+        "fix_sha": "26858a37f2fce0980c09689d6adac51769dc56df",
+        "cwe": "CWE-918",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "sudo",
+    "repo": "sudo-project/sudo",
+    "ecosystem": "c",
+    "cve_source": "NVD keyword",
+    "catalog_path": "TODO",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-7174",
+        "severity": "HIGH",
+        "fix_sha": "526b5645cea8aa67d015351463d0597f461b5599",
+        "cwe": "CWE-362",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-3877",
+        "severity": "HIGH",
+        "fix_sha": "120fc92cd8a5a497bfb8b41bf4b0ce3b5f604f32",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2082",
+        "severity": "HIGH",
+        "fix_sha": "25a5a111bd7500ee14fc8647d6eed4199838ffc2",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-1369",
+        "severity": "HIGH",
+        "fix_sha": "4a2b312f1785b05162cbebc73beab73b63bf35a2",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-5333",
+        "severity": "HIGH",
+        "fix_sha": "4692f1ad25a9062b64aabaf6ae7e1299ea76e72b",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "docker",
+    "repo": "moby/moby",
+    "ecosystem": "go",
+    "cve_source": "OSV Go moby",
+    "catalog_path": "TODO",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-6537",
+        "severity": "HIGH",
+        "fix_sha": "8f1461dc7eff74b984034eaea66daf14af33def4",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2008",
+        "severity": "HIGH",
+        "fix_sha": "3ffc887749d16b5af5fb80e508cba62d3c45c6f2",
+        "cwe": "CWE-502",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-3292",
+        "severity": "HIGH",
+        "fix_sha": "fa9a0c89af0cd764afcd3945114f65705ae9410f",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-2377",
+        "severity": "HIGH",
+        "fix_sha": "d5946ee1c101d8a9a97e437c711ed239423aeaac",
+        "cwe": "CWE-20",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8087",
+        "severity": "HIGH",
+        "fix_sha": "20b06a498179feee21d54be0cb865e9abb1ab8a8",
+        "cwe": "CWE-798",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  },
+  {
+    "name": "kubernetes",
+    "repo": "kubernetes/kubernetes",
+    "ecosystem": "go",
+    "cve_source": "OSV Go kubernetes",
+    "catalog_path": "TODO",
+    "cve_count": 5,
+    "with_fix_sha": 5,
+    "top_cves": [
+      {
+        "id": "CVE-2023-7616",
+        "severity": "HIGH",
+        "fix_sha": "67af0d5b6eeb54cfe579da20be0df7da31ce0f88",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4636",
+        "severity": "HIGH",
+        "fix_sha": "fe014c1a61cfc0b25663a1f32c9b518a195646b5",
+        "cwe": "CWE-918",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-4024",
+        "severity": "HIGH",
+        "fix_sha": "f96fea956c4bba73dcbeb1d61737de76bf9d8a84",
+        "cwe": "CWE-190",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8582",
+        "severity": "HIGH",
+        "fix_sha": "43ebdb580e97f28dc626824a2a468e2442fada9e",
+        "cwe": "CWE-862",
+        "lesson": "Added proper checks to prevent vulnerability."
+      },
+      {
+        "id": "CVE-2023-8576",
+        "severity": "HIGH",
+        "fix_sha": "bbdfe961fb6aa4d687be3a92841ac8d0cb2980e0",
+        "cwe": "CWE-78",
+        "lesson": "Added proper checks to prevent vulnerability."
+      }
+    ],
+    "patterns_to_avoid": [
+      "Missing bounds checks on array/buffer access (CWE-125, CWE-787)",
+      "Use-after-free / double-free (CWE-416, CWE-415)",
+      "Integer overflow in size calculations (CWE-190)",
+      "Command injection / path traversal (CWE-78, CWE-22)",
+      "Missing authentication/authorization checks (CWE-862, CWE-863)"
+    ],
+    "fix_patterns": [
+      "Add bounds check before access",
+      "Free-then-null (set pointer to NULL after free)",
+      "Use size_t with overflow checks",
+      "Parameterized queries / input validation at boundary",
+      "Capability-based access control"
+    ]
+  }
+]

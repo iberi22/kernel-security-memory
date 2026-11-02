@@ -24,3 +24,7 @@
 9. Look for official feeds for openssh, nginx, qemu, unbound and glibc (distribution trackers, mailing-list archives) before relying on NVD keyword search.
 
 Each stage needs evidence, source snapshots, exact verification and honest incomplete status. Generated explanations are never published automatically.
+
+## Top-20 Open-Source Repos Projects Tracking
+- Incorporate more projects beyond the core 20 to widen the lessons dataset for agents.
+- Expand skill files from `docs/studies/top20/skills/` directly into broader ecosystems.
