@@ -593,7 +593,7 @@ class ConverterTests(unittest.TestCase):
             self.assertTrue(hand.exists(), 'hand-authored record must be preserved')
 
     def test_qrels_abstention_probes_are_not_degraded(self):
-        """Guard the text choices: qrels-v1 baseline must be unchanged by the new records."""
+        """Guard the text choices: added records must preserve recall and abstention."""
         from measure_baseline import measure
         qrels = ROOT / 'experiments' / 'qrels-v1.json'
         negatives = [i for i in json.loads(qrels.read_text())['items'] if i['expect'] == 'ABSTAIN']
@@ -608,7 +608,7 @@ class ConverterTests(unittest.TestCase):
         self.assertEqual((summary['positive_recall']['hits'], summary['positive_recall']['denominator']),
                          (6, 6))
         self.assertEqual((summary['negative_abstention']['correct'],
-                          summary['negative_abstention']['denominator']), (2, 3))
+                          summary['negative_abstention']['denominator']), (3, 3))
 
 
 if __name__ == '__main__':

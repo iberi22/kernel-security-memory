@@ -46,6 +46,8 @@ def query_graph(database_path, query, max_hops=2, max_nodes=10, as_of=None):
         lexical_results = query_pack.query_database(path, query)
         database_path = path
 
+    # Expand only records admitted by lexical retrieval, including its exact-ID
+    # and shared-term gates. An empty seed set must never spill into the graph.
     if not lexical_results:
         if td:
             td.cleanup()
