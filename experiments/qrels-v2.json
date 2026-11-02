@@ -1,0 +1,378 @@
+{
+  "version": "2.0",
+  "review_status": "single-author; independent review pending",
+  "scope": "Committed docs/memory evidence records only, not site CVE catalogs",
+  "items": [
+    {
+      "id": "q1-lex-interval-gc",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "netfilter nft_set_rbtree interval garbage collection",
+      "evidence": [
+        "e-commit",
+        "e-before",
+        "e-after"
+      ],
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "q2-lex-cve-fix",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "CVE-2024-26581 netfilter fix advisory",
+      "evidence": [
+        "e-advisory",
+        "e-commit"
+      ],
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "q3-lex-paraphrase-gc-mask",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "skip end interval element generation mask removal garbage collection",
+      "evidence": [
+        "e-commit",
+        "e-before",
+        "e-after"
+      ],
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "q4-lex-symbol-file",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "nft_rbtree_gc_elem net/netfilter/nft_set_rbtree.c generation-state",
+      "evidence": [
+        "e-before",
+        "e-after",
+        "e-commit"
+      ],
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "q5-graph-parent",
+      "mode": "graph",
+      "expect": "FOUND",
+      "query": "parent_of commit 60c0c230c6f046da536d3df8b39a20b9a9fd6af0 parent f82777e8ce6c039cdcacbcf1eb8619b99a20c06d",
+      "evidence": [
+        "e-commit"
+      ],
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "q6-graph-fixedby-fixes",
+      "mode": "graph",
+      "expect": "FOUND",
+      "query": "fixed_by CVE-2024-26581 fix commit 60c0c230 fixes trailer f718863aca469a109895cb855e6b81fff4827d71",
+      "evidence": [
+        "e-commit",
+        "e-advisory"
+      ],
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n1-unknown-cve",
+      "mode": "lexical",
+      "expect": "ABSTAIN",
+      "query": "CVE-2023-99999 nonexistent bluetooth driver use-after-free",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n2-unrelated-subsystem",
+      "mode": "lexical",
+      "expect": "ABSTAIN",
+      "query": "eBPF verifier pruning logic selftest scale test",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n3-unrelated-driver",
+      "mode": "graph",
+      "expect": "ABSTAIN",
+      "query": "amdgpu firmware hang resume regression powerplay clocks",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "p1-interval-cleanup",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Which netfilter fix prevents interval end markers from being removed during garbage collection?",
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "evidence": [
+        "e-commit",
+        "e-before",
+        "e-after"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "p2-generation-visibility",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Find the rbtree cleanup change that preserves interval elements across generation masks.",
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "evidence": [
+        "e-commit",
+        "e-before",
+        "e-after"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "p3-gc-end-markers",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "How does nftables garbage collection avoid dropping the end of an interval?",
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "evidence": [
+        "e-commit",
+        "e-before",
+        "e-after"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "p4-tree-generation",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Locate the correction to generation state checks in nft_rbtree_gc_elem.",
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "evidence": [
+        "e-commit",
+        "e-before",
+        "e-after"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "p5-removal-invariant",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Why must nft_set_rbtree skip an end interval element when collecting expired entries?",
+      "record_id": "linux-CVE-2024-26581-mainline",
+      "evidence": [
+        "e-commit",
+        "e-before",
+        "e-after"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n4-absent-cve",
+      "mode": "lexical",
+      "expect": "ABSTAIN",
+      "query": "CVE-2099-99999 fix advisory",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n5-bluetooth",
+      "mode": "lexical",
+      "expect": "ABSTAIN",
+      "query": "Bluetooth L2CAP socket race mitigation",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n6-wifi",
+      "mode": "graph",
+      "expect": "ABSTAIN",
+      "query": "ath11k firmware recovery regression backport",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n7-filesystem",
+      "mode": "graph",
+      "expect": "ABSTAIN",
+      "query": "btrfs tree log replay deadlock fixes",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "n8-spectre",
+      "mode": "lexical",
+      "expect": "ABSTAIN",
+      "query": "Spectre branch predictor microcode mitigation",
+      "evidence": [],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "r1-lex-git",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Find the advisory-linked fix reference for CVE-2016-2315 in git",
+      "record_id": "git-CVE-2016-2315",
+      "evidence": [
+        "e-study",
+        "e-commit",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "g1-fixedby-git",
+      "mode": "graph",
+      "expect": "FOUND",
+      "query": "Which fixed_by edge connects CVE-2016-2315 to commit 34fa79a6cde56d6d428ab0d3160cb094ebad3305?",
+      "record_id": "git-CVE-2016-2315",
+      "evidence": [
+        "e-study",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "r2-lex-nginx",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Find the advisory-linked fix reference for CVE-2017-20005 in nginx",
+      "record_id": "nginx-CVE-2017-20005",
+      "evidence": [
+        "e-study",
+        "e-commit",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "g2-fixedby-nginx",
+      "mode": "graph",
+      "expect": "FOUND",
+      "query": "Which fixed_by edge connects CVE-2017-20005 to commit 0206ebe76f748bb39d9de4dd4b3fce777fdfdccf?",
+      "record_id": "nginx-CVE-2017-20005",
+      "evidence": [
+        "e-study",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "r3-lex-openssh",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Find the advisory-linked fix reference for CVE-2018-20685 in openssh",
+      "record_id": "openssh-CVE-2018-20685",
+      "evidence": [
+        "e-study",
+        "e-commit",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "g3-fixedby-openssh",
+      "mode": "graph",
+      "expect": "FOUND",
+      "query": "Which fixed_by edge connects CVE-2018-20685 to commit 6010c0303a422a9c5fa8860c061bf7105eb7f8b2?",
+      "record_id": "openssh-CVE-2018-20685",
+      "evidence": [
+        "e-study",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "r4-lex-sqlite",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Find the advisory-linked fix reference for CVE-2019-19244 in sqlite",
+      "record_id": "sqlite-CVE-2019-19244",
+      "evidence": [
+        "e-study",
+        "e-commit",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "g4-fixedby-sqlite",
+      "mode": "graph",
+      "expect": "FOUND",
+      "query": "Which fixed_by edge connects CVE-2019-19244 to commit e59c562b3f6894f84c715772c4b116d7b5c01348?",
+      "record_id": "sqlite-CVE-2019-19244",
+      "evidence": [
+        "e-study",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "r5-lex-systemd",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Find the advisory-linked fix reference for CVE-2020-1712 in systemd",
+      "record_id": "systemd-CVE-2020-1712",
+      "evidence": [
+        "e-study",
+        "e-commit",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "g5-fixedby-systemd",
+      "mode": "graph",
+      "expect": "FOUND",
+      "query": "Which fixed_by edge connects CVE-2020-1712 to commit 1068447e6954dc6ce52f099ed174c442cb89ed54?",
+      "record_id": "systemd-CVE-2020-1712",
+      "evidence": [
+        "e-study",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    },
+    {
+      "id": "r6-lex-git",
+      "mode": "lexical",
+      "expect": "FOUND",
+      "query": "Find the advisory-linked fix reference for CVE-2016-2324 in git",
+      "record_id": "git-CVE-2016-2324",
+      "evidence": [
+        "e-study",
+        "e-commit",
+        "e-commit-meta"
+      ],
+      "reviewer": "codex-subagent-c (author/source consistency review; not independent)",
+      "reviewed_at": "2026-11-02"
+    }
+  ]
+}

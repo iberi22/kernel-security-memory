@@ -1,4 +1,6 @@
-# Baseline — qrels-v1 pilot measurement
+# Baseline — exploratory retrieval measurements
+
+## Historical v1 pilot measurement
 
 Command: `python3 scripts/measure_baseline.py`
 (see `scripts/measure_baseline.py`; per-item verdicts HIT / MISS /
@@ -24,21 +26,59 @@ ABSTAIN_CORRECT / NOT_MEASURED over a temp read-only SQLite built from
 
 ## Reading
 
-- All nine items now meet their judgments. Previously n1 retrieved the seed
-  for a fabricated CVE (negative_abstention 2/3). Explicit CVE queries now
-  require an exact CVE token in the record ID and abstain when absent.
-  Other lexical queries require at least two distinct shared query terms
-  or FTS5 BM25 <= -5.0, checked before applying the result limit. The score
-  cutoff preserves strong single-term searches such as `generation`; it is
-  a pilot heuristic, not a calibrated or corpus-independent threshold.
-  Graph retrieval abstains when lexical retrieval supplies no seeds.
-- No MRR / composite recall reported: qrels-v1 carries unranked
-  FOUND/ABSTAIN judgments only.
+- The v1 baseline (single seed, 9 items) originally missed n1 (fabricated CVE)
+  because `query_database` joined terms with OR. After the abstention fix
+  (W1a), n1 now abstains: explicit CVE queries require an exact CVE token in
+  the record ID and abstain when absent; other lexical queries require at
+  least two distinct shared query terms or FTS5 BM25 <= -5.0 before the
+  result limit. Graph retrieval abstains when lexical retrieval supplies no
+  seeds. negative_abstention on v1 is now 3/3.
+- v1 carries unranked FOUND/ABSTAIN judgments only; MRR/Recall@5/citation
+  completeness are reported by the extended evaluator on v2 (see below).
 
 ## Limits
 
 - Single seed (`linux-CVE-2024-26581-mainline`), n=9: recall is
   illustrative, NOT generalizable. No bootstrap intervals, no holdout.
 - One-author labels, no independent review: treat as exploratory.
-- Graph probes q5/q6 use lexical retrieval seeds first (with exact CVE
-  lookup for q6), so their HITs partly reflect the seed retrieval.
+- Graph probes q5/q6 seed lexical retrieval first (`query_graph` falls back
+  to FTS seeding), so their HITs partly reflect lexical overlap.
+
+## v2 measurement (2026-11-02)
+
+Reproduce with Python standard library only:
+
+```sh
+python3 scripts/measure_baseline.py --qrels experiments/qrels-v2.json
+# Optional full per-item JSON:
+python3 scripts/measure_baseline.py --qrels experiments/qrels-v2.json --json-out /tmp/baseline-v2.json
+```
+
+The default remains `experiments/qrels-v1.json`. Both modes use a temporary
+read-only database built from the committed SQL export. With the default
+five-result budget and 35-record pack, v2 measured all 30 items,
+**0 NOT_MEASURED**:
+
+| Metric | Numerator / denominator | Value |
+|--------|-------------------------|------:|
+| positive_recall | 22 / 22 | 1.000000 |
+| negative_abstention | 5 / 8 | 0.625000 |
+| MRR | reciprocal-rank sum 22 / 22 | 1.000000 |
+| Recall@5 | 22 / 22 | 1.000000 |
+| citation_completeness | 22 / 22 | 1.000000 |
+
+All FOUND targets ranked first with complete expected evidence. Abstention
+misses were n1 (fabricated CVE), n4 (absent CVE) and n7 (btrfs query):
+shared tokens in the OR-based lexical search still retrieve other records.
+The evaluator records these failures rather than adjusting labels or the
+retriever. See [QRELS.md](QRELS.md) for metric definitions, budgets and
+judgment provenance.
+
+These perfect positive scores reflect an easy, author-labeled navigation
+set with explicit identifiers and correlated paraphrases; they do not
+establish semantic retrieval quality or patch success. Evidence completeness
+checks citation IDs, not whether the source proves a security conclusion.
+No independent review, confidence interval, temporal/family holdout or
+seven-method comparison has been measured. The historical v1 table above
+was recorded on the original seed; corpus expansion can change results.
+>>>>>>> feat/w1c-qrels-v2
