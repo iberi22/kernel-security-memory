@@ -1,0 +1,2806 @@
+{
+  "budget": {
+    "additional_searches": 2,
+    "candidate_limit": 50,
+    "max_hops": 2,
+    "max_nodes_per_record": 10,
+    "top_k": 5
+  },
+  "corpus_records": 35,
+  "corpus_sha256": "0a5b44b08bdadadaba0d761fb16eafc6e88bafe6b3f3afcd693b37ec39b5e092",
+  "qrels_file": "qrels-v1.json",
+  "qrels_sha256": "39b9f204434ad60a32814f1097391bbc5faacd2f36a82cdf4337cb7ccd7d9a2b",
+  "qrels_version": "1.0",
+  "strategies": {
+    "bounded_iterative_graph": {
+      "items": [
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.6105719842016697,
+          "expect": "FOUND",
+          "id": "q1-lex-interval-gc",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 3
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 2.4584929924458265,
+          "expect": "FOUND",
+          "id": "q2-lex-cve-fix",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 3
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.6238269745372236,
+          "expect": "FOUND",
+          "id": "q3-lex-paraphrase-gc-mask",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 3
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 2.3897230275906622,
+          "expect": "FOUND",
+          "id": "q4-lex-symbol-file",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "nginx-CVE-2017-20005"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 3
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 2.2969460114836693,
+          "expect": "FOUND",
+          "id": "q5-graph-parent",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712",
+            "systemd-CVE-2021-33910"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 3
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 2.3460290394723415,
+          "expect": "FOUND",
+          "id": "q6-graph-fixedby-fixes",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 3
+        },
+        {
+          "abstained": false,
+          "citation_completeness": null,
+          "elapsed_ms": 1.9985290127806365,
+          "expect": "ABSTAIN",
+          "id": "n1-unknown-cve",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "openssh-CVE-2023-51385",
+            "openssh-CVE-2023-51767",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": null,
+          "search_calls": 3
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.3026360063813627,
+          "expect": "ABSTAIN",
+          "id": "n2-unrelated-subsystem",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.2827480202540755,
+          "expect": "ABSTAIN",
+          "id": "n3-unrelated-driver",
+          "mode": "graph",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        }
+      ],
+      "metrics": {
+        "abstention_rate": 0.2222222222222222,
+        "citation_completeness": 1.0,
+        "elapsed_ms": 15.309503069147468,
+        "graph_probes": [
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 2.2969460114836693,
+            "expect": "FOUND",
+            "id": "q5-graph-parent",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712",
+              "systemd-CVE-2021-33910"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 3
+          },
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 2.3460290394723415,
+            "expect": "FOUND",
+            "id": "q6-graph-fixedby-fixes",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "git-CVE-2024-32002",
+                "e-commit"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-commit-meta"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-study"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "git-CVE-2024-32002",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 3
+          }
+        ],
+        "mrr": 1.0,
+        "negative_abstention_rate": 0.6666666666666666,
+        "negative_queries": 3,
+        "ranking_queries": 4,
+        "recall_at_5": 1.0
+      },
+      "status": "MEASURED"
+    },
+    "lexical_code_aware": {
+      "items": [
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.0204900172539055,
+          "expect": "FOUND",
+          "id": "q1-lex-interval-gc",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 4.084714048076421,
+          "expect": "FOUND",
+          "id": "q2-lex-cve-fix",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 0.823194975964725,
+          "expect": "FOUND",
+          "id": "q3-lex-paraphrase-gc-mask",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 3.6274350131861866,
+          "expect": "FOUND",
+          "id": "q4-lex-symbol-file",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "nginx-CVE-2017-20005"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 3.4784720046445727,
+          "expect": "FOUND",
+          "id": "q5-graph-parent",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712",
+            "systemd-CVE-2021-33910"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 5.532076000235975,
+          "expect": "FOUND",
+          "id": "q6-graph-fixedby-fixes",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": null,
+          "elapsed_ms": 6.475859961938113,
+          "expect": "ABSTAIN",
+          "id": "n1-unknown-cve",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "openssh-CVE-2023-51385",
+            "openssh-CVE-2023-51767",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": null,
+          "search_calls": 1
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.7608270389027894,
+          "expect": "ABSTAIN",
+          "id": "n2-unrelated-subsystem",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.43952499981969595,
+          "expect": "ABSTAIN",
+          "id": "n3-unrelated-driver",
+          "mode": "graph",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        }
+      ],
+      "metrics": {
+        "abstention_rate": 0.2222222222222222,
+        "citation_completeness": 1.0,
+        "elapsed_ms": 26.242594060022384,
+        "graph_probes": [
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 3.4784720046445727,
+            "expect": "FOUND",
+            "id": "q5-graph-parent",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712",
+              "systemd-CVE-2021-33910"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 1
+          },
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 5.532076000235975,
+            "expect": "FOUND",
+            "id": "q6-graph-fixedby-fixes",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "git-CVE-2024-32002",
+                "e-commit"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-commit-meta"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-study"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "git-CVE-2024-32002",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 1
+          }
+        ],
+        "mrr": 1.0,
+        "negative_abstention_rate": 0.6666666666666666,
+        "negative_queries": 3,
+        "ranking_queries": 4,
+        "recall_at_5": 1.0
+      },
+      "status": "MEASURED"
+    },
+    "lexical_metadata": {
+      "items": [
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 24.959356000181288,
+          "expect": "FOUND",
+          "id": "q1-lex-interval-gc",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.148123003076762,
+          "expect": "FOUND",
+          "id": "q2-lex-cve-fix",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 0.6900320295244455,
+          "expect": "FOUND",
+          "id": "q3-lex-paraphrase-gc-mask",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.0353680117987096,
+          "expect": "FOUND",
+          "id": "q4-lex-symbol-file",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "nginx-CVE-2017-20005"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.0254989610984921,
+          "expect": "FOUND",
+          "id": "q5-graph-parent",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712",
+            "systemd-CVE-2021-33910"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.0505770333111286,
+          "expect": "FOUND",
+          "id": "q6-graph-fixedby-fixes",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": null,
+          "elapsed_ms": 1.0060719796456397,
+          "expect": "ABSTAIN",
+          "id": "n1-unknown-cve",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "openssh-CVE-2023-51385",
+            "openssh-CVE-2023-51767",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": null,
+          "search_calls": 1
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.4706750041805208,
+          "expect": "ABSTAIN",
+          "id": "n2-unrelated-subsystem",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.42631098767742515,
+          "expect": "ABSTAIN",
+          "id": "n3-unrelated-driver",
+          "mode": "graph",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        }
+      ],
+      "metrics": {
+        "abstention_rate": 0.2222222222222222,
+        "citation_completeness": 1.0,
+        "elapsed_ms": 31.81201301049441,
+        "graph_probes": [
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 1.0254989610984921,
+            "expect": "FOUND",
+            "id": "q5-graph-parent",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712",
+              "systemd-CVE-2021-33910"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 1
+          },
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 1.0505770333111286,
+            "expect": "FOUND",
+            "id": "q6-graph-fixedby-fixes",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "git-CVE-2024-32002",
+                "e-commit"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-commit-meta"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-study"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "git-CVE-2024-32002",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 1
+          }
+        ],
+        "mrr": 1.0,
+        "negative_abstention_rate": 0.6666666666666666,
+        "negative_queries": 3,
+        "ranking_queries": 4,
+        "recall_at_5": 1.0
+      },
+      "status": "MEASURED"
+    },
+    "lexical_typed_graph": {
+      "items": [
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 0.6929879891686141,
+          "expect": "FOUND",
+          "id": "q1-lex-interval-gc",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.1620590230450034,
+          "expect": "FOUND",
+          "id": "q2-lex-cve-fix",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 0.7033970323391259,
+          "expect": "FOUND",
+          "id": "q3-lex-paraphrase-gc-mask",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.1793819721788168,
+          "expect": "FOUND",
+          "id": "q4-lex-symbol-file",
+          "mode": "lexical",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2018-20685",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "openssh-CVE-2018-20685",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "nginx-CVE-2017-20005"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.3608270091935992,
+          "expect": "FOUND",
+          "id": "q5-graph-parent",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2021-33910",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712",
+            "systemd-CVE-2021-33910"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": 1.0,
+          "elapsed_ms": 1.2194379814900458,
+          "expect": "FOUND",
+          "id": "q6-graph-fixedby-fixes",
+          "mode": "graph",
+          "mrr": 1.0,
+          "observed_citations": [
+            [
+              "git-CVE-2024-32002",
+              "e-commit"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-commit-meta"
+            ],
+            [
+              "git-CVE-2024-32002",
+              "e-study"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2017-20005",
+              "e-study"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-commit-meta"
+            ],
+            [
+              "nginx-CVE-2019-20372",
+              "e-study"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-commit-meta"
+            ],
+            [
+              "systemd-CVE-2020-1712",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "linux-CVE-2024-26581-mainline",
+            "git-CVE-2024-32002",
+            "nginx-CVE-2017-20005",
+            "nginx-CVE-2019-20372",
+            "systemd-CVE-2020-1712"
+          ],
+          "recall_at_5": 1.0,
+          "search_calls": 1
+        },
+        {
+          "abstained": false,
+          "citation_completeness": null,
+          "elapsed_ms": 1.0961140505969524,
+          "expect": "ABSTAIN",
+          "id": "n1-unknown-cve",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-advisory"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-after"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-before"
+            ],
+            [
+              "linux-CVE-2024-26581-mainline",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-25136",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51384",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51385",
+              "e-study"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-commit-meta"
+            ],
+            [
+              "openssh-CVE-2023-51767",
+              "e-study"
+            ]
+          ],
+          "observed_record_ids": [
+            "openssh-CVE-2023-51385",
+            "openssh-CVE-2023-51767",
+            "openssh-CVE-2023-25136",
+            "openssh-CVE-2023-51384",
+            "linux-CVE-2024-26581-mainline"
+          ],
+          "recall_at_5": null,
+          "search_calls": 1
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.3135359729640186,
+          "expect": "ABSTAIN",
+          "id": "n2-unrelated-subsystem",
+          "mode": "lexical",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        },
+        {
+          "abstained": true,
+          "citation_completeness": null,
+          "elapsed_ms": 0.2912339987233281,
+          "expect": "ABSTAIN",
+          "id": "n3-unrelated-driver",
+          "mode": "graph",
+          "mrr": null,
+          "observed_citations": [],
+          "observed_record_ids": [],
+          "recall_at_5": null,
+          "search_calls": 1
+        }
+      ],
+      "metrics": {
+        "abstention_rate": 0.2222222222222222,
+        "citation_completeness": 1.0,
+        "elapsed_ms": 8.018975029699504,
+        "graph_probes": [
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 1.3608270091935992,
+            "expect": "FOUND",
+            "id": "q5-graph-parent",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2021-33910",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712",
+              "systemd-CVE-2021-33910"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 1
+          },
+          {
+            "abstained": false,
+            "citation_completeness": 1.0,
+            "elapsed_ms": 1.2194379814900458,
+            "expect": "FOUND",
+            "id": "q6-graph-fixedby-fixes",
+            "mode": "graph",
+            "mrr": 1.0,
+            "observed_citations": [
+              [
+                "git-CVE-2024-32002",
+                "e-commit"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-commit-meta"
+              ],
+              [
+                "git-CVE-2024-32002",
+                "e-study"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-advisory"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-after"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-before"
+              ],
+              [
+                "linux-CVE-2024-26581-mainline",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2017-20005",
+                "e-study"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-commit-meta"
+              ],
+              [
+                "nginx-CVE-2019-20372",
+                "e-study"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-commit-meta"
+              ],
+              [
+                "systemd-CVE-2020-1712",
+                "e-study"
+              ]
+            ],
+            "observed_record_ids": [
+              "linux-CVE-2024-26581-mainline",
+              "git-CVE-2024-32002",
+              "nginx-CVE-2017-20005",
+              "nginx-CVE-2019-20372",
+              "systemd-CVE-2020-1712"
+            ],
+            "recall_at_5": 1.0,
+            "search_calls": 1
+          }
+        ],
+        "mrr": 1.0,
+        "negative_abstention_rate": 0.6666666666666666,
+        "negative_queries": 3,
+        "ranking_queries": 4,
+        "recall_at_5": 1.0
+      },
+      "status": "MEASURED"
+    },
+    "llm": {
+      "metrics": null,
+      "reason": "No LLM retrieval adapter configured; no model calls authorized or made.",
+      "status": "NOT_RUN"
+    },
+    "vector": {
+      "metrics": null,
+      "reason": "No pinned embedding model or vector index; no model downloaded.",
+      "status": "NOT_RUN"
+    }
+  }
+}

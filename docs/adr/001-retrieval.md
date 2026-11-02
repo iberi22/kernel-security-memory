@@ -1,6 +1,6 @@
 # ADR-001 — evidence-first temporal code retrieval
 
-Status: **PROPOSED**. Architectural acceptance is pending the remote simulation and measured retrieval experiment.
+Status: **PROPOSED**. The measured qrels-v1 comparison matches the simpler lexical baseline; broader independent evidence is required for acceptance.
 
 ## Context and options
 
@@ -22,3 +22,20 @@ This is a testable hypothesis, not an accepted winner. Full-framework deployment
 ## Acceptance gate
 
 Record actual run command/revision, seeds, all assumptions, primary/composite disagreement, uncertainty and sensitivity. Accept only after independently assessed real-code retrieval/negative tests and measured operational constraints support the design. If a simpler retrieval baseline performs comparably, keep it.
+
+## Measured retrieval (2026-11-02)
+
+[Actual pack comparison](../../experiments/ADR001-MEASURED.md) and
+[per-query artifact](../../experiments/ADR001-MEASURED.json): 35 records,
+qrels-v1 (qrels-v2 absent; W1c dependency). All four strategies obtain
+Recall@5 = 1.0, MRR = 1.0 and citation completeness = 1.0 on four lexical
+positives; negative abstention = 2/3. Graph probes are reported separately.
+Lexical metadata matches code-aware weighting, typed graph expansion and
+the bounded iterative graph baseline. Keep **PROPOSED**: no measured quality
+advantage justifies the added architecture. Vector/LLM variants are NOT_RUN.
+
+These exploratory labels target a single fix and lack independent review,
+time/patch-family holdouts, temporal tests and measured model/index costs.
+The historical simulation section above records the earlier pending state;
+the reported completed swal-sim artifact is unavailable in this checkout.
+Simulation assumptions do not replace retrieval measurements.

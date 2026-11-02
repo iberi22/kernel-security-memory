@@ -27,6 +27,17 @@ Evidence schema and deterministic JSON/SQL pack; read-only lexical+graph pack re
 
 No LLM is used anywhere in extraction or enrichment.
 
+## ADR-001 retrieval measurement (2026-11-02)
+
+[Measured comparison](../experiments/ADR001-MEASURED.md): four stdlib retrieval
+strategies over the actual 35-record SQL pack, pinned corpus/qrels hashes and
+per-query artifacts. qrels-v2 is absent on this branch (W1c dependency); v1
+provides four lexical positives, two separate graph probes and three negatives.
+All four strategies tie: Recall@5/MRR/citation completeness = 1.0 on lexical
+positives; negative abstention = 2/3. ADR-001 stays **PROPOSED** because the
+simpler lexical baseline matches. Vector/LLM strategies are **NOT_RUN**.
+Single-fix, non-independent labels do not establish general retrieval quality.
+
 ## Known limits
 
 - NVD keyword search is a weak source: slow (one request per 15 s without a key) and polluted. Per-project upstream feeds are the primary source from now on.
