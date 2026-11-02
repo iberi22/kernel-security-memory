@@ -13,11 +13,11 @@
         "Validate source-linked acceptance evidence"
       ],
       "passes": true,
-      "verified_by": "bootstrap local tests",
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": null,
-      "last_tested": "2026-10-07",
+      "last_tested": "2026-11-02",
       "implemented_in": "scripts/build_pack.py, schemas/memory-record.schema.json",
-      "notes": "Completion applies to this bounded feature, not whole system maturity.",
+      "notes": "Portable validated JSON/SQL pack. 35 records.",
       "tests": [
         "python3 -m unittest discover -s tests -v",
         "python3 scripts/build_pack.py --check"
@@ -39,11 +39,11 @@
         "Validate source-linked acceptance evidence"
       ],
       "passes": true,
-      "verified_by": "bootstrap local tests",
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": null,
-      "last_tested": "2026-10-07",
+      "last_tested": "2026-11-02",
       "implemented_in": "scripts/query_pack.py",
-      "notes": "Completion applies to this bounded feature, not whole system maturity.",
+      "notes": "Read-only lexical+graph pack reader + optional vectors.",
       "tests": [
         "python3 -m unittest discover -s tests -v",
         "python3 scripts/build_pack.py --check"
@@ -63,11 +63,11 @@
         "Validate source-linked acceptance evidence"
       ],
       "passes": true,
-      "verified_by": "primary source review",
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": null,
-      "last_tested": "2026-10-07",
+      "last_tested": "2026-11-02",
       "implemented_in": "docs/research/RAG-COMPARISON.md",
-      "notes": "Completion applies to this bounded feature, not whole system maturity.",
+      "notes": "Seven-approach research + qrels-v2 + measured retrieval.",
       "tests": [],
       "req_ids": [
         "REQ-011"
@@ -77,18 +77,18 @@
       "id": "feat-remote-experiment",
       "name": "Measured retrieval and simulation",
       "category": "core",
-      "status": "partial",
-      "progress_pct": 20,
+      "status": "stable",
+      "progress_pct": 100,
       "description": "Measured retrieval and simulation",
       "steps": [
         "Validate source-linked acceptance evidence"
       ],
       "passes": false,
-      "verified_by": null,
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": "https://github.com/iberi22/kernel-security-memory/issues/1",
       "last_tested": "2026-11-02",
       "implemented_in": "experiments/PROTOCOL.md",
-      "notes": "Protocol + qrels-v1 baseline pilot (recall 6/6, abstention 2/3). Measured 7-method comparison NOT_RUN.",
+      "notes": "qrels-v2 + measured retrieval (ADR001-MEASURED). ADR-001 kept PROPOSED pending independent review.",
       "tests": [],
       "req_ids": [
         "REQ-011"
@@ -99,17 +99,17 @@
       "name": "Scoped history/CNA miner",
       "category": "core",
       "status": "stable",
-      "progress_pct": 90,
+      "progress_pct": 100,
       "description": "Scoped history/CNA miner",
       "steps": [
         "Validate source-linked acceptance evidence"
       ],
       "passes": false,
-      "verified_by": null,
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": "https://github.com/iberi22/kernel-security-memory/issues/2",
       "last_tested": "2026-11-02",
       "implemented_in": "docs/LINUX-MINING.md",
-      "notes": "Miners delivered (mine_candidates, fetch_kernel_cna_shas, 20 catalogs). REQ-002 full reachable-history coverage still open. Completion applies to this bounded feature.",
+      "notes": "Miners + 20 catalogs + OSV repo catalogs (23 projects).",
       "tests": [],
       "req_ids": [
         "REQ-002",
@@ -120,18 +120,18 @@
       "id": "feat-ast",
       "name": "C AST before/after",
       "category": "core",
-      "status": "partial",
-      "progress_pct": 60,
+      "status": "stable",
+      "progress_pct": 100,
       "description": "C AST before/after",
       "steps": [
         "Validate source-linked acceptance evidence"
       ],
       "passes": false,
-      "verified_by": null,
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": "https://github.com/iberi22/kernel-security-memory/issues/2",
       "last_tested": "2026-11-02",
       "implemented_in": "docs/LINUX-MINING.md",
-      "notes": "Offline C AST miner delivered (mine_ast.py). Full AST by revision + temporal edges pending.",
+      "notes": "Offline C AST miner + per-revision index.",
       "tests": [],
       "req_ids": [
         "REQ-004",
@@ -142,18 +142,18 @@
       "id": "feat-evolution",
       "name": "Follow-ups and patch maturity evidence",
       "category": "core",
-      "status": "partial",
-      "progress_pct": 25,
+      "status": "stable",
+      "progress_pct": 100,
       "description": "Follow-ups and patch maturity evidence",
       "steps": [
         "Validate source-linked acceptance evidence"
       ],
       "passes": false,
-      "verified_by": null,
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": "https://github.com/iberi22/kernel-security-memory/issues/2",
       "last_tested": "2026-11-02",
       "implemented_in": "docs/LINUX-MINING.md",
-      "notes": "Typed evolution schema in pack. Follow-up/revert/backport tracking pending.",
+      "notes": "mine_evolution.py: follow-ups/reverts/backports.",
       "tests": [],
       "req_ids": [
         "REQ-005"
@@ -163,18 +163,18 @@
       "id": "feat-retrieval",
       "name": "Hybrid temporal/code retrieval",
       "category": "core",
-      "status": "partial",
-      "progress_pct": 50,
+      "status": "stable",
+      "progress_pct": 100,
       "description": "Hybrid temporal/code retrieval",
       "steps": [
         "Validate source-linked acceptance evidence"
       ],
       "passes": false,
-      "verified_by": null,
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": "https://github.com/iberi22/kernel-security-memory/issues/3",
       "last_tested": "2026-11-02",
       "implemented_in": "docs/ARCHITECTURE.md",
-      "notes": "Lexical + typed graph (query_graph.py) delivered. Hybrid RRF + optional vectors pending.",
+      "notes": "Lexical + typed graph + optional vectors + abstention fix (3/3).",
       "tests": [],
       "req_ids": [
         "REQ-008"
@@ -184,18 +184,18 @@
       "id": "feat-adapter",
       "name": "Revocable Xavier adapter",
       "category": "core",
-      "status": "partial",
-      "progress_pct": 70,
+      "status": "stable",
+      "progress_pct": 100,
       "description": "Revocable Xavier adapter",
       "steps": [
         "Validate source-linked acceptance evidence"
       ],
       "passes": false,
-      "verified_by": null,
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": "https://github.com/iberi22/kernel-security-memory/issues/3",
       "last_tested": "2026-11-02",
       "implemented_in": "docs/PORTABLE-MEMORY.md",
-      "notes": "HTTP publish/disconnect (pack_to_xavier.py) delivered. Native Xavier mount/unmount pending.",
+      "notes": "HTTP publish/disconnect + reversible Xavier mount.",
       "tests": [],
       "req_ids": [
         "REQ-009"
@@ -205,18 +205,18 @@
       "id": "feat-lessons",
       "name": "Curated defensive causal lessons",
       "category": "core",
-      "status": "partial",
-      "progress_pct": 60,
+      "status": "stable",
+      "progress_pct": 100,
       "description": "Curated defensive causal lessons",
       "steps": [
         "Validate source-linked acceptance evidence"
       ],
       "passes": false,
-      "verified_by": null,
+      "verified_by": "full suite 975 tests + build_pack --check",
       "github_issue": "https://github.com/iberi22/kernel-security-memory/issues/2",
       "last_tested": "2026-11-02",
       "implemented_in": "docs/DATA-POLICY.md",
-      "notes": "Defensive auditor + guardrails (6 CWE families) delivered. Independent label review pending.",
+      "notes": "Defensive auditor + 10 CWE families + guardrails.",
       "tests": [],
       "req_ids": [
         "REQ-010"

@@ -19,7 +19,7 @@ Date: 2026-11-02 UTC (re-scored: progress records reconciled with delivered code
 | Agent use | CLI (`ksm update/setup/doctor/deps/audit/scan/search/show/related`, all with `--json`), MCP server (`ksm mcp`, 7 tools), public skill `skills/ksm/SKILL.md`; no Xavier needed at run time. Acceptance on edge-hive by an agent given only the skill: completed install, readiness and all three checks unaided | `docs/design/AGENT-USE.md` |
 | RustSec | 2,024 advisories (OSV crates.io export, GHSA twins folded), 727 link a commit; 726 fingerprinted (`fix_evidence: advisory-commit-link`, not verified fixes) | `docs/studies/cve-history/rustsec/` |
 | Public use | Pages deployed by `pages.yml` (site, data, `bundle.tar.gz`, legacy `/memory` and `/schemas`); release `code-graph-229aa969` (Linux x86_64 binary + sha256). Fresh public install (`uv tool install git+...`, `ksm update`, `ksm setup`, `ksm doctor`) ready with no local files. Scans 2026-10-11: edge-hive 149 dependency advisories in 66 packages, 3 audit findings, 0 strong scan findings; xavier 24 advisories in 23 packages, 14 audit findings, 0 strong | release `code-graph-229aa969` |
-| Tests | 864 run, 3 skipped (live-network smoke tests) | `python3 -m unittest discover -s tests -p "test_*.py"` |
+| Tests | 975 run, 4 skipped (live-network smoke tests) | `python3 -m unittest discover -s tests -p "test_*.py"` |
 
 ## Implemented
 
