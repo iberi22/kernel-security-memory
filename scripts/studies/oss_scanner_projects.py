@@ -295,6 +295,12 @@ def build_manifest(*, source=None, ref=None, catalogs_dir, cache_dir, no_osv,
                                                      offline=offline_osv),
             }
         )
+    for project in projects:
+        if project["osv_git_supported"] is False:
+            project["notes"] = (
+                "NO_OSV_GIT_FEED: no repo-scoped OSV GIT data in the recorded selection snapshot; "
+                "skipped without creating a catalog. This does not establish absence of vulnerabilities."
+            )
     projects.sort(key=lambda p: p["name"])
     return {
         "source_repo": UPSTREAM,
