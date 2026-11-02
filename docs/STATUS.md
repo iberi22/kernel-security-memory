@@ -40,6 +40,10 @@ Single-fix, non-independent labels do not establish general retrieval quality.
 
 ## Known limits
 
+- Independent qrels review workflow and stdlib checker are implemented (see
+  [review process](REVIEW-PROCESS.md)); the nine v1 judgments still lack reviewer
+  metadata, so no paired-review kappa is available and labels remain exploratory.
+
 - NVD keyword search is a weak source: slow (one request per 15 s without a key) and polluted. Per-project upstream feeds are the primary source from now on.
 - Pack records keep `status=unknown` and `evolution=UNKNOWN`; pattern families and lessons are hypotheses.
 - Raw upstream snapshots and the OSV cache are local, gitignored caches (they contain third-party advisory text, see `DATA-POLICY.md`); `index.json` pins their URL and sha256.
